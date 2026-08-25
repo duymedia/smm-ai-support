@@ -36,3 +36,42 @@ jobs:
 
       - name: Build application
         run: npm run build
+
+  deploy:
+    name: Deploy to VPS
+    needs: validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_VPS }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: 22
+          script_stop: true
+          script: |
+            set -e
+            APP_DIR=/var/www/smm-ai-support
+
+            if [ ! -d "$APP_DIR/.git" ]; then
+              echo "Repository is missing at $APP_DIR"
+              exit 1
+            fi
+
+            cd "$APP_DIR"
+            git fetch origin main
+            git reset --hard origin/main
+            npm install --no-audit --no-fund
+            npx prisma generate
+            npm run build
+
+            if command -v pm2 >/dev/null 2>&1; then
+              pm2 restart smm-ai-support --update-env || pm2 start npm --name smm-ai-support -- start
+              pm2 save
+            else
+              echo "PM2 is not installed on the VPS"
+              exit 1
+            fi
