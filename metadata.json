@@ -1,0 +1,6 @@
+{
+  "name": "NexusSMM - AI SMM Panel Management Platform",
+  "description": "Enterprise-grade SaaS platform for renting, managing, and automatically optimizing SMM panels with AI operations, flexible subscriptions, and real-time monitoring.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

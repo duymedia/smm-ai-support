@@ -1,0 +1,150 @@
+NEXUSSMM REST API - POSTMAN REQUESTS
+Base URL: http://localhost:3000
+Authorization: Cookie jwt_token=<cookie-tu-login> (Postman tự lưu cookie)
+Content-Type: application/json
+
+[AUTH]
+POST {{baseUrl}}/api/auth/register
+{"name":"Nguyen Van A","username":"nguyenvana","email":"nguyenvana@gmail.com","password":"MatKhau@2026","phone":"+84988889999"}
+
+POST {{baseUrl}}/api/auth/login
+{"email":"nguyenvana@gmail.com","password":"MatKhau@2026"}
+
+GET {{baseUrl}}/api/auth/me
+POST {{baseUrl}}/api/auth/logout
+POST {{baseUrl}}/api/auth/forgot-password
+{"email":"nguyenvana@gmail.com"}
+POST {{baseUrl}}/api/auth/reset-password
+{"token":"TOKEN_FROM_EMAIL","password":"NewPassword@2026"}
+
+[PROFILE]
+GET {{baseUrl}}/api/user/profile
+PUT {{baseUrl}}/api/auth/profile
+{"name":"Nguyen Van B","phone":"+84900000000","timezone":"Asia/Ho_Chi_Minh","language":"vi","currency":"USD"}
+PUT {{baseUrl}}/api/user/change-password
+{"currentPassword":"MatKhau@2026","newPassword":"NewPassword@2026"}
+POST {{baseUrl}}/api/user/rotate-api-key
+
+[TWO-FACTOR AUTHENTICATION]
+# Dùng Authorization: Bearer <jwt_token> hoặc cookie jwt_token
+POST {{baseUrl}}/api/user/2fa/setup
+POST {{baseUrl}}/api/user/2fa/enable
+{"code":"123456"}
+POST {{baseUrl}}/api/user/2fa/disable
+{"code":"123456"}
+
+[DASHBOARD]
+GET {{baseUrl}}/api/dashboard/stats
+
+[PANELS]
+GET {{baseUrl}}/api/panels
+POST {{baseUrl}}/api/panels
+{"name":"My SMM Panel","domain":"panel.example.com","packageId":"starter"}
+GET {{baseUrl}}/api/panels/:id
+PUT {{baseUrl}}/api/panels/:id
+{"name":"Updated Panel","domain":"new.example.com"}
+DELETE {{baseUrl}}/api/panels/:id
+POST {{baseUrl}}/api/panels/:id/test-dispatch
+PUT {{baseUrl}}/api/panels/:id/domain
+{"domain":"panel.example.com"}
+POST {{baseUrl}}/api/panels/:id/rotate-key
+POST {{baseUrl}}/api/panels/:id/extend
+{"days":30}
+POST {{baseUrl}}/api/panels/:id/toggle-autorenew
+{"autoRenew":true}
+POST {{baseUrl}}/api/panels/:id/action
+{"action":"restart"}
+POST {{baseUrl}}/api/panels/:id/diagnose
+{"message":"Panel is slow"}
+
+[SERVICES AND PACKAGES]
+GET {{baseUrl}}/api/services
+POST {{baseUrl}}/api/services
+{"panelId":"panel-id","serviceId":"service-id","link":"https://instagram.com/example","quantity":1000}
+PUT {{baseUrl}}/api/services/:id
+{"status":"paused"}
+DELETE {{baseUrl}}/api/services/:id
+GET {{baseUrl}}/api/packages
+
+[BILLING]
+POST {{baseUrl}}/api/billing/add-funds
+{"amount":25,"method":"vietqr"}
+GET {{baseUrl}}/api/transactions
+GET {{baseUrl}}/api/subscriptions
+POST {{baseUrl}}/api/subscriptions/:id/renew
+{"billingCycle":"monthly"}
+
+[SUPPORT AND NOTIFICATIONS]
+POST {{baseUrl}}/api/support/ai/chat
+{"message":"How can I add funds?","history":[]}
+GET {{baseUrl}}/api/support/tickets
+POST {{baseUrl}}/api/support/tickets
+{"subject":"Need help","message":"Please check my panel","priority":"normal"}
+POST {{baseUrl}}/api/support/tickets/:id/messages
+{"message":"Any update?"}
+GET {{baseUrl}}/api/notifications
+PUT {{baseUrl}}/api/notifications/read-all
+
+[PUBLIC]
+GET {{baseUrl}}/api/public/site-config
+GET {{baseUrl}}/api/public/announcements
+POST {{baseUrl}}/api/public/coupons/apply
+{"code":"WELCOME10","amount":50}
+
+[ADMIN - require role admin or super_admin]
+GET {{baseUrl}}/api/admin/stats
+GET {{baseUrl}}/api/admin/overview
+GET {{baseUrl}}/api/admin/users?search=&page=1&limit=20
+POST {{baseUrl}}/api/admin/users/:id/adjust-balance
+{"amount":10,"type":"add","reason":"Manual credit"}
+PUT {{baseUrl}}/api/admin/users/:id/role
+{"role":"support"}
+GET {{baseUrl}}/api/admin/panels
+POST {{baseUrl}}/api/admin/panels/create
+{"userId":"user-id","name":"Panel","domain":"example.com","packageId":"starter"}
+PUT {{baseUrl}}/api/admin/panels/:id
+{"status":"active"}
+POST {{baseUrl}}/api/admin/panels/:id/extend
+{"days":30}
+DELETE {{baseUrl}}/api/admin/panels/:id
+GET {{baseUrl}}/api/admin/providers
+POST {{baseUrl}}/api/admin/providers
+{"name":"Provider","apiUrl":"https://provider.example/api/v2","apiKey":"secret","markup":20}
+POST {{baseUrl}}/api/admin/providers/:id/ping
+DELETE {{baseUrl}}/api/admin/providers/:id
+POST {{baseUrl}}/api/admin/services/bulk-price
+{"markupPercent":10}
+PUT {{baseUrl}}/api/admin/packages/:id
+{"price":29.99}
+GET {{baseUrl}}/api/admin/system/settings
+PUT {{baseUrl}}/api/admin/system/settings
+{"maintenanceMode":false,"defaultLanguage":"vi","defaultCurrency":"USD"}
+POST {{baseUrl}}/api/admin/system/purge-cache
+POST {{baseUrl}}/api/admin/system/sync-all-providers
+GET {{baseUrl}}/api/admin/audit-logs
+GET {{baseUrl}}/api/admin/orders
+POST {{baseUrl}}/api/admin/orders/:id/retry
+POST {{baseUrl}}/api/admin/orders/:id/cancel-refund
+PUT {{baseUrl}}/api/admin/orders/:id/status
+{"status":"completed"}
+GET {{baseUrl}}/api/admin/site-config
+PUT {{baseUrl}}/api/admin/site-config
+{"siteName":"NexusSMM"}
+GET {{baseUrl}}/api/admin/announcements
+POST {{baseUrl}}/api/admin/announcements
+{"title":"Maintenance","message":"Scheduled maintenance","active":true}
+PUT {{baseUrl}}/api/admin/announcements/:id
+{"active":false}
+DELETE {{baseUrl}}/api/admin/announcements/:id
+GET {{baseUrl}}/api/admin/coupons
+POST {{baseUrl}}/api/admin/coupons
+{"code":"WELCOME10","discountType":"percent","discountValue":10,"maxUses":100}
+PUT {{baseUrl}}/api/admin/coupons/:id
+{"discountValue":15}
+DELETE {{baseUrl}}/api/admin/coupons/:id
+GET {{baseUrl}}/api/admin/ai-config
+PUT {{baseUrl}}/api/admin/ai-config
+{"model":"gemini-2.5-flash","temperature":0.3}
+
+[EXPECTED STATUS]
+200 success | 201 created | 400 validation | 401 unauthenticated | 403 forbidden | 404 not found | 409 duplicate | 429 rate limited
