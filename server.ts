@@ -1588,12 +1588,9 @@ async function startServer() {
     };
   };
 
-  // 1. GET Admin All Users with Panels & Dispatch Configs (Mỗi user là 1 JSON riêng biệt)
+  // 1. GET Admin All Users with Panels & Dispatch Configs (Yêu cầu JWT Token xác thực role == admin)
   app.get("/api/admin/users-dispatch-configs", async (req, res) => {
     try {
-      let targetUserId: number | undefined;
-      let isAdmin = currentUser.role === "admin" || currentUser.role === "super_admin";
-
       let token: string | undefined;
       const authHeader = req.headers.authorization;
       if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -1601,14 +1598,65 @@ async function startServer() {
       } else if (req.cookies) {
         token = req.cookies.jwt_token || req.cookies.session_token;
       }
-      if (token) {
-        try {
-          const decoded = (req as any).user || (await import("./src/server/lib/auth")).verifyToken(token);
-          if (decoded?.userId) {
-            targetUserId = Number(decoded.userId);
-            if (decoded.role === "admin" || decoded.role === "super_admin") isAdmin = true;
-          }
-        } catch (e) {}
+
+      if (!token) {
+        return res.status(401).json({
+          success: false,
+          code: "UNAUTHORIZED",
+          message: locMsg(req, "Yêu cầu cung cấp Authorization Bearer JWT Token để truy cập API quản trị.", "Authorization Bearer JWT Token is required to access this admin endpoint."),
+        });
+      }
+
+      const { verifyToken } = await import("./src/server/lib/auth");
+      const decoded = (req as any).user || verifyToken(token);
+      if (!decoded || (!decoded.userId && !decoded.id && !decoded.username)) {
+        return res.status(401).json({
+          success: false,
+          code: "INVALID_TOKEN",
+          message: locMsg(req, "Token xác thực không hợp lệ hoặc đã hết hạn.", "Invalid or expired JWT authorization token."),
+        });
+      }
+
+      const numUserId = Number(decoded.userId || decoded.id);
+      const orClauses: any[] = [];
+      if (!Number.isNaN(numUserId) && numUserId > 0) {
+        orClauses.push({ id: numUserId });
+      }
+      if (decoded.email) {
+        orClauses.push({ email: decoded.email });
+      }
+      if (decoded.username) {
+        orClauses.push({ username: decoded.username });
+      }
+
+      const dbUser = orClauses.length > 0 ? await prisma.user.findFirst({
+        where: { OR: orClauses },
+        select: { id: true, role: true, status: true, username: true },
+      }) : null;
+
+      if (!dbUser) {
+        return res.status(401).json({
+          success: false,
+          code: "USER_NOT_FOUND",
+          message: locMsg(req, "Tài khoản xác thực không tồn tại trên hệ thống.", "Authenticated user account does not exist."),
+        });
+      }
+
+      if (dbUser.status === "banned" || dbUser.status === "suspended") {
+        return res.status(403).json({
+          success: false,
+          code: "ACCOUNT_SUSPENDED",
+          message: locMsg(req, "Tài khoản của bạn đã bị tạm khóa.", "Account has been suspended."),
+        });
+      }
+
+      const isAdmin = dbUser.role === "admin" || dbUser.role === "super_admin" || decoded.role === "admin" || decoded.role === "super_admin";
+      if (!isAdmin) {
+        return res.status(403).json({
+          success: false,
+          code: "FORBIDDEN",
+          message: locMsg(req, "Truy cập bị từ chối. API này chỉ dành riêng cho tài khoản Quản trị viên (role == admin).", "Access denied. This endpoint requires administrator privileges (role == admin)."),
+        });
       }
 
       // Filter theo query params nếu có
@@ -1617,9 +1665,7 @@ async function startServer() {
       const filterDomain = req.query.domain ? String(req.query.domain).trim() : undefined;
 
       const whereClause: any = {};
-      if (!isAdmin && targetUserId) {
-        whereClause.id = targetUserId;
-      } else if (filterUserId) {
+      if (filterUserId) {
         whereClause.id = filterUserId;
       } else if (filterUsername) {
         whereClause.username = { contains: filterUsername };
@@ -1631,10 +1677,7 @@ async function startServer() {
           panels: {
             where: filterDomain
               ? {
-                  OR: [
-                    { domain: { contains: filterDomain } },
-                    { customDomain: { contains: filterDomain } },
-                  ],
+                  domain: { contains: filterDomain },
                 }
               : undefined,
             include: {
@@ -1665,7 +1708,7 @@ async function startServer() {
             id: p.id,
             name: p.name,
             domain: p.domain,
-            customDomain: p.customDomain,
+            cookie: p.cookie || null,
             status: p.status,
             currency: p.currency,
             expiresAt: p.expiresAt,
@@ -1713,7 +1756,12 @@ async function startServer() {
       res.json({
         success: true,
         totalUsers: data.length,
-        isAdmin,
+        isAdmin: true,
+        authenticatedAdmin: {
+          id: dbUser.id,
+          username: dbUser.username,
+          role: dbUser.role,
+        },
         systemSessions,
         data,
       });
