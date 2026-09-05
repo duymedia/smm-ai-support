@@ -38,7 +38,7 @@
   }
 
   /* Standardize Monospace fonts for numbers, API keys, and IDs */
-  .font-mono, [data-mono="true"], code, pre {
+  .font-mono, .font-mono *, [data-mono="true"], code, code *, pre, pre * {
     font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
     font-variant-numeric: tabular-nums;
   }
@@ -59,6 +59,59 @@
   border-radius: 9999px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+/* Dynamic Brand Theme CSS Variables */
+:root {
+  --brand-primary: #2563eb;
+  --brand-secondary: #4f46e5;
+  --brand-light: rgba(37, 99, 235, 0.08);
+  --brand-border: rgba(37, 99, 235, 0.2);
+  --brand-shadow: rgba(37, 99, 235, 0.25);
+}
+
+.bg-brand-primary {
+  background-color: var(--brand-primary) !important;
+}
+
+.bg-brand-gradient {
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary)) !important;
+}
+
+.bg-brand-light {
+  background-color: var(--brand-light) !important;
+}
+
+.text-brand-primary {
+  color: var(--brand-primary) !important;
+}
+
+.border-brand-primary {
+  border-color: var(--brand-primary) !important;
+}
+
+.border-brand-light {
+  border-color: var(--brand-border) !important;
+}
+
+.shadow-brand {
+  box-shadow: 0 4px 14px 0 var(--brand-shadow) !important;
+}
+
+/* Marquee Smooth Scrolling Animation */
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee {
+  display: inline-block;
+  white-space: nowrap;
+  animation: marquee 25s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
 }

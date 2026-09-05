@@ -10,11 +10,16 @@ export interface User {
   avatar?: string;
   phone?: string;
   telegramContact?: string;
+  transferCode?: string;
   timezone?: string;
   language: 'en' | 'vi';
+  currency?: 'USD' | 'VND' | string;
   twoFactorEnabled?: boolean;
   twoFactorSecret?: string;
   apiKey?: string;
+  adminUsername?: string;
+  adminPassword?: string;
+  adminTwoFactorSecret?: string;
   emailVerified?: boolean;
   createdAt: string;
   lastLoginAt?: string;
@@ -24,34 +29,80 @@ export type PanelStatus = 'active' | 'pending' | 'suspended' | 'maintenance' | '
 
 export type DispatchMethod = 'ticket' | 'telegram' | 'whatsapp' | 'api';
 
+export interface ProviderTicketItem {
+  id: string;
+  domain: string; // Domain nhà cung cấp (Perfect Panel)
+  username: string; // Tài khoản đăng nhập NCC
+  password: string; // Mật khẩu đăng nhập NCC
+  category?: string; // Category ID (VD: 18, 1, 10...)
+  subcategory?: string; // Subcategory ID (VD: 19, 21, 23...)
+  enabled?: boolean;
+}
+
+export interface ProviderTelegramItem {
+  id: string;
+  domain: string; // Domain nhà cung cấp (VD: smmflare.com, fastsmm.vip...)
+  target: string; // @username hoặc SĐT người nhận (VD: @smmflare_support)
+  enabled?: boolean;
+}
+
+export interface ProviderWhatsAppItem {
+  id: string;
+  domain: string; // Domain nhà cung cấp (VD: smmflare.com, fastsmm.vip...)
+  targetType: 'user' | 'group';
+  userPhone?: string; // SĐT người nhận (+84...)
+  groupLink?: string; // Link nhóm WhatsApp
+  groupId?: string; // Group ID / JID
+  gatewayUrl?: string;
+  apiKey?: string;
+  instanceId?: string;
+  enabled?: boolean;
+}
+
 export interface ProviderDispatchConfig {
   enabled: boolean;
   method: DispatchMethod;
-  // 1. Ticket Nhà Cung Cấp
+  // 1. Ticket Nhà Cung Cấp (Hỗ trợ cấu hình nhiều Domain NCC khác nhau)
   ticket?: {
-    providerName?: string;
-    loginUrl?: string; // URL đăng nhập NCC
-    username?: string; // Tài khoản đăng nhập NCC
-    password?: string; // Mật khẩu đăng nhập NCC
-    ticketSubjectTemplate?: string;
-    ticketMessageTemplate?: string;
+    providers?: ProviderTicketItem[];
+    defaultCategory?: string;
+    defaultSubcategory?: string;
     autoCreateOnOrder?: boolean;
+    loginUrl?: string;
+    username?: string;
+    password?: string;
   };
-  // 2. Telegram Bot / Channel
+  // 2. Telegram (Hỗ trợ cấu hình nhiều Domain NCC khác nhau)
   telegram?: {
+    mode?: 'telethon' | 'bot';
+    apiId?: string | number;
+    apiHash?: string;
+    sessionName?: string;
+    target?: string;
+    defaultMessage?: string;
+    targetType?: 'user' | 'group';
+    authUser?: any;
     botToken?: string;
+    userPhone?: string;
+    userUsername?: string;
     chatId?: string;
+    groupUsername?: string;
     threadId?: string;
-    messageTemplate?: string;
-    parseMode?: 'HTML' | 'Markdown';
+    autoCreateOnOrder?: boolean;
+    providers?: ProviderTelegramItem[];
   };
-  // 3. WhatsApp Gateway
+  // 3. WhatsApp (Hỗ trợ cấu hình nhiều Domain NCC khác nhau)
   whatsapp?: {
+    targetType?: 'user' | 'group';
     gatewayUrl?: string;
     apiKey?: string;
     instanceId?: string;
+    userPhone?: string;
     recipientPhone?: string;
-    messageTemplate?: string;
+    groupLink?: string;
+    groupId?: string;
+    autoCreateOnOrder?: boolean;
+    providers?: ProviderWhatsAppItem[];
   };
   // 4. REST API Key
   api?: {
@@ -63,10 +114,14 @@ export interface ProviderDispatchConfig {
 export interface SmmPanel {
   id: string;
   userId: string;
+  orderId?: number | string;
+  packageId?: number | string;
   name: string;
   domain: string;
   customDomain?: string;
   apiKey?: string;
+  cookie?: string;
+  adminUsername?: string;
   secretKey?: string;
   planId: string;
   planName: string;
@@ -75,21 +130,22 @@ export interface SmmPanel {
   expiresAt: string;
   autoRenew?: boolean;
   uptime: number; // e.g. 99.98
-  activeServicesCount: number;
-  totalOrders: number;
+  activeServicesCount?: number;
+  totalOrders?: number;
   totalMessages?: number; // Tổng tin nhắn đã xử lý
   todayMessages?: number; // Tin nhắn đã xử lý hôm nay
   messageRatePerMin?: number; // Tốc độ xử lý (tin nhắn/phút)
-  monthlyRevenue: number;
+  monthlyRevenue?: number;
+  balance?: number;
   currency: string;
-  nameservers: {
+  nameservers?: {
     ns1: string;
     ns2: string;
     status: 'configured' | 'pending';
   };
-  sslActive: boolean;
-  providerApiSynced: boolean;
-  healthScore: number; // 0 - 100
+  sslActive?: boolean;
+  providerApiSynced?: boolean;
+  healthScore?: number; // 0 - 100
   notes?: string;
   dispatchConfig?: ProviderDispatchConfig;
 }
@@ -127,6 +183,7 @@ export interface PanelPackage {
   tagline: string;
   badge?: string;
   isPopular?: boolean;
+  active?: boolean;
   pricing: {
     weekly: number;
     monthly: number;
@@ -136,15 +193,16 @@ export interface PanelPackage {
     panelsCount: number | 'Unlimited';
     maxOrdersPerMonth: number | 'Unlimited';
     servicesLimit: number | 'Unlimited';
-    customDomain: boolean;
-    aiOpsAssistant: boolean;
-    autoRefillSync: boolean;
-    freeSsl: boolean;
     uptimeSla: string;
     supportLevel: 'Standard' | 'Priority 24/7' | 'Dedicated VIP';
-    advancedAnalytics: boolean;
     apiAccess: boolean;
-    automatedBackup: boolean;
+    customDomain?: boolean;
+    aiOpsAssistant?: boolean;
+    autoRefillSync?: boolean;
+    freeSsl?: boolean;
+    advancedAnalytics?: boolean;
+    automatedBackup?: boolean;
+    [key: string]: any;
   };
 }
 
@@ -174,14 +232,16 @@ export type TransactionType = 'deposit' | 'subscription' | 'refund' | 'adjustmen
 export type TransactionStatus = 'completed' | 'pending' | 'failed' | 'refunded';
 
 export interface Transaction {
-  id: string;
+  id: string | number;
+  code?: string;
   userId: string;
   date: string;
   description: string;
   type: TransactionType;
-  amount: number; // positive for deposit, negative for purchase/sub
-  status: TransactionStatus;
+  amount: number; // positive for deposit, negative for purchase/sub/renewal
+  balanceBefore: number;
   balanceAfter: number;
+  status: TransactionStatus;
   paymentMethod?: string;
   referenceCode?: string;
 }
@@ -314,6 +374,12 @@ export interface SiteFrontendConfig {
   supportHotline: string;
   allowUserRegistration: boolean;
   allowFreeTrialPanel: boolean;
+  freeTrialDurationDays?: number;
+  freeTrialMaxPerUser?: number;
+  freeTrialStartDate?: string | null;
+  freeTrialEndDate?: string | null;
+  freeTrialPackageId?: number | null;
+  freeTrialRequireVerification?: boolean;
   allowGuestServiceViewing: boolean;
   enableLiveChatWidget: boolean;
   headerAnnouncementBar: string;
@@ -322,8 +388,26 @@ export interface SiteFrontendConfig {
   seoMetaTitle: string;
   seoMetaKeywords: string;
   seoMetaDescription: string;
+  seoCanonicalUrl?: string;
+  seoOgTitle?: string;
+  seoOgDescription?: string;
+  seoOgImageUrl?: string;
+  seoOgType?: string;
+  seoTwitterCard?: string;
+  seoRobotsIndexing?: string;
+  seoGoogleSiteVerification?: string;
+  seoBingSiteVerification?: string;
+  seoGoogleAnalyticsId?: string;
   customCss?: string;
   customHeaderScripts?: string;
+  customBodyScripts?: string;
+  smtpHost?: string;
+  smtpPort?: number;
+  smtpUsername?: string;
+  smtpPassword?: string;
+  smtpEncryption?: 'tls' | 'ssl' | 'none' | string;
+  smtpFromEmail?: string;
+  smtpFromName?: string;
 }
 
 export interface AnnouncementItem {
@@ -358,3 +442,58 @@ export interface AiAutomationConfig {
   maxDailyAiTokens: number;
   temperature: number;
 }
+
+export type GatewayType = 'vietqr' | 'crypto';
+export type BankCode = 'MBBANK' | 'VIETINBANK' | 'VIETCOMBANK' | 'ACB' | 'AGRIBANK' | 'TPBANK' | 'OCB' | 'BIDV' | 'OTHER';
+export type CryptoType = 'BINANCE_PAY' | 'USDT';
+export type CryptoNetwork = 'TRC20' | 'BEP20' | 'ERC20' | 'POLYGON' | 'BINANCE_DIRECT';
+
+export interface PaymentGatewayItem {
+  id: number | string;
+  name: string;
+  type: GatewayType;
+  currency?: 'VND' | 'USD' | string;
+  logoUrl?: string;
+  bankCode?: BankCode | string;
+  bankName?: string;
+  accountNumber?: string;
+  accountHolder?: string;
+  cryptoType?: CryptoType;
+  cryptoNetwork?: CryptoNetwork;
+  walletAddress?: string;
+  memoTag?: string;
+  apiKey?: string;
+  secretKey?: string;
+  merchantId?: string;
+  qrCodeUrl?: string;
+  notes?: string;
+  exchangeRateUsdToVnd?: number;
+  bonusPercentage?: number;
+  webhookSecret?: string;
+  webhookUrl?: string;
+  instructions?: string; // Ghi chú
+  active: boolean;
+  sortOrder?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CurrencyItem {
+  id: number;
+  code: string;
+  name: string;
+  symbol: string;
+  symbolPosition: 'left' | 'right';
+  rate: number;
+  thousandSeparator: string;
+  decimalSeparator: string;
+  decimalDigits: number;
+  isDefault: boolean;
+  autoSync: boolean;
+  active: boolean;
+  sortOrder: number;
+  lastSyncAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+

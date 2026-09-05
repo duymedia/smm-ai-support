@@ -56,11 +56,11 @@ export const Modal: React.FC<ModalProps> = ({
 
       {/* Dialog card */}
       <div
-        className={`relative w-full ${maxWidthClass} bg-white rounded-2xl border border-slate-200 shadow-2xl z-10 overflow-hidden transform transition-all animate-in zoom-in-95 duration-150 my-8`}
+        className={`relative w-full ${maxWidthClass} bg-white rounded-2xl border border-slate-200 shadow-2xl z-10 transform transition-all animate-in zoom-in-95 duration-150 my-8`}
         role="dialog"
         aria-modal="true"
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50 rounded-t-2xl">
           <div>
             <h3 className="text-lg font-semibold text-slate-900 leading-tight">{title}</h3>
             {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
@@ -74,7 +74,7 @@ export const Modal: React.FC<ModalProps> = ({
           </button>
         </div>
 
-        <div className="p-6 max-h-[80vh] overflow-y-auto">{children}</div>
+        <div className="p-6 max-h-[85vh] overflow-y-auto">{children}</div>
       </div>
     </div>
   );

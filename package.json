@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
-    "predev": "prisma db push --skip-generate",
+    "predev": "prisma db push --skip-generate --accept-data-loss",
     "build": "vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
-    "prestart": "prisma db push --skip-generate",
+    "prestart": "prisma db push --skip-generate --accept-data-loss",
     "start": "node dist/server.cjs",
+    "db:init": "mysql -h 127.0.0.1 -u root -e \"source database.sql;\" || mysql -u root -e \"source database.sql;\"",
     "preview": "vite preview",
     "clean": "rm -rf dist server.cjs",
     "lint": "tsc --noEmit"

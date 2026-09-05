@@ -41,6 +41,7 @@ import {
   Flame,
   Check,
   User as UserIcon,
+  MessageSquare,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -56,6 +57,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeSectio
     setLanguage,
     currency,
     setCurrency,
+    currencies,
     formatMoney,
     t,
     unreadNotifsCount,
@@ -63,19 +65,33 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeSectio
     switchRole,
     logout,
     addToast,
-    refreshData
+    refreshData,
+    siteConfig,
+    applySeoAndHeaderConfig
   } = useApp();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [systemUptime, setSystemUptime] = useState(99.99);
   const [isPurging, setIsPurging] = useState(false);
 
+  // Sync SEO and Title for Admin
+  useEffect(() => {
+    if (siteConfig) {
+      applySeoAndHeaderConfig(siteConfig);
+    }
+    const brandName = siteConfig?.siteName || 'NexusSMM Enterprise';
+    document.title = `Admin Quản Trị Hệ Thống - ${brandName}`;
+  }, [siteConfig]);
+
   // Close dropdowns on click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
+      if (!target.closest('#admin-currency-select-container')) {
+        setCurrencyDropdownOpen(false);
+      }
       if (!target.closest('#admin-lang-select-container')) {
         setLangDropdownOpen(false);
       }
@@ -83,8 +99,15 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeSectio
         setUserDropdownOpen(false);
       }
     };
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+    const target = (e: MouseEvent) => e.target as HTMLElement;
+    const clickHandler = (e: MouseEvent) => {
+      const el = e.target as HTMLElement;
+      if (!el.closest('#admin-currency-select-container')) setCurrencyDropdownOpen(false);
+      if (!el.closest('#admin-lang-select-container')) setLangDropdownOpen(false);
+      if (!el.closest('#admin-user-menu-container')) setUserDropdownOpen(false);
+    };
+    document.addEventListener('click', clickHandler);
+    return () => document.removeEventListener('click', clickHandler);
   }, []);
 
   const adminNavItems = [
@@ -94,21 +117,26 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeSectio
         { id: 'overview', label: language === 'vi' ? 'Tổng quan' : 'Overview', icon: Activity, path: '/admin/overview' },
         { id: 'orders', label: language === 'vi' ? 'Đơn hàng' : 'Orders', icon: ShoppingBag, path: '/admin/orders', badge: 'LIVE' },
         { id: 'panels', label: language === 'vi' ? 'Quản lý Panels' : 'SMM Panels', icon: Server, path: '/admin/panels' },
-        { id: 'users', label: language === 'vi' ? 'Người dùng & Ví' : 'Users & Wallets', icon: Users, path: '/admin/users' },
+        { id: 'users', label: language === 'vi' ? 'Quản lý người dùng' : 'Users', icon: Users, path: '/admin/users' },
       ]
     },
     {
-      group: language === 'vi' ? 'DỊCH VỤ & NCC' : 'SERVICES & PROVIDERS',
+      group: language === 'vi' ? 'GÓI THUÊ' : 'PACKAGES',
       items: [
-        { id: 'services', label: language === 'vi' ? 'Dịch vụ & Giá' : 'Services & Pricing', icon: Layers, path: '/admin/services' },
-        { id: 'providers', label: language === 'vi' ? 'Nhà cung cấp' : 'API Providers', icon: Radio, path: '/admin/providers', badge: 'HUB' },
         { id: 'packages', label: language === 'vi' ? 'Gói thuê Panel' : 'Rental Plans', icon: Package, path: '/admin/packages' },
+      ]
+    },
+    {
+      group: language === 'vi' ? 'CHĂM SÓC KHÁCH HÀNG' : 'CUSTOMER SUPPORT',
+      items: [
+        { id: 'tickets', label: language === 'vi' ? 'Hỗ trợ & tickets' : 'Support Tickets', icon: MessageSquare, path: '/admin/tickets', badge: 'TICKETS' },
       ]
     },
     {
       group: language === 'vi' ? 'CẤU HÌNH HỆ THỐNG' : 'PORTAL SETUP',
       items: [
         { id: 'site-config', label: language === 'vi' ? 'Giao diện & Web' : 'Site & Branding', icon: Palette, path: '/admin/site-config', highlight: true },
+        { id: 'currencies', label: language === 'vi' ? 'Tiền tệ & Tỷ giá' : 'Currencies & FX', icon: DollarSign, path: '/admin/currencies', highlight: true },
         { id: 'gateways', label: language === 'vi' ? 'Cổng thanh toán' : 'Gateways & FX', icon: CreditCard, path: '/admin/gateways' },
         { id: 'announcements', label: language === 'vi' ? 'Thông báo' : 'Announcements', icon: Megaphone, path: '/admin/announcements' },
         { id: 'coupons', label: language === 'vi' ? 'Mã giảm giá' : 'Coupons & Promo', icon: Tag, path: '/admin/coupons' },
@@ -118,7 +146,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeSectio
     {
       group: language === 'vi' ? 'BẢO MẬT' : 'SECURITY',
       items: [
-        { id: 'logs', label: language === 'vi' ? 'Nhật ký Audit' : 'Audit Logs', icon: FileText, path: '/admin/logs' },
+        { id: 'logs', label: language === 'vi' ? 'Nhật ký hoạt động' : 'Audit Logs', icon: FileText, path: '/admin/logs' },
       ]
     }
   ];
@@ -150,34 +178,31 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeSectio
             <Menu className="w-5 h-5" />
           </button>
 
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-2xs font-black shrink-0">
-              <ShieldCheck className="w-4 h-4" />
-            </div>
-            <div className="hidden sm:flex items-center gap-1.5">
-              <span className="font-extrabold text-slate-900 text-sm sm:text-base tracking-tight whitespace-nowrap">NexusSMM</span>
-              <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-900 text-white tracking-wider uppercase whitespace-nowrap">
-                Admin
-              </span>
-            </div>
+          <div
+            className="flex items-center gap-2 cursor-pointer"
+            onClick={() => onNavigate('overview')}
+            title={siteConfig?.siteTagline || siteConfig?.siteName || 'NexusSMM Admin'}
+          >
+            {siteConfig?.siteLogoUrl ? (
+              <img
+                src={siteConfig.siteLogoUrl}
+                alt="logo"
+                className="h-8 max-w-[140px] object-contain rounded-lg shadow-2xs"
+              />
+            ) : (
+              <>
+                <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-2xs font-black shrink-0">
+                  <ShieldCheck className="w-4 h-4" />
+                </div>
+                <span className="font-extrabold text-slate-900 text-sm sm:text-base tracking-tight whitespace-nowrap hidden sm:inline">
+                  {siteConfig?.siteName || 'NexusSMM'}
+                </span>
+              </>
+            )}
           </div>
         </div>
 
-        {/* Center: Realtime Cluster Nodes Status Pill */}
-        <div className="hidden xl:flex items-center gap-2.5 px-3 py-1 rounded-full bg-slate-100/90 border border-slate-200 text-xs">
-          <div className="flex items-center gap-1.5 text-emerald-700 font-bold text-[11px]">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-            <span>5 Nodes Online</span>
-          </div>
-          <span className="text-slate-300">|</span>
-          <div className="text-slate-600 text-[11px] font-mono">
-            SLA: <strong className="text-slate-900">99.99%</strong>
-          </div>
-          <span className="text-slate-300">|</span>
-          <div className="text-slate-600 text-[11px] font-mono">
-            Ping: <strong className="text-blue-600">142ms</strong>
-          </div>
-        </div>
+
 
         {/* Right: Quick Tools & Client Switch */}
         <div className="flex items-center gap-1.5 sm:gap-2">
@@ -192,58 +217,105 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeSectio
             <span>Purge CDN</span>
           </button>
 
-          {/* Quick Switch to Client Portal button - Hidden on Mobile */}
-          <button
-            onClick={() => {
-              setCurrentRoute('/dashboard');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/80 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap"
-            title={language === 'vi' ? 'Xem giao diện người dùng' : 'Switch to Customer View'}
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>{language === 'vi' ? 'Trang người dùng' : 'User Portal'}</span>
-          </button>
+          {/* Currency Select Option Dropdown (Displays Balance + Currency Code) */}
+          <div id="admin-currency-select-container" className="relative">
+            <button
+              type="button"
+              onClick={() => setCurrencyDropdownOpen(!currencyDropdownOpen)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-xs font-bold text-slate-900 transition-all cursor-pointer shadow-2xs"
+              title="Chọn đơn vị tiền tệ & Xem số dư"
+            >
+              <div className="flex items-center gap-1.5">
+                <span className="text-slate-900 font-extrabold tracking-tight">
+                  {formatMoney(user?.balance || 0)}
+                </span>
+                <span className="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200/60 font-mono">
+                  {currency}
+                </span>
+              </div>
+              <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${currencyDropdownOpen ? 'rotate-180 text-blue-600' : ''}`} />
+            </button>
+
+            {currencyDropdownOpen && (
+              <div className="absolute right-0 mt-1.5 w-56 max-h-72 overflow-y-auto bg-white rounded-xl border border-slate-200 shadow-xl py-1.5 z-50 animate-in fade-in zoom-in-95">
+                <div className="px-3 py-1 text-[10px] font-semibold text-slate-500 border-b border-slate-100 mb-1 sticky top-0 bg-white">
+                  {language === 'vi' ? 'Chọn loại tiền tệ' : 'Select Currency'}
+                </div>
+
+                {(currencies && currencies.length > 0 ? currencies.filter(c => c.active) : [
+                  { id: 1, code: 'USD', name: 'USD ($)', symbol: '$' },
+                  { id: 2, code: 'VND', name: 'VND (₫)', symbol: '₫' },
+                ]).map((cur) => (
+                  <button
+                    key={cur.code}
+                    type="button"
+                    onClick={() => {
+                      setCurrency(cur.code);
+                      setCurrencyDropdownOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                      currency === cur.code ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-[11px]">
+                        {cur.symbol}
+                      </span>
+                      <span>{formatMoney(user?.balance || 0, cur.code)}</span>
+                    </div>
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-700">
+                      {cur.code}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Language Selector */}
           <div id="admin-lang-select-container" className="relative">
             <button
               onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-              className="flex items-center gap-1 px-2 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-2xs transition-colors cursor-pointer"
+              className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-xs font-bold text-slate-800 transition-all cursor-pointer shadow-2xs"
+              title="Chọn ngôn ngữ / Select language"
             >
-              <span className={`fi ${language === 'vi' ? 'fi-vn' : 'fi-us'} fis rounded-xs w-4 h-3 inline-block`} />
+              <span className={`fi ${language === 'vi' ? 'fi-vn' : 'fi-us'} fis rounded-xs shadow-2xs w-4 h-3.5 inline-block`} />
+              <span className="font-semibold text-xs text-slate-800 hidden sm:inline">
+                {language === 'vi' ? 'Tiếng Việt' : 'English'}
+              </span>
+              <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${langDropdownOpen ? 'rotate-180 text-blue-600' : ''}`} />
             </button>
+
             {langDropdownOpen && (
-              <div className="absolute right-0 mt-1.5 w-36 bg-white rounded-xl border border-slate-200 shadow-xl py-1 z-50 animate-in fade-in">
+              <div className="absolute right-0 mt-1.5 w-40 bg-white rounded-xl border border-slate-200 shadow-xl py-1.5 z-50 animate-in fade-in zoom-in-95">
+                <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 mb-1">
+                  {language === 'vi' ? 'Ngôn ngữ' : 'Language'}
+                </div>
                 <button
-                  onClick={() => {
-                    setLanguage('vi');
-                    setLangDropdownOpen(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2 text-xs font-bold ${
-                    language === 'vi' ? 'bg-blue-50 text-blue-700' : 'text-slate-700 hover:bg-slate-50'
+                  type="button"
+                  onClick={() => { setLanguage('vi'); setLangDropdownOpen(false); }}
+                  className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                    language === 'vi' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50'
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="fi fi-vn fis rounded-xs w-4 h-3 inline-block" />
+                    <span className="fi fi-vn fis rounded-xs shadow-2xs w-4 h-3.5 inline-block" />
                     <span>Tiếng Việt</span>
                   </div>
-                  {language === 'vi' && <Check className="w-3.5 h-3.5 text-blue-600" />}
+                  {language === 'vi' && <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />}
                 </button>
                 <button
-                  onClick={() => {
-                    setLanguage('en');
-                    setLangDropdownOpen(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2 text-xs font-bold ${
-                    language === 'en' ? 'bg-blue-50 text-blue-700' : 'text-slate-700 hover:bg-slate-50'
+                  type="button"
+                  onClick={() => { setLanguage('en'); setLangDropdownOpen(false); }}
+                  className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                    language === 'en' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50'
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="fi fi-us fis rounded-xs w-4 h-3 inline-block" />
+                    <span className="fi fi-us fis rounded-xs shadow-2xs w-4 h-3.5 inline-block" />
                     <span>English</span>
                   </div>
-                  {language === 'en' && <Check className="w-3.5 h-3.5 text-blue-600" />}
+                  {language === 'en' && <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />}
                 </button>
               </div>
             )}
@@ -253,13 +325,22 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeSectio
           <div id="admin-user-menu-container" className="relative">
             <button
               onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-              className="flex items-center gap-1.5 p-1 pl-1.5 pr-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 shadow-2xs transition-colors cursor-pointer"
+              className="flex items-center gap-2 p-1 pl-1.5 pr-2 rounded-xl hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-all cursor-pointer"
             >
-              <div className="w-6 h-6 rounded-lg bg-indigo-600 text-white font-bold text-[11px] flex items-center justify-center">
-                SA
+              <div className="w-8 h-8 rounded-lg bg-blue-600 text-white font-bold text-xs flex items-center justify-center overflow-hidden ring-1 ring-slate-200">
+                {user?.avatar ? (
+                  <img src={user.avatar} alt={user?.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                ) : (
+                  user?.name?.slice(0, 2).toUpperCase() || 'AD'
+                )}
               </div>
-              <span className="text-xs font-bold text-slate-700 hidden md:block">Admin</span>
-              <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform duration-200 ${userDropdownOpen ? 'rotate-180 text-indigo-600' : ''}`} />
+              <div className="hidden lg:block text-left">
+                <p className="text-xs font-semibold text-slate-900 leading-tight truncate max-w-[120px]">{user?.name || 'Administrator'}</p>
+                <p className="text-[10px] text-blue-600 font-semibold">
+                  {user?.role === 'super_admin' ? 'Super Admin' : 'Admin'}
+                </p>
+              </div>
+              <ChevronDown className={`w-3.5 h-3.5 text-slate-400 hidden sm:block transition-transform duration-200 ${userDropdownOpen ? 'rotate-180 text-blue-600' : ''}`} />
             </button>
 
             {userDropdownOpen && (
@@ -268,45 +349,26 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeSectio
                   <p className="text-xs font-bold text-slate-900">{user?.name || 'System Administrator'}</p>
                   <p className="text-[11px] text-slate-500 truncate">{user?.email || 'admin@nexussmm.io'}</p>
                 </div>
-                <div className="p-1 space-y-0.5 text-xs">
+                <div className="px-2 py-1 space-y-0.5">
                   <button
-                    onClick={() => {
-                      setUserDropdownOpen(false);
-                      setCurrentRoute('/profile');
-                    }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer text-left font-semibold"
+                    onClick={() => { setUserDropdownOpen(false); setCurrentRoute('/profile'); }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer text-left"
                   >
                     <UserIcon className="w-4 h-4 text-slate-500" />
                     <span>{language === 'vi' ? 'Trang cá nhân' : 'Profile & Account'}</span>
                   </button>
                   <button
-                    onClick={() => {
-                      setUserDropdownOpen(false);
-                      onNavigate('site-config');
-                    }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer text-left font-semibold"
+                    onClick={() => { setUserDropdownOpen(false); onNavigate('site-config'); }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer text-left"
                   >
                     <Settings className="w-4 h-4 text-slate-500" />
                     <span>{language === 'vi' ? 'Cấu hình hệ thống' : 'Site Configuration'}</span>
                   </button>
+                </div>
+                <div className="pt-1 mt-1 border-t border-slate-100 px-2">
                   <button
-                    onClick={() => {
-                      setUserDropdownOpen(false);
-                      switchRole('customer');
-                      setCurrentRoute('/dashboard');
-                    }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 text-indigo-700 hover:bg-indigo-50 rounded-xl transition-colors cursor-pointer text-left font-bold"
-                  >
-                    <ArrowLeft className="w-4 h-4 text-indigo-600" />
-                    <span>{language === 'vi' ? 'Chuyển sang User Portal' : 'Switch to Customer View'}</span>
-                  </button>
-                  <div className="border-t border-slate-100 my-1" />
-                  <button
-                    onClick={() => {
-                      setUserDropdownOpen(false);
-                      logout();
-                    }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer text-left font-bold"
+                    onClick={() => { setUserDropdownOpen(false); logout(); }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer text-left"
                   >
                     <LogOut className="w-4 h-4 text-rose-500" />
                     <span>{language === 'vi' ? 'Đăng xuất' : 'Log Out'}</span>
@@ -333,16 +395,26 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeSectio
             <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white z-50 shadow-2xl animate-in slide-in-from-left duration-200 h-full">
               {/* Drawer Top Header with Brand & Close Button */}
               <div className="h-14 px-4 border-b border-slate-200/90 flex items-center justify-between shrink-0 bg-white">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-2xs font-black shrink-0">
-                    <ShieldCheck className="w-4 h-4" />
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-extrabold text-slate-900 text-sm tracking-tight">NexusSMM</span>
-                    <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-900 text-white tracking-wider uppercase">
-                      Admin
-                    </span>
-                  </div>
+                <div
+                  className="flex items-center gap-2 cursor-pointer"
+                  onClick={() => { onNavigate('overview'); setSidebarOpen(false); }}
+                >
+                  {siteConfig?.siteLogoUrl ? (
+                    <img
+                      src={siteConfig.siteLogoUrl}
+                      alt="logo"
+                      className="h-8 max-w-[120px] object-contain rounded-lg shadow-2xs"
+                    />
+                  ) : (
+                    <>
+                      <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-2xs font-black shrink-0">
+                        <ShieldCheck className="w-4 h-4" />
+                      </div>
+                      <span className="font-extrabold text-slate-900 text-sm tracking-tight">
+                        {siteConfig?.siteName || 'NexusSMM'}
+                      </span>
+                    </>
+                  )}
                 </div>
 
                 <button
@@ -526,8 +598,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeSectio
         </aside>
 
         {/* Content Body */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50">
-          <div className="max-w-7xl mx-auto space-y-6">
+        <main className="flex-1 overflow-y-auto bg-slate-50 min-w-0">
+          <div className="p-4 sm:p-5 lg:p-6">
             {children}
           </div>
         </main>

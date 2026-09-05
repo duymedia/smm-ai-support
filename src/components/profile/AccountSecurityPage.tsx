@@ -20,17 +20,20 @@ import {
   EyeOff,
   Check,
   X,
+  ChevronDown,
 } from 'lucide-react';
 
 export const AccountSecurityPage: React.FC = () => {
   const { user, updateProfile, addToast, language, t } = useApp();
 
   // Personal Info Form
-  const [name, setName] = useState(user?.name || 'Alex Morgan');
-  const [email, setEmail] = useState(user?.email || 'alex.morgan@nexussmm.io');
-  const [phone, setPhone] = useState('+84 988 776 655');
-  const [telegramContact, setTelegramContact] = useState('@alex_agency_smm');
-  const [timezone, setTimezone] = useState('Asia/Ho_Chi_Minh (GMT+7)');
+  const [name, setName] = useState(user?.name || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [phone, setPhone] = useState(user?.phone || '');
+  const [telegramContact, setTelegramContact] = useState(user?.telegramContact || '');
+  const [timezone, setTimezone] = useState(user?.timezone || 'Asia/Ho_Chi_Minh (GMT+7)');
+  const [timezoneOpen, setTimezoneOpen] = useState(false);
+  const [timezoneSearch, setTimezoneSearch] = useState('');
   const [savingProfile, setSavingProfile] = useState(false);
 
   // Password Change Form
@@ -76,7 +79,7 @@ export const AccountSecurityPage: React.FC = () => {
   };
 
   // API Key Management
-  const [apiKey, setApiKey] = useState(user?.apiKey || 'nexus_sk_94827104928174928104');
+  const [apiKey, setApiKey] = useState(user?.apiKey || '');
   const [rotatingKey, setRotatingKey] = useState(false);
 
   // Active Sessions Mock Data
@@ -93,10 +96,33 @@ export const AccountSecurityPage: React.FC = () => {
   };
   React.useEffect(() => { loadSessions(); }, []);
 
+  // The JWT is only stored in localStorage. The current user is loaded by
+  // AppContext from /api/auth/me and is the single source of truth here.
+  React.useEffect(() => {
+    setName(user?.name || '');
+    setEmail(user?.email || '');
+    setPhone(user?.phone || '');
+    setTelegramContact(user?.telegramContact || '');
+    setTimezone(user?.timezone || 'Asia/Ho_Chi_Minh (GMT+7)');
+    setApiKey(user?.apiKey || '');
+    setTwoFactorEnabled(Boolean(user?.twoFactorEnabled));
+  }, [user]);
+
+  const timezoneOptions = [
+    { value: 'Asia/Ho_Chi_Minh (GMT+7)', label: 'Asia/Ho_Chi_Minh', detail: 'GMT+7 · Bangkok, Hanoi, Jakarta' },
+    { value: 'Asia/Singapore (GMT+8)', label: 'Asia/Singapore', detail: 'GMT+8 · Singapore, Kuala Lumpur, Beijing' },
+    { value: 'America/New_York (GMT-5)', label: 'America/New_York', detail: 'GMT-5 · Eastern Time' },
+    { value: 'Europe/London (GMT+0)', label: 'Europe/London', detail: 'GMT+0 · UTC/GMT' },
+  ];
+  const selectedTimezone = timezoneOptions.find((option) => option.value === timezone) || timezoneOptions[0];
+  const filteredTimezones = timezoneOptions.filter((option) =>
+    `${option.label} ${option.detail}`.toLowerCase().includes(timezoneSearch.toLowerCase()),
+  );
+
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setSavingProfile(true);
-    const success = await updateProfile({ name, email, phone, timezone });
+    const success = await updateProfile({ name, email, phone, telegramContact, timezone });
     setSavingProfile(false);
     if (success) {
       addToast(
@@ -312,16 +338,47 @@ export const AccountSecurityPage: React.FC = () => {
                   <label className="block font-bold text-slate-700 mb-1">
                     {language === 'vi' ? 'Múi giờ làm việc:' : 'Primary Timezone:'}
                   </label>
-                  <select
-                    value={timezone}
-                    onChange={(e) => setTimezone(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-hidden focus:border-blue-500 bg-slate-50/50"
-                  >
-                    <option value="Asia/Ho_Chi_Minh (GMT+7)">Asia/Ho_Chi_Minh (GMT+7:00 Bangkok, Hanoi, Jakarta)</option>
-                    <option value="Asia/Singapore (GMT+8)">Asia/Singapore (GMT+8:00 Singapore, KL, Beijing)</option>
-                    <option value="America/New_York (GMT-5)">America/New_York (GMT-5:00 Eastern Time)</option>
-                    <option value="Europe/London (GMT+0)">Europe/London (GMT+0:00 UTC/GMT)</option>
-                  </select>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setTimezoneOpen((open) => !open)}
+                      className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-left transition-colors hover:border-blue-300 focus:outline-hidden focus:border-blue-500"
+                      aria-haspopup="listbox"
+                      aria-expanded={timezoneOpen}
+                    >
+                      <span>
+                        <span className="block text-xs font-semibold text-slate-800">{selectedTimezone.label}</span>
+                        <span className="block text-[10px] text-slate-400">{selectedTimezone.detail}</span>
+                      </span>
+                      <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${timezoneOpen ? 'rotate-180 text-blue-600' : ''}`} />
+                    </button>
+                    {timezoneOpen && (
+                      <div className="absolute left-0 right-0 top-full z-30 mt-1.5 overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl">
+                        <input
+                          autoFocus
+                          value={timezoneSearch}
+                          onChange={(e) => setTimezoneSearch(e.target.value)}
+                          placeholder={language === 'vi' ? 'Tìm múi giờ...' : 'Search timezone...'}
+                          className="mb-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 placeholder-slate-400 focus:border-blue-500 focus:outline-none"
+                        />
+                        <div className="max-h-52 overflow-y-auto" role="listbox">
+                          {filteredTimezones.map((option) => (
+                            <button
+                              key={option.value}
+                              type="button"
+                              onClick={() => { setTimezone(option.value); setTimezoneOpen(false); setTimezoneSearch(''); }}
+                              className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left transition-colors ${timezone === option.value ? 'bg-blue-50 text-blue-700' : 'text-slate-700 hover:bg-slate-50'}`}
+                              role="option"
+                              aria-selected={timezone === option.value}
+                            >
+                              <span><span className="block text-xs font-semibold">{option.label}</span><span className="block text-[10px] text-slate-400">{option.detail}</span></span>
+                              {timezone === option.value && <Check className="h-3.5 w-3.5" />}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -599,18 +656,9 @@ export const AccountSecurityPage: React.FC = () => {
                   {language === 'vi' ? 'Phiên Đăng Nhập Hoạt Động' : 'Active Login Sessions'}
                 </h3>
               </div>
-              {sessions.length > 1 && (
-                <button
-                  type="button"
-                  onClick={handleRevokeOtherSessions}
-                  className="text-[11px] font-bold text-rose-600 hover:text-rose-700 cursor-pointer"
-                >
-                  {language === 'vi' ? 'Đăng xuất thiết bị khác' : 'Log out other devices'}
-                </button>
-              )}
             </div>
 
-            <div className="divide-y divide-slate-100 text-xs">
+            <div className="max-h-64 divide-y divide-slate-100 overflow-y-auto pr-1 text-xs">
               {sessions.map((sess) => {
                 const Icon = /iphone|android|mobile/i.test(sess.device) ? Smartphone : Laptop;
                 return (
@@ -622,11 +670,6 @@ export const AccountSecurityPage: React.FC = () => {
                       <div className="space-y-0.5">
                         <div className="flex items-center gap-1.5">
                           <p className="font-bold text-slate-900 text-xs">{sess.device}</p>
-                          {sess.current && (
-                            <span className="px-1.5 py-0.2 rounded-xs text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                              HIỆN TẠI
-                            </span>
-                          )}
                         </div>
                         <p className="text-[11px] text-slate-500 font-mono">{sess.ip} • {sess.location}</p>
                       </div>

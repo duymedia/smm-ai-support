@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
+import { AnnouncementMarquee } from './AnnouncementMarquee';
 import {
   LayoutDashboard,
   Server,
@@ -40,6 +41,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
     setLanguage,
     currency,
     setCurrency,
+    currencies,
     formatMoney,
     currentRoute,
     setCurrentRoute,
@@ -49,6 +51,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
     switchRole,
     logout,
     t,
+    siteConfig,
   } = useApp();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -81,28 +84,18 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
 
   const navItems = [
     { id: 'dashboard', label: t('nav.dashboard'), icon: LayoutDashboard, path: '/dashboard' },
-    { id: 'panels', label: t('nav.myPanels'), icon: Server, path: '/panels', badge: '2' },
-    { id: 'services', label: t('nav.myServices'), icon: Layers, path: '/services' },
     { id: 'packages', label: t('nav.packages'), icon: Package, path: '/packages', highlight: true },
+    { id: 'subscriptions', label: language === 'vi' ? 'Gói đang thuê' : 'Subscriptions', icon: Repeat, path: '/subscriptions', badge: 'Active' },
+    { id: 'panels', label: t('nav.myPanels'), icon: Server, path: '/panels', badge: '2' },
     { id: 'dispatch', label: t('nav.dispatch'), icon: Send, path: '/dispatch', badge: 'NCC' },
     { id: 'add-funds', label: t('nav.addFunds'), icon: CreditCard, path: '/add-funds' },
     { id: 'transactions', label: t('nav.transactions'), icon: History, path: '/transactions' },
-    { id: 'subscriptions', label: t('nav.subscriptions'), icon: Repeat, path: '/subscriptions' },
     { id: 'support', label: t('nav.support'), icon: LifeBuoy, path: '/support' },
     { id: 'profile', label: t('nav.profile'), icon: UserIcon, path: '/profile' },
-    { id: 'settings', label: t('nav.settings'), icon: Settings, path: '/settings' },
   ];
 
-  if (user?.role === 'admin' || activeTab === 'admin') {
-    navItems.unshift({
-      id: 'admin',
-      label: t('nav.admin'),
-      icon: ShieldCheck,
-      path: '/admin',
-      badge: 'MASTER',
-    });
-  } else {
-    // Add Admin quick access for ease of setup
+  // Chỉ hiển thị mục Quản trị viên khi role == 'admin' hoặc 'super_admin'
+  if (user?.role === 'admin' || user?.role === 'super_admin') {
     navItems.push({
       id: 'admin',
       label: t('nav.admin'),
@@ -119,7 +112,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col antialiased text-slate-900">
+    <div className="min-h-screen lg:h-screen bg-slate-50 flex flex-col antialiased text-slate-900 lg:overflow-hidden">
+      <AnnouncementMarquee />
       {/* Top Navigation Bar */}
       <header className="sticky top-0 z-30 h-16 bg-white border-b border-slate-200/90 flex items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Left: Mobile hamburger & Logo */}
@@ -136,13 +130,23 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
             onClick={() => handleNav('/dashboard')}
             className="flex items-center gap-2.5 text-left group cursor-pointer focus:outline-hidden"
           >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white shadow-xs shadow-blue-500/20">
+            <div
+              style={{ background: 'linear-gradient(135deg, var(--brand-primary), var(--brand-secondary))' }}
+              className="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-xs"
+            >
               <Zap className="w-4.5 h-4.5 fill-current text-white" />
             </div>
             <div className="hidden sm:block">
               <div className="flex items-center gap-1.5 leading-none">
                 <span className="font-bold text-base text-slate-900 tracking-tight">NexusSMM</span>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200/60">
+                <span
+                  style={{
+                    backgroundColor: 'var(--brand-light)',
+                    color: 'var(--brand-primary)',
+                    borderColor: 'var(--brand-border)'
+                  }}
+                  className="text-[10px] font-bold px-1.5 py-0.5 rounded-full border"
+                >
                   SaaS
                 </span>
               </div>
@@ -176,9 +180,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
             >
               <div className="flex items-center gap-1.5">
                 <span className="text-slate-900 font-extrabold tracking-tight">
-                  {currency === 'USD'
-                    ? `$${(user?.balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                    : `${Math.round((user?.balance || 0) * 25400).toLocaleString('vi-VN')} ₫`}
+                  {formatMoney(user?.balance || 0)}
                 </span>
                 <span className="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200/60 font-mono">
                   {currency}
@@ -188,52 +190,37 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
             </button>
 
             {currencyDropdownOpen && (
-              <div className="absolute right-0 mt-1.5 w-56 bg-white rounded-xl border border-slate-200 shadow-xl py-1.5 z-50 animate-in fade-in zoom-in-95">
-                <div className="px-3 py-1 text-[10px] font-semibold text-slate-500 border-b border-slate-100 mb-1">
+              <div className="absolute right-0 mt-1.5 w-56 max-h-72 overflow-y-auto bg-white rounded-xl border border-slate-200 shadow-xl py-1.5 z-50 animate-in fade-in zoom-in-95">
+                <div className="px-3 py-1 text-[10px] font-semibold text-slate-500 border-b border-slate-100 mb-1 sticky top-0 bg-white">
                   {language === 'vi' ? 'Chọn loại tiền tệ' : 'Select Currency'}
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCurrency('USD');
-                    setCurrencyDropdownOpen(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
-                    currency === 'USD' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-[11px]">
-                      $
+                {(currencies && currencies.length > 0 ? currencies.filter(c => c.active) : [
+                  { id: 1, code: 'USD', name: 'USD ($)', symbol: '$' },
+                  { id: 2, code: 'VND', name: 'VND (₫)', symbol: '₫' },
+                ]).map((cur) => (
+                  <button
+                    key={cur.code}
+                    type="button"
+                    onClick={() => {
+                      setCurrency(cur.code);
+                      setCurrencyDropdownOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                      currency === cur.code ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-[11px]">
+                        {cur.symbol}
+                      </span>
+                      <span>{formatMoney(user?.balance || 0, cur.code)}</span>
+                    </div>
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-700">
+                      {cur.code}
                     </span>
-                    <span>${(user?.balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                  </div>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-700">
-                    USD
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCurrency('VND');
-                    setCurrencyDropdownOpen(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
-                    currency === 'VND' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-[11px]">
-                      ₫
-                    </span>
-                    <span>{Math.round((user?.balance || 0) * 25400).toLocaleString('vi-VN')} ₫</span>
-                  </div>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-700">
-                    VND
-                  </span>
-                </button>
+                  </button>
+                ))}
               </div>
             )}
           </div>
@@ -241,7 +228,11 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
           {/* Top Up Fast Button */}
           <button
             onClick={() => handleNav('/add-funds')}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs transition-all cursor-pointer"
+            style={{
+              backgroundColor: 'var(--brand-primary)',
+              boxShadow: '0 2px 8px 0 var(--brand-shadow)'
+            }}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold hover:brightness-95 text-white rounded-xl transition-all cursor-pointer"
             title="Nạp tiền vào tài khoản"
           >
             <PlusCircle className="w-3.5 h-3.5" />
@@ -280,7 +271,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="fi fi-vn fis rounded-xs shadow-2xs w-4 h-3.5 inline-block" />
+                    <span className="fi fi-vn fis rounded-xs w-4 h-3 inline-block shadow-2xs" />
                     <span>Tiếng Việt</span>
                   </div>
                   {language === 'vi' && <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />}
@@ -297,7 +288,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="fi fi-us fis rounded-xs shadow-2xs w-4 h-3.5 inline-block" />
+                    <span className="fi fi-us fis rounded-xs w-4 h-3 inline-block shadow-2xs" />
                     <span>English</span>
                   </div>
                   {language === 'en' && <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />}
@@ -306,65 +297,59 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
             )}
           </div>
 
-          {/* Notification Center */}
-          <div id="notif-container" className="relative">
+          {/* Notifications Dropdown */}
+          <div id="notification-dropdown-container" className="relative">
             <button
               onClick={() => setNotifDropdownOpen(!notifDropdownOpen)}
-              className="relative p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-colors cursor-pointer"
+              className="p-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-600 hover:text-slate-900 relative transition-all cursor-pointer shadow-2xs"
               aria-label="View notifications"
             >
-              <Bell className="w-4.5 h-4.5" />
+              <Bell className="w-4 h-4" />
               {unreadNotifsCount > 0 && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-blue-600 rounded-full ring-2 ring-white animate-pulse" />
+                <span
+                  style={{ backgroundColor: 'var(--brand-primary)' }}
+                  className="absolute top-1 right-1 w-2 h-2 rounded-full ring-2 ring-white animate-pulse"
+                />
               )}
             </button>
 
-            {/* Notifications Dropdown */}
             {notifDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl border border-slate-200 shadow-xl py-3 z-50 animate-in fade-in zoom-in-95">
-                <div className="flex items-center justify-between px-4 pb-2 border-b border-slate-100">
+              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl border border-slate-200 shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95">
+                <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">Notifications</span>
-                    {unreadNotifsCount > 0 && (
-                      <span className="px-1.5 py-0.5 text-[10px] font-bold bg-blue-100 text-blue-700 rounded-full">
-                        {unreadNotifsCount} new
-                      </span>
-                    )}
+                    <h3 className="font-bold text-slate-900 text-sm">{t('nav.notifications')}</h3>
+                    <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-blue-100 text-blue-700">
+                      {unreadNotifsCount} new
+                    </span>
                   </div>
-                  {unreadNotifsCount > 0 && (
-                    <button
-                      onClick={markAllNotificationsAsRead}
-                      className="text-[11px] font-medium text-blue-600 hover:text-blue-800 cursor-pointer"
-                    >
-                      Mark all read
-                    </button>
-                  )}
+                  <button
+                    onClick={markAllNotificationsAsRead}
+                    className="text-xs text-blue-600 hover:text-blue-800 font-semibold cursor-pointer"
+                  >
+                    Đánh dấu đã đọc
+                  </button>
                 </div>
 
-                <div className="max-h-72 overflow-y-auto divide-y divide-slate-50 px-2 py-1">
+                <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
                   {notifications.length === 0 ? (
-                    <div className="py-6 text-center text-xs text-slate-400">No notifications</div>
+                    <div className="p-8 text-center text-slate-400 text-xs">
+                      Không có thông báo mới
+                    </div>
                   ) : (
                     notifications.map((n) => (
                       <div
                         key={n.id}
-                        className={`p-2.5 rounded-xl transition-colors ${
-                          n.read ? 'hover:bg-slate-50 opacity-80' : 'bg-blue-50/50 hover:bg-blue-50/80 font-medium'
+                        className={`p-3.5 text-xs transition-colors hover:bg-slate-50 flex gap-3 ${
+                          !n.read ? 'bg-blue-50/30' : ''
                         }`}
                       >
-                        <div className="flex items-start gap-2">
-                          <span
-                            className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${
-                              n.type === 'success' ? 'bg-emerald-500' : n.type === 'warning' ? 'bg-amber-500' : 'bg-blue-500'
-                            }`}
-                          />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-semibold text-slate-900">{n.title}</p>
-                            <p className="text-[11px] text-slate-600 mt-0.5 leading-snug">{n.message}</p>
-                            <p className="text-[10px] text-slate-400 mt-1">
-                              {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </p>
-                          </div>
+                        <div className="w-2 h-2 rounded-full bg-blue-500 mt-1.5 shrink-0" />
+                        <div className="space-y-1">
+                          <p className="font-semibold text-slate-800 leading-snug">{n.title}</p>
+                          <p className="text-slate-500 text-[11px] leading-relaxed">{n.message}</p>
+                          <span className="text-[10px] text-slate-400 font-mono block">
+                            {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
                         </div>
                       </div>
                     ))
@@ -374,57 +359,85 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
             )}
           </div>
 
-          {/* User Avatar & Menu */}
+          {/* User Account Menu Avatar Dropdown */}
           <div id="user-menu-container" className="relative">
             <button
               onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="flex items-center gap-2 p-1 pl-1.5 pr-2 rounded-xl hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-all cursor-pointer"
+              className="flex items-center gap-2.5 p-1 rounded-xl hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-all cursor-pointer"
             >
-              <div className="w-8 h-8 rounded-lg bg-blue-600 text-white font-bold text-xs flex items-center justify-center overflow-hidden ring-1 ring-slate-200">
+              <div
+                style={{ backgroundColor: 'var(--brand-primary)' }}
+                className="w-8 h-8 rounded-lg text-white font-bold text-xs flex items-center justify-center overflow-hidden ring-1 ring-slate-200"
+              >
                 {user?.avatar ? (
-                  <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                  <img src={user.avatar} alt={user?.name || 'User'} className="w-full h-full object-cover" />
                 ) : (
-                  user?.name?.slice(0, 2).toUpperCase() || 'AM'
+                  <span>{user?.name ? user.name.substring(0, 2).toUpperCase() : 'US'}</span>
                 )}
               </div>
-              <div className="hidden lg:block text-left">
-                <p className="text-xs font-semibold text-slate-900 leading-tight truncate max-w-[120px]">{user?.name}</p>
-                <p className="text-[10px] text-blue-600 font-semibold">
-                  {user?.role === 'admin' ? 'Super Admin' : 'Agency Owner'}
-                </p>
+
+              <div className="hidden sm:block text-left pr-1">
+                <div className="text-xs font-bold text-slate-900 leading-tight">
+                  {user?.name || 'Customer Account'}
+                </div>
+                <div className="text-[10px] font-semibold text-slate-400">
+                  {user?.role === 'admin' ? (language === 'vi' ? 'Quản trị viên' : 'Super Admin') : (language === 'vi' ? 'Khách hàng' : 'Customer')}
+                </div>
               </div>
-              <ChevronDown className={`w-3.5 h-3.5 text-slate-400 hidden sm:block transition-transform duration-200 ${userMenuOpen ? 'rotate-180 text-blue-600' : ''}`} />
+
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden sm:block" />
             </button>
 
             {userMenuOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl border border-slate-200 shadow-xl py-2 z-50 animate-in fade-in zoom-in-95">
-                <div className="px-4 py-2 border-b border-slate-100">
-                  <p className="text-xs font-bold text-slate-900">{user?.name}</p>
-                  <p className="text-[11px] text-slate-500 truncate">{user?.email}</p>
+              <div className="absolute right-0 mt-2 w-60 bg-white rounded-2xl border border-slate-200 shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95">
+                <div className="px-4 py-2.5 border-b border-slate-100">
+                  <p className="text-xs font-bold text-slate-900 truncate">{user?.name}</p>
+                  <p className="text-[11px] text-slate-500 font-mono truncate">{user?.email}</p>
+                  <div className="mt-1.5 flex items-center justify-between text-[11px] bg-slate-50 p-1.5 rounded-lg">
+                    <span className="text-slate-500 font-medium">{language === 'vi' ? 'Số dư:' : 'Balance:'}</span>
+                    <span className="font-bold text-slate-900">
+                      {currency === 'USD'
+                        ? `$${(user?.balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                        : `${Math.round((user?.balance || 0) * 25400).toLocaleString('vi-VN')} ₫`}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="px-2 py-1 space-y-0.5">
+                <div className="py-1">
                   <button
                     onClick={() => {
-                      handleNav('/profile');
                       setUserMenuOpen(false);
+                      handleNav('/profile');
                     }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer text-left"
+                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer text-left"
                   >
-                    <UserIcon className="w-4 h-4 text-slate-500" />
-                    <span>{language === 'vi' ? 'Trang cá nhân' : 'Profile & Account'}</span>
+                    <UserIcon className="w-4 h-4 text-slate-400" />
+                    <span>{t('nav.profile')}</span>
                   </button>
 
                   <button
                     onClick={() => {
-                      handleNav('/settings');
                       setUserMenuOpen(false);
+                      handleNav('/add-funds');
                     }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer text-left"
+                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer text-left"
                   >
-                    <Settings className="w-4 h-4 text-slate-500" />
-                    <span>{language === 'vi' ? 'Cài đặt' : 'Settings'}</span>
+                    <CreditCard className="w-4 h-4 text-slate-400" />
+                    <span>{t('nav.addFunds')}</span>
                   </button>
+
+                  {user?.role === 'admin' && (
+                    <button
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        handleNav('/admin');
+                      }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-purple-700 font-semibold hover:bg-purple-50 transition-colors cursor-pointer text-left"
+                    >
+                      <ShieldCheck className="w-4 h-4 text-purple-600" />
+                      <span>{t('nav.admin')}</span>
+                    </button>
+                  )}
                 </div>
 
                 <div className="pt-1 mt-1 border-t border-slate-100 px-2">
@@ -446,14 +459,18 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
       </header>
 
       {/* Main Layout Body with Sidebar + Main Content */}
-      <div className="flex-1 flex overflow-hidden h-[calc(100vh-4rem)]">
+      <div className="flex-1 flex overflow-hidden min-h-0">
         {/* Desktop Sidebar */}
         <aside className="hidden lg:flex flex-col w-64 border-r border-slate-200/90 bg-white p-4 justify-between shrink-0 h-full overflow-y-auto">
           <div className="space-y-5">
             {/* Quick Rent Action Banner */}
             <button
               onClick={() => handleNav('/packages')}
-              className="w-full py-2.5 px-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-semibold text-xs shadow-xs hover:shadow-md shadow-blue-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer group"
+              style={{
+                background: 'linear-gradient(135deg, var(--brand-primary), var(--brand-secondary))',
+                boxShadow: '0 4px 14px 0 var(--brand-shadow)'
+              }}
+              className="w-full py-2.5 px-3 hover:brightness-95 text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer group"
             >
               <PlusCircle className="w-4 h-4 group-hover:rotate-90 transition-transform" />
               <span>{t('dashboard.rentNewPanel')}</span>
@@ -469,14 +486,26 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
                   <button
                     key={item.id}
                     onClick={() => handleNav(item.path)}
+                    style={
+                      isActive
+                        ? {
+                            backgroundColor: 'var(--brand-light)',
+                            color: 'var(--brand-primary)',
+                            borderColor: 'var(--brand-border)',
+                          }
+                        : {}
+                    }
                     className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all cursor-pointer text-left ${
                       isActive
-                        ? 'bg-blue-50/90 text-blue-700 font-bold border border-blue-200/60 shadow-2xs'
+                        ? 'font-bold border shadow-2xs'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 border border-transparent'
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <Icon className={`w-4.5 h-4.5 ${isActive ? 'text-blue-600' : 'text-slate-400'}`} />
+                      <Icon
+                        style={isActive ? { color: 'var(--brand-primary)' } : {}}
+                        className={`w-4.5 h-4.5 ${isActive ? '' : 'text-slate-400'}`}
+                      />
                       <span>{item.label}</span>
                     </div>
 
@@ -580,36 +609,24 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
         )}
 
         {/* Content Area & Dashboard Footer */}
-        <div className="flex-1 flex flex-col h-full overflow-y-auto bg-slate-50/70">
-          <main className="flex-1 w-full p-4 sm:p-6 lg:p-7 space-y-6 pb-20 lg:pb-8">
+        <div className="flex-1 flex min-h-0 min-w-0 flex-col h-full w-full">
+          <main className="flex-1 overflow-y-auto w-full min-w-0 p-4 sm:p-6 lg:p-7 space-y-6 pb-24 lg:pb-6 bg-slate-50/70">
             {children}
           </main>
 
-          {/* Clean Dashboard Footer */}
-          <footer className="w-full border-t border-slate-200 bg-white py-3.5 px-4 sm:px-6 lg:px-8 text-xs text-slate-500 shrink-0">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px]">
-              <div className="flex items-center gap-3">
-                <span className="flex items-center gap-1.5 font-medium text-emerald-700">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  All Systems Operational (14ms)
-                </span>
-                <span className="hidden md:inline text-slate-300">|</span>
-                <span className="hidden md:inline text-slate-500 font-mono">v2.4.0 Enterprise</span>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-4 text-slate-600 font-medium">
-                <button onClick={() => handleNav('/support')} className="hover:text-blue-600 transition-colors cursor-pointer">
-                  {t('nav.support')}
-                </button>
-                <button onClick={() => handleNav('/services')} className="hover:text-blue-600 transition-colors cursor-pointer">
-                  {t('nav.myServices')}
-                </button>
-                <button onClick={() => handleNav('/transactions')} className="hover:text-blue-600 transition-colors cursor-pointer">
-                  {t('nav.transactions')}
-                </button>
-                <span className="text-slate-400">© 2026 NexusSMM Cloud</span>
-              </div>
-            </div>
+          {/* Custom Footer from Admin Site Configuration */}
+          <footer className="shrink-0 w-full border-t border-slate-200 bg-white/95 py-3 px-4 sm:px-6 lg:px-8 text-xs text-slate-500 shadow-[0_-2px_8px_rgba(15,23,42,0.04)] backdrop-blur-sm">
+            <div
+              className="w-full text-center text-[12px] text-slate-500 leading-relaxed [&_p]:m-0 [&_a]:text-blue-600 [&_a]:hover:underline"
+              dangerouslySetInnerHTML={{
+                __html: (siteConfig?.footerCopyright || `© ${new Date().getFullYear()} ${siteConfig?.siteName || 'NexusSMM Platform'}. All rights reserved.`)
+                  .replace(/\{year\}/g, String(new Date().getFullYear()))
+                  .replace(/\{siteName\}/g, siteConfig?.siteName || 'NexusSMM Platform')
+                  .replace(/\{supportEmail\}/g, siteConfig?.supportEmail || '')
+                  .replace(/\{supportHotline\}/g, siteConfig?.supportHotline || '')
+                  .replace(/\{supportTelegram\}/g, siteConfig?.supportTelegram || ''),
+              }}
+            />
           </footer>
         </div>
       </div>

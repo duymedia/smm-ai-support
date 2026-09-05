@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -18,4 +18,6 @@ if (process.env.NODE_ENV !== "production") {
   globalThis.prismaGlobal = prisma;
 }
 
+export { Prisma, PrismaClient };
 export default prisma;
+

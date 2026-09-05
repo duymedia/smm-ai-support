@@ -147,7 +147,7 @@ export const AdminCouponsView: React.FC = () => {
                 <th className="py-3 px-4">Đơn Tối Thiểu</th>
                 <th className="py-3 px-4">Lượt Đã Dùng</th>
                 <th className="py-3 px-4">Hạn Dùng</th>
-                <th className="py-3 px-4">Trạng Thái</th>
+                <th className="py-3 px-4 text-center">Trạng Thái</th>
                 <th className="py-3 px-4 text-right">Thao Tác</th>
               </tr>
             </thead>
@@ -192,20 +192,22 @@ export const AdminCouponsView: React.FC = () => {
                     </span>
                   </td>
 
-                  <td className="py-3.5 px-4">
+                  <td className="py-3.5 px-4 text-center">
                     <button
                       onClick={() => handleToggleActive(cpn)}
-                      className="cursor-pointer"
-                      title="Bật/Tắt mã"
+                      className="inline-flex items-center gap-1 cursor-pointer focus:outline-hidden"
+                      title="Bấm để Bật/Tắt mã giảm giá"
                     >
                       {cpn.active ? (
-                        <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                          HOẠT ĐỘNG
-                        </span>
+                        <div className="flex items-center gap-1 text-emerald-600 font-bold">
+                          <ToggleRight className="w-6 h-6 text-emerald-600" />
+                          <span className="text-[10px] uppercase">Active</span>
+                        </div>
                       ) : (
-                        <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-slate-100 text-slate-500 border border-slate-200">
-                          TẠM TẮT
-                        </span>
+                        <div className="flex items-center gap-1 text-slate-400 font-bold">
+                          <ToggleLeft className="w-6 h-6 text-slate-300" />
+                          <span className="text-[10px] uppercase">Off</span>
+                        </div>
                       )}
                     </button>
                   </td>

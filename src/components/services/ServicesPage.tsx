@@ -15,6 +15,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { SmmService } from '../../types';
+import { EmptyState } from '../ui/EmptyState';
 
 export const ServicesPage: React.FC = () => {
   const { services, formatMoney, addToast, t } = useApp();
@@ -163,7 +164,9 @@ export const ServicesPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {filteredServices.map((svc) => {
+              {filteredServices.length === 0 ? (
+                <tr><td colSpan={8} className="py-4"><EmptyState icon={Layers} title="No services found" description="Try another keyword or category. Services synchronized from your providers will appear here." /></td></tr>
+              ) : filteredServices.map((svc) => {
                 const resalePrice = svc.ratePer1000 * marginMultiplier;
                 const profit = resalePrice - svc.ratePer1000;
 

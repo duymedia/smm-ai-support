@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Navbar } from '../layout/Navbar';
 import {
@@ -21,15 +21,40 @@ import {
   Coins,
   Headphones,
   Flame,
+  Mail,
+  Phone,
+  Send,
 } from 'lucide-react';
+import { PanelPackage } from '../../types';
+import { AnnouncementMarquee } from '../layout/AnnouncementMarquee';
 
 export const LandingPage: React.FC = () => {
-  const { setCurrentRoute, packages, formatMoney, t } = useApp();
+  const { setCurrentRoute, packages, formatMoney, siteConfig, language, t } = useApp();
+  const [publicPackages, setPublicPackages] = useState<PanelPackage[]>(packages);
   const [billingPeriod, setBillingPeriod] = useState<'weekly' | 'monthly' | 'yearly'>('monthly');
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [aiPromptInput, setAiPromptInput] = useState('How do I handle slow order fulfillment from Provider #14?');
+  const [aiPromptInput, setAiPromptInput] = useState(
+    language === 'vi'
+      ? 'Dịch vụ tăng follow Instagram bị kẹt đơn hơn 20 phút thì xử lý sao?'
+      : 'How do I handle slow order fulfillment from Provider #14?'
+  );
   const [aiSimulatedLoading, setAiSimulatedLoading] = useState(false);
   const [aiDemoReply, setAiDemoReply] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (packages && packages.length > 0) {
+      setPublicPackages(packages);
+    } else {
+      fetch('/api/packages')
+        .then((r) => r.json())
+        .then((res) => {
+          if (res?.data && Array.isArray(res.data) && res.data.length > 0) {
+            setPublicPackages(res.data);
+          }
+        })
+        .catch((e) => console.warn('Failed to load landing public packages:', e));
+    }
+  }, [packages]);
 
   const handleRunAiDemo = async () => {
     setAiSimulatedLoading(true);
@@ -40,43 +65,100 @@ export const LandingPage: React.FC = () => {
         body: JSON.stringify({ message: aiPromptInput }),
       });
       const data = await res.json();
-      setAiDemoReply(data?.data?.reply || 'Diagnostic completed: Failover rerouted 45 orders to backup Provider #08 with 0% price increase.');
+      setAiDemoReply(
+        data?.data?.reply ||
+          (language === 'vi'
+            ? 'Kết quả chẩn đoán: Hệ thống đã tự động chuyển 45 đơn sang Nhà cung cấp dự phòng #08 với giá gốc không đổi.'
+            : 'Diagnostic completed: Failover rerouted 45 orders to backup Provider #08 with 0% price increase.')
+      );
     } catch (e) {
-      setAiDemoReply('Diagnostic completed: Failover rerouted 45 orders to backup Provider #08 with 0% price increase.');
+      setAiDemoReply(
+        language === 'vi'
+          ? 'Kết quả chẩn đoán: Hệ thống đã tự động chuyển 45 đơn sang Nhà cung cấp dự phòng #08 với giá gốc không đổi.'
+          : 'Diagnostic completed: Failover rerouted 45 orders to backup Provider #08 with 0% price increase.'
+      );
     } finally {
       setAiSimulatedLoading(false);
     }
   };
 
-  const faqItems = [
-    {
-      q: 'How fast is a new SMM panel provisioned after rental?',
-      a: 'Your SMM panel instance is deployed automatically in under 60 seconds on high-speed NVMe cloud servers with free SSL certificates and pre-configured database endpoints.',
-    },
-    {
-      q: 'Can I connect multiple upstream SMM API providers?',
-      a: 'Yes! NexusSMM supports connecting unlimited upstream SMM API v2 providers. You can easily map services, set automatic profit margins, and enable automated failovers.',
-    },
-    {
-      q: 'How does the Nexus Operations Assistant help my panel?',
-      a: 'Nexus continuously monitors provider API response latencies, detects order queues that are stalled or partial, automates customer support tickets, and suggests profit-maximizing margin pricing.',
-    },
-    {
-      q: 'Can I use my own custom domain (e.g., mypanel.com)?',
-      a: 'Absolutely. Every plan supports white-label custom domains. Simply point your domain A-Record or Nameservers, and our system auto-provisions TLS 1.3 SSL and Edge CDN caching.',
-    },
-    {
-      q: 'What payment methods can I use to rent a panel or add wallet funds?',
-      a: 'We support international Credit/Debit cards via Stripe, PayPal Express, Crypto (USDT TRC20/ERC20, Bitcoin), and instant Vietnamese Bank Transfer via VietQR.',
-    },
-  ];
+  const faqItems =
+    language === 'vi'
+      ? [
+          {
+            q: 'Thời gian khởi tạo panel sau khi thanh toán thuê mất bao lâu?',
+            a: 'Hệ thống SMM Panel của bạn được khởi tạo tự động trong chưa đầy 60 giây trên máy chủ Cloud NVMe tốc độ cao, kèm chứng chỉ SSL miễn phí và kết nối cơ sở dữ liệu đã cấu hình sẵn.',
+          },
+          {
+            q: 'Tôi có thể kết nối nhiều nhà cung cấp (Provider) API không?',
+            a: 'Hoàn toàn được! Hệ thống hỗ trợ kết nối không giới hạn các nhà cung cấp SMM API v2. Bạn có thể dễ dàng đồng bộ dịch vụ, cài đặt tỷ suất lợi nhuận tự động và kích hoạt cơ chế tự chuyển hướng khi nhà cung cấp bị lỗi.',
+          },
+          {
+            q: 'Hệ thống tự động hỗ trợ vận hành panel như thế nào?',
+            a: 'Hệ thống liên tục giám sát độ trễ phản hồi của API nhà cung cấp, phát hiện các đơn hàng bị nghẽn hoặc lỗi, tự động phân luồng hỗ trợ khách hàng và gợi ý mức giá tối ưu lợi nhuận.',
+          },
+          {
+            q: 'Tôi có thể sử dụng tên miền riêng (ví dụ: mypanel.com) không?',
+            a: 'Chắc chắn rồi. Mọi gói thuê đều hỗ trợ gắn tên miền riêng White-Label. Bạn chỉ cần trỏ bản ghi A-Record hoặc Nameservers, hệ thống sẽ tự động cấp phát SSL TLS 1.3 và bộ nhớ đệm CDN Edge.',
+          },
+          {
+            q: 'Những phương thức thanh toán nào được hỗ trợ khi thuê gói hoặc nạp tiền ví?',
+            a: 'Chúng tôi hỗ trợ chuyển khoản ngân hàng Việt Nam tự động qua VietQR, thẻ thanh toán quốc tế Visa/Mastercard (Stripe), PayPal Express và tiền mã hóa USDT (TRC20/ERC20, Bitcoin).',
+          },
+        ]
+      : [
+          {
+            q: 'How fast is a new SMM panel provisioned after rental?',
+            a: 'Your SMM panel instance is deployed automatically in under 60 seconds on high-speed NVMe cloud servers with free SSL certificates and pre-configured database endpoints.',
+          },
+          {
+            q: 'Can I connect multiple upstream SMM API providers?',
+            a: 'Yes! NexusSMM supports connecting unlimited upstream SMM API v2 providers. You can easily map services, set automatic profit margins, and enable automated failovers.',
+          },
+          {
+            q: 'How does the Nexus Operations Assistant help my panel?',
+            a: 'Nexus continuously monitors provider API response latencies, detects order queues that are stalled or partial, automates customer support tickets, and suggests profit-maximizing margin pricing.',
+          },
+          {
+            q: 'Can I use my own custom domain (e.g., mypanel.com)?',
+            a: 'Absolutely. Every plan supports white-label custom domains. Simply point your domain A-Record or Nameservers, and our system auto-provisions TLS 1.3 SSL and Edge CDN caching.',
+          },
+          {
+            q: 'What payment methods can I use to rent a panel or add wallet funds?',
+            a: 'We support international Credit/Debit cards via Stripe, PayPal Express, Crypto (USDT TRC20/ERC20, Bitcoin), and instant Vietnamese Bank Transfer via VietQR.',
+          },
+        ];
+
+  useEffect(() => {
+    const handleHashScroll = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        const cleanHash = hash.replace('#', '');
+        if (cleanHash === 'hero' || cleanHash === '') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+        const targetEl = document.getElementById(cleanHash) || document.getElementById(`${cleanHash}-section`);
+        if (targetEl) {
+          setTimeout(() => {
+            targetEl.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+        }
+      }
+    };
+
+    handleHashScroll();
+    window.addEventListener('hashchange', handleHashScroll);
+    return () => window.removeEventListener('hashchange', handleHashScroll);
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col antialiased">
+      <AnnouncementMarquee />
       <Navbar />
 
       {/* HERO SECTION */}
-      <section className="relative pt-12 pb-20 lg:pt-20 lg:pb-28 overflow-hidden bg-gradient-to-b from-white via-slate-50 to-slate-100/60 border-b border-slate-200/80">
+      <section id="hero" className="relative pt-12 pb-20 lg:pt-20 lg:pb-28 overflow-hidden bg-gradient-to-b from-white via-slate-50 to-slate-100/60 border-b border-slate-200/80 scroll-mt-16">
         {/* Subtle background grid pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-40 pointer-events-none" />
 
@@ -160,19 +242,31 @@ export const LandingPage: React.FC = () => {
             <div className="p-5 sm:p-7 bg-slate-50/70 space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs">
-                  <span className="text-xs text-slate-500 font-medium">Active Fleet Revenue</span>
+                  <span className="text-xs text-slate-500 font-medium">
+                    {language === 'vi' ? 'Doanh thu hệ thống' : 'Active Fleet Revenue'}
+                  </span>
                   <div className="text-xl font-bold text-slate-900 mt-1">$28,490.50 /mo</div>
-                  <span className="text-[11px] text-emerald-600 font-semibold">+18.4% vs last week</span>
+                  <span className="text-[11px] text-emerald-600 font-semibold">
+                    {language === 'vi' ? '+18.4% so với tuần trước' : '+18.4% vs last week'}
+                  </span>
                 </div>
                 <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs">
-                  <span className="text-xs text-slate-500 font-medium">Orders Processing Rate</span>
+                  <span className="text-xs text-slate-500 font-medium">
+                    {language === 'vi' ? 'Tốc độ xử lý đơn hàng' : 'Orders Processing Rate'}
+                  </span>
                   <div className="text-xl font-bold text-blue-600 mt-1">1,420 orders / min</div>
-                  <span className="text-[11px] text-slate-500">6 Connected API Providers</span>
+                  <span className="text-[11px] text-slate-500">
+                    {language === 'vi' ? '6 nhà cung cấp API đang kết nối' : '6 Connected API Providers'}
+                  </span>
                 </div>
                 <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs">
-                  <span className="text-xs text-slate-500 font-medium">Fleet Health Score</span>
+                  <span className="text-xs text-slate-500 font-medium">
+                    {language === 'vi' ? 'Chỉ số sức khỏe hệ thống' : 'Fleet Health Score'}
+                  </span>
                   <div className="text-xl font-bold text-emerald-600 mt-1">99.8 / 100</div>
-                  <span className="text-[11px] text-emerald-700 font-medium">0 stuck orders</span>
+                  <span className="text-[11px] text-emerald-700 font-medium">
+                    {language === 'vi' ? '0 đơn hàng bị kẹt' : '0 stuck orders'}
+                  </span>
                 </div>
               </div>
 
@@ -181,7 +275,9 @@ export const LandingPage: React.FC = () => {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2 text-xs font-bold text-indigo-300">
                     <Zap className="w-4 h-4 text-indigo-400" />
-                    <span>Interactive SMM Operations Diagnostic</span>
+                    <span>
+                      {language === 'vi' ? 'Chẩn đoán vận hành SMM tương tác' : 'Interactive SMM Operations Diagnostic'}
+                    </span>
                   </div>
                   <span className="text-[10px] bg-indigo-900 text-indigo-200 px-2 py-0.5 rounded font-mono">
                     v2.4 Core Engine
@@ -194,14 +290,24 @@ export const LandingPage: React.FC = () => {
                     value={aiPromptInput}
                     onChange={(e) => setAiPromptInput(e.target.value)}
                     className="flex-1 px-3.5 py-2 text-xs bg-indigo-900/60 border border-indigo-800 rounded-lg text-white placeholder-indigo-300 focus:outline-hidden focus:ring-2 focus:ring-indigo-400"
-                    placeholder="Ask assistant to troubleshoot orders, DNS, or margin prices..."
+                    placeholder={
+                      language === 'vi'
+                        ? 'Yêu cầu hệ thống chẩn đoán đơn hàng, DNS hoặc cài đặt tỷ suất lợi nhuận...'
+                        : 'Ask assistant to troubleshoot orders, DNS, or margin prices...'
+                    }
                   />
                   <button
                     onClick={handleRunAiDemo}
                     disabled={aiSimulatedLoading}
                     className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold transition-colors cursor-pointer shrink-0 disabled:opacity-50 flex items-center justify-center gap-1.5"
                   >
-                    {aiSimulatedLoading ? 'Analyzing...' : 'Run Diagnostic'}
+                    {aiSimulatedLoading
+                      ? language === 'vi'
+                        ? 'Đang phân tích...'
+                        : 'Analyzing...'
+                      : language === 'vi'
+                      ? 'Chạy chẩn đoán'
+                      : 'Run Diagnostic'}
                   </button>
                 </div>
 
@@ -217,8 +323,8 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* CORE FEATURES SECTION */}
-      <section className="py-20 bg-white border-b border-slate-200/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="features" className="py-20 bg-white border-b border-slate-200/80 scroll-mt-16">
+        <div id="features-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
               {t('landing.featuresTitle')}
@@ -286,38 +392,54 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* HOW IT WORKS SECTION */}
-      <section className="py-20 bg-slate-50 border-b border-slate-200/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* HOW IT WORKS / OPERATIONS SECTION */}
+      <section id="operations" className="py-20 bg-slate-50 border-b border-slate-200/80 scroll-mt-16">
+        <div id="operations-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs font-bold uppercase tracking-wider text-blue-600">Zero Code Workflow</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
+              {language === 'vi' ? 'Quy trình không cần viết mã' : 'Zero Code Workflow'}
+            </span>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
-              Launch Your High-Profit SMM Store in 3 Steps
+              {language === 'vi'
+                ? 'Khởi tạo website SMM Panel chỉ trong 3 bước'
+                : 'Launch Your High-Profit SMM Store in 3 Steps'}
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="p-6 rounded-2xl bg-white border border-slate-200 relative">
               <div className="text-3xl font-black text-blue-600 mb-3">01</div>
-              <h3 className="text-base font-bold text-slate-900">Select Rental Plan & Domain</h3>
+              <h3 className="text-base font-bold text-slate-900">
+                {language === 'vi' ? 'Chọn gói thuê & tên miền' : 'Select Rental Plan & Domain'}
+              </h3>
               <p className="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Choose weekly, monthly, or annual billing. Attach your domain name or get an instant free .nexussmm.store subdomain.
+                {language === 'vi'
+                  ? 'Lựa chọn chu kỳ thanh toán theo tuần, theo tháng hoặc theo năm. Gắn tên miền thương hiệu riêng của bạn hoặc sử dụng tên miền phụ miễn phí.'
+                  : 'Choose weekly, monthly, or annual billing. Attach your domain name or get an instant free .nexussmm.store subdomain.'}
               </p>
             </div>
 
             <div className="p-6 rounded-2xl bg-white border border-slate-200 relative">
               <div className="text-3xl font-black text-indigo-600 mb-3">02</div>
-              <h3 className="text-base font-bold text-slate-900">Import SMM Services & Margins</h3>
+              <h3 className="text-base font-bold text-slate-900">
+                {language === 'vi' ? 'Nhập dịch vụ SMM & cài đặt lợi nhuận' : 'Import SMM Services & Margins'}
+              </h3>
               <p className="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Connect your upstream API key (e.g. Instagram, TikTok, YouTube). Set markup rules (e.g. 50% profit margin) in 1-click.
+                {language === 'vi'
+                  ? 'Kết nối API nhà cung cấp cấp trên (Instagram, TikTok, YouTube, Facebook). Thiết lập mức lợi nhuận mong muốn (ví dụ 50%) chỉ với 1 cú nhấp chuột.'
+                  : 'Connect your upstream API key (e.g. Instagram, TikTok, YouTube). Set markup rules (e.g. 50% profit margin) in 1-click.'}
               </p>
             </div>
 
             <div className="p-6 rounded-2xl bg-white border border-slate-200 relative">
               <div className="text-3xl font-black text-emerald-600 mb-3">03</div>
-              <h3 className="text-base font-bold text-slate-900">Autonomous Automation Takes Over</h3>
+              <h3 className="text-base font-bold text-slate-900">
+                {language === 'vi' ? 'Hệ thống tự động vận hành hoàn toàn' : 'Autonomous Automation Takes Over'}
+              </h3>
               <p className="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Nexus automatically routes orders, auto-fails over down providers, triggers auto-refills, and runs 24/7 client ticket triage.
+                {language === 'vi'
+                  ? 'Hệ thống tự động chuyển đơn, tự động chuyển đổi khi nhà cung cấp gặp sự cố, tự động bảo hành và phân loại ticket hỗ trợ khách hàng 24/7.'
+                  : 'Nexus automatically routes orders, auto-fails over down providers, triggers auto-refills, and runs 24/7 client ticket triage.'}
               </p>
             </div>
           </div>
@@ -325,8 +447,8 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* PRICING SECTION */}
-      <section id="pricing-section" className="py-20 bg-white border-b border-slate-200/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="pricing" className="py-20 bg-white border-b border-slate-200/80 scroll-mt-16">
+        <div id="pricing-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-10">
             <span className="text-xs font-semibold text-blue-600">Predictable Billing</span>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
@@ -370,7 +492,7 @@ export const LandingPage: React.FC = () => {
 
           {/* Pricing Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {packages.map((pkg) => {
+            {(publicPackages.length > 0 ? publicPackages : packages).map((pkg) => {
               const price = pkg.pricing[billingPeriod];
               const periodLabel =
                 billingPeriod === 'weekly'
@@ -418,14 +540,6 @@ export const LandingPage: React.FC = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span>Custom Domain & Free SSL</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span>Autonomous Ops & Dispatch</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
                         <span>{pkg.features.uptimeSla} Uptime SLA</span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -453,8 +567,8 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* FAQ SECTION */}
-      <section className="py-20 bg-slate-50 border-b border-slate-200/80">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="faq" className="py-20 bg-slate-50 border-b border-slate-200/80 scroll-mt-16">
+        <div id="faq-section" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
               {t('landing.faqTitle')}
@@ -499,13 +613,13 @@ export const LandingPage: React.FC = () => {
               onClick={() => setCurrentRoute('/register')}
               className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-white text-blue-700 font-bold text-sm shadow-lg hover:bg-blue-50 transition-all cursor-pointer"
             >
-              Start Free Trial Now
+              {language === 'vi' ? 'Bắt đầu dùng thử miễn phí' : 'Start Free Trial Now'}
             </button>
             <button
               onClick={() => setCurrentRoute('/packages')}
               className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-blue-800/60 hover:bg-blue-800 text-white font-semibold text-sm border border-blue-400/40 transition-all cursor-pointer"
             >
-              Explore Plans
+              {language === 'vi' ? 'Khám phá bảng giá gói' : 'Explore Plans'}
             </button>
           </div>
         </div>
@@ -516,31 +630,125 @@ export const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-5 gap-8">
           <div className="col-span-2 space-y-3">
             <div className="flex items-center gap-2 text-white font-bold text-base">
-              <Zap className="w-5 h-5 text-blue-500 fill-current" />
-              <span>NexusSMM Platform</span>
+              {siteConfig?.siteLogoUrl ? (
+                <img
+                  src={siteConfig.siteLogoUrl}
+                  alt={siteConfig?.siteName || 'Logo'}
+                  className="h-8 w-auto max-w-[180px] object-contain"
+                />
+              ) : (
+                <>
+                  <Zap className="w-5 h-5 text-blue-500 fill-current" />
+                  <span>{siteConfig?.siteName || 'NexusSMM Platform'}</span>
+                </>
+              )}
             </div>
             <p className="text-slate-400 max-w-sm leading-relaxed">
-              Enterprise-grade SaaS infrastructure for renting, managing, and scaling automated SMM panels worldwide.
+              {siteConfig?.siteTagline ||
+                (language === 'vi'
+                  ? 'Hạ tầng SaaS chuyên nghiệp để thuê, quản lý và mở rộng hệ thống SMM Panel tự động trên toàn cầu.'
+                  : 'Enterprise-grade SaaS infrastructure for renting, managing, and scaling automated SMM panels worldwide.')}
             </p>
-            <div className="text-[11px] text-slate-500">
-              © {new Date().getFullYear()} NexusSMM Technologies Inc. All rights reserved.
-            </div>
+            {(Boolean(siteConfig?.supportEmail?.trim()) ||
+              Boolean(siteConfig?.supportHotline?.trim()) ||
+              Boolean(siteConfig?.supportTelegram?.trim())) && (
+              <div className="text-xs text-slate-400 space-y-1.5 pt-2 border-t border-slate-800/80">
+                {Boolean(siteConfig?.supportEmail?.trim()) && (
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                    <span>Email:</span>
+                    <a
+                      href={`mailto:${siteConfig!.supportEmail.trim()}`}
+                      className="text-slate-300 hover:text-white underline transition-colors"
+                    >
+                      {siteConfig!.supportEmail.trim()}
+                    </a>
+                  </div>
+                )}
+                {Boolean(siteConfig?.supportHotline?.trim()) && (
+                  <div className="flex items-center gap-2">
+                    <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span>Hotline:</span>
+                    <a
+                      href={`tel:${siteConfig!.supportHotline.replace(/\s+/g, '')}`}
+                      className="text-slate-300 hover:text-white transition-colors"
+                    >
+                      {siteConfig!.supportHotline.trim()}
+                    </a>
+                  </div>
+                )}
+                {Boolean(siteConfig?.supportTelegram?.trim()) && (
+                  <div className="flex items-center gap-2">
+                    <Send className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                    <span>Telegram:</span>
+                    <a
+                      href={`https://t.me/${siteConfig!.supportTelegram.replace('@', '').trim()}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sky-400 hover:text-sky-300 hover:underline transition-colors font-medium"
+                    >
+                      {siteConfig!.supportTelegram.trim()}
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div>
             <p className="font-bold text-white text-xs mb-3">Product</p>
             <ul className="space-y-2">
-              <li><button onClick={() => setCurrentRoute('/packages')} className="hover:text-white">Rental Packages</button></li>
-              <li><button onClick={() => setCurrentRoute('/features')} className="hover:text-white">Features</button></li>
-              <li><button onClick={() => setCurrentRoute('/support')} className="hover:text-white">Operations & Support</button></li>
-              <li><button onClick={() => setCurrentRoute('/pricing')} className="hover:text-white">Pricing</button></li>
+              <li><button onClick={() => setCurrentRoute('/packages')} className="hover:text-white cursor-pointer">Rental Packages</button></li>
+              <li>
+                <button
+                  onClick={() => {
+                    window.history.pushState(null, '', '/#features');
+                    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="hover:text-white cursor-pointer"
+                >
+                  Features
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => {
+                    window.history.pushState(null, '', '/#operations');
+                    document.getElementById('operations')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="hover:text-white cursor-pointer"
+                >
+                  Operations & Support
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => {
+                    window.history.pushState(null, '', '/#pricing');
+                    document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="hover:text-white cursor-pointer"
+                >
+                  Pricing
+                </button>
+              </li>
             </ul>
           </div>
 
           <div>
             <p className="font-bold text-white text-xs mb-3">Resources</p>
             <ul className="space-y-2">
-              <li><button onClick={() => setCurrentRoute('/faq')} className="hover:text-white">Knowledge Base</button></li>
+              <li>
+                <button
+                  onClick={() => {
+                    window.history.pushState(null, '', '/#faq');
+                    document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="hover:text-white cursor-pointer"
+                >
+                  Knowledge Base (FAQ)
+                </button>
+              </li>
               <li><span className="text-slate-500">API Documentation</span></li>
               <li><span className="text-slate-500">Uptime Status</span></li>
               <li><span className="text-slate-500">DNS Setup</span></li>
@@ -555,6 +763,26 @@ export const LandingPage: React.FC = () => {
               <li><button onClick={() => setCurrentRoute('/dashboard')} className="hover:text-white">Dashboard</button></li>
               <li><button onClick={() => setCurrentRoute('/support')} className="hover:text-white">Support Center</button></li>
             </ul>
+          </div>
+        </div>
+
+        {/* Bottom Full-Width Copyright Row */}
+        <div className="border-t border-slate-800/80 pt-6 mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+          <div
+            className="text-slate-400 leading-relaxed"
+            dangerouslySetInnerHTML={{
+              __html: (siteConfig?.footerCopyright || `© ${new Date().getFullYear()} ${siteConfig?.siteName || 'NexusSMM Platform'}. All rights reserved.`)
+                .replace(/\{year\}/g, String(new Date().getFullYear()))
+                .replace(/\{siteName\}/g, siteConfig?.siteName || 'NexusSMM Platform')
+                .replace(/\{supportEmail\}/g, siteConfig?.supportEmail || '')
+                .replace(/\{supportHotline\}/g, siteConfig?.supportHotline || ''),
+            }}
+          />
+          <div className="flex items-center gap-4 text-slate-400 shrink-0">
+            <span className="flex items-center gap-1.5 text-emerald-400 font-medium text-[11px]">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              {language === 'vi' ? 'Toàn bộ hệ thống hoạt động tối ưu' : 'All Systems Operational'}
+            </span>
           </div>
         </div>
       </footer>

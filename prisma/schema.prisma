@@ -18,6 +18,7 @@ model User {
   avatar           String?   @db.VarChar(500)
   phone            String?   @unique @db.VarChar(50)
   telegramContact  String?   @map("telegram_contact") @db.VarChar(100)
+  transferCode     String?   @map("transfer_code") @db.VarChar(100)
   timezone         String    @default("Asia/Ho_Chi_Minh (GMT+7)") @db.VarChar(100)
   language         String    @default("en") @db.VarChar(10)
   currency         String    @default("USD") @db.VarChar(10)
@@ -31,12 +32,59 @@ model User {
   updatedAt        DateTime  @updatedAt @map("updated_at")
 
   loginSessions     LoginSession[]
+  orders            Order[]
+  panels            Panel[]
+  transactions      Transaction[]
+  supportTickets    SupportTicket[]
+  supportTicketMessages SupportTicketMessage[]
 
   @@map("users")
 }
 
+/// Catalogue of plans shown on /packages. Prices are stored as minor units in
+/// the app currency (Decimal keeps billing calculations lossless).
+model Package {
+  id               Int      @id @default(autoincrement())
+  code             String   @unique @db.VarChar(64)
+  name             String   @db.VarChar(120)
+  tagline          String?  @db.Text
+  badge            String?  @db.VarChar(60)
+  isPopular        Boolean  @default(false) @map("is_popular")
+  weeklyPrice      Decimal  @default(0) @map("weekly_price") @db.Decimal(15, 4)
+  monthlyPrice     Decimal  @default(0) @map("monthly_price") @db.Decimal(15, 4)
+  yearlyPrice      Decimal  @default(0) @map("yearly_price") @db.Decimal(15, 4)
+  features         Json
+  active           Boolean  @default(true)
+  sortOrder        Int      @default(0) @map("sort_order")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+  orders           Order[]
+  panels           Panel[]
+  @@map("packages")
+}
+
+model Order {
+  id           Int       @id @default(autoincrement())
+  userId       Int       @map("user_id")
+  packageId    Int?      @map("package_id")
+  billingCycle String?   @map("billing_cycle") @db.VarChar(20)
+  total        Decimal   @db.Decimal(15, 4)
+  status       String    @default("active") @db.VarChar(20)
+  expiresAt    DateTime? @map("expires_at")
+  metadata     Json?
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  package      Package?  @relation(fields: [packageId], references: [id], onDelete: SetNull)
+  panels       Panel[]
+  @@index([userId, createdAt])
+  @@index([status])
+  @@index([expiresAt])
+  @@map("orders")
+}
+
 model LoginSession {
-  id           String    @id @default(cuid()) @db.VarChar(191)
+  id           Int       @id @default(autoincrement())
   userId       Int       @map("user_id")
   tokenHash    String    @unique @map("token_hash") @db.Char(64)
   userAgent    String?   @map("user_agent") @db.VarChar(500)
@@ -75,7 +123,7 @@ model Setting {
   siteLogoUrl              String?  @map("site_logo_url")
   faviconUrl               String?  @map("favicon_url")
   primaryBrandColor        String   @default("#2563eb") @map("primary_brand_color")
-  supportEmail             String   @default("support@nexussmm.io") @map("support_email")
+  supportEmail             String?  @map("support_email")
   supportTelegram          String?  @map("support_telegram")
   supportHotline           String?  @map("support_hotline")
   smtpHost                 String?  @map("smtp_host")
@@ -87,6 +135,12 @@ model Setting {
   smtpFromName             String?  @map("smtp_from_name")
   allowUserRegistration    Boolean  @default(true) @map("allow_user_registration")
   allowFreeTrialPanel      Boolean  @default(true) @map("allow_free_trial_panel")
+  freeTrialDurationDays    Int      @default(7) @map("free_trial_duration_days")
+  freeTrialMaxPerUser      Int      @default(1) @map("free_trial_max_per_user")
+  freeTrialStartDate       DateTime? @map("free_trial_start_date")
+  freeTrialEndDate         DateTime? @map("free_trial_end_date")
+  freeTrialPackageId       Int?     @map("free_trial_package_id")
+  freeTrialRequireVerification Boolean @default(false) @map("free_trial_require_verification")
   allowGuestServiceViewing Boolean  @default(true) @map("allow_guest_service_viewing")
   enableLiveChatWidget     Boolean  @default(true) @map("enable_live_chat_widget")
   headerAnnouncementBar    String?  @map("header_announcement_bar") @db.Text
@@ -95,17 +149,32 @@ model Setting {
   seoMetaTitle             String?  @map("seo_meta_title")
   seoMetaKeywords          String?  @map("seo_meta_keywords") @db.Text
   seoMetaDescription       String?  @map("seo_meta_description") @db.Text
+  seoCanonicalUrl          String?  @map("seo_canonical_url")
+  seoOgTitle               String?  @map("seo_og_title")
+  seoOgDescription         String?  @map("seo_og_description") @db.Text
+  seoOgImageUrl            String?  @map("seo_og_image_url")
+  seoOgType                String?  @default("website") @map("seo_og_type")
+  seoTwitterCard           String?  @default("summary_large_image") @map("seo_twitter_card")
+  seoTwitterSite           String?  @map("seo_twitter_site")
+  seoTwitterCreator        String?  @map("seo_twitter_creator")
+  seoRobotsIndexing        String?  @default("index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1") @map("seo_robots_indexing")
+  seoSitemapUrl            String?  @map("seo_sitemap_url")
+  seoStructuredDataJson    String?  @map("seo_structured_data_json") @db.LongText
+  seoGoogleSiteVerification String? @map("seo_google_site_verification")
+  seoBingSiteVerification   String? @map("seo_bing_site_verification")
+  seoGoogleAnalyticsId     String?  @map("seo_google_analytics_id")
   customCss                String?  @map("custom_css") @db.Text
   customHeaderScripts      String?  @map("custom_header_scripts") @db.Text
+  customBodyScripts        String?  @map("custom_body_scripts") @db.Text
   maintenanceMode          Boolean  @default(false) @map("maintenance_mode")
   autoDispatchEnabled      Boolean  @default(true) @map("auto_dispatch_enabled")
   autoProvisioningEnabled  Boolean  @default(true) @map("auto_provisioning_enabled")
   autoBankingSync          Boolean  @default(true) @map("auto_banking_sync")
   usdToVndRate             Decimal  @default(25400.00) @map("usd_to_vnd_rate") @db.Decimal(12, 2)
   minDepositUsd            Decimal  @default(5.00) @map("min_deposit_usd") @db.Decimal(10, 2)
-  vietqrBankCode           String?  @default("MBBANK") @map("vietqr_bank_code")
-  vietqrAccountNumber      String?  @default("0988889999") @map("vietqr_account_number")
-  vietqrAccountHolder      String?  @default("NEXUS SMM HOLDINGS") @map("vietqr_account_holder")
+  vietqrBankCode           String?  @map("vietqr_bank_code")
+  vietqrAccountNumber      String?  @map("vietqr_account_number")
+  vietqrAccountHolder      String?  @map("vietqr_account_holder")
   vietqrAutoVerify         Boolean  @default(true) @map("vietqr_auto_verify")
   usdtTrc20Address         String?  @map("usdt_trc20_address")
   usdtErc20Address         String?  @map("usdt_erc20_address")
@@ -130,3 +199,164 @@ model Setting {
 
   @@map("settings")
 }
+
+model PaymentGateway {
+  id                   Int      @id @default(autoincrement())
+  name                 String   @db.VarChar(255)
+  type                 String   @default("vietqr") @db.VarChar(50)
+  currency             String   @default("VND") @db.VarChar(10)
+  logoUrl              String?  @map("logo_url") @db.VarChar(500)
+  bankCode             String?  @map("bank_code") @db.VarChar(50)
+  bankName             String?  @map("bank_name") @db.VarChar(255)
+  accountNumber        String?  @map("account_number") @db.VarChar(100)
+  accountHolder        String?  @map("account_holder") @db.VarChar(255)
+  cryptoType           String?  @map("crypto_type") @db.VarChar(50)
+  cryptoNetwork        String?  @map("crypto_network") @db.VarChar(50)
+  walletAddress        String?  @map("wallet_address") @db.VarChar(255)
+  memoTag              String?  @map("memo_tag") @db.VarChar(100)
+  apiKey               String?  @map("api_key") @db.VarChar(255)
+  secretKey            String?  @map("secret_key") @db.VarChar(255)
+  merchantId           String?  @map("merchant_id") @db.VarChar(100)
+  qrCodeUrl            String?  @map("qr_code_url") @db.VarChar(500)
+  notes                String?  @db.Text
+  exchangeRateUsdToVnd Decimal  @default(25400.00) @map("exchange_rate_usd_to_vnd") @db.Decimal(15, 2)
+  bonusPercentage      Decimal  @default(0.00) @map("bonus_percentage") @db.Decimal(5, 2)
+  webhookSecret        String?  @map("webhook_secret") @db.VarChar(255)
+  webhookUrl           String?  @map("webhook_url") @db.VarChar(500)
+  instructions         String?  @db.Text
+  active               Boolean  @default(true)
+  sortOrder            Int      @default(0) @map("sort_order")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  @@map("payment_gateways")
+}
+
+model Panel {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
+  orderId   Int?      @map("order_id")
+  packageId Int?      @map("package_id")
+  name      String    @db.VarChar(255)
+  domain    String    @db.VarChar(255)
+  apiKey    String?   @map("api_key") @db.VarChar(255)
+  adminUsername String? @map("admin_username") @db.VarChar(100)
+  adminPassword String? @map("admin_password") @db.VarChar(255)
+  adminTwoFactorSecret String? @map("admin_two_factor_secret") @db.VarChar(255)
+  cookie    String?   @db.Text
+  balance   Decimal   @default(0.00) @map("balance") @db.Decimal(15, 4)
+  currency  String    @default("USD") @db.VarChar(10)
+  status    String    @default("active") @db.VarChar(50)
+  notes     String?   @db.Text
+  expiresAt DateTime? @map("expires_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order   Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  package Package? @relation(fields: [packageId], references: [id], onDelete: SetNull)
+  dispatchConfig PanelDispatchConfig?
+
+  @@index([userId, status])
+  @@index([orderId])
+  @@index([packageId])
+  @@index([domain])
+  @@map("panels")
+}
+
+model PanelDispatchConfig {
+  id        Int      @id @default(autoincrement())
+  panelId   Int      @unique @map("panel_id")
+  enabled   Boolean  @default(true)
+  method    String   @default("ticket") @db.VarChar(20)
+  config    Json
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  panel     Panel    @relation(fields: [panelId], references: [id], onDelete: Cascade)
+  @@map("panel_dispatch_configs")
+}
+
+model Transaction {
+  id            Int      @id @default(autoincrement())
+  code          String   @unique @db.VarChar(64)
+  userId        Int      @map("user_id")
+  type          String   @db.VarChar(50)
+  amount        Decimal  @db.Decimal(15, 4)
+  balanceBefore Decimal  @map("balance_before") @db.Decimal(15, 4)
+  balanceAfter  Decimal  @map("balance_after") @db.Decimal(15, 4)
+  description   String   @db.Text
+  paymentMethod String?  @map("payment_method") @db.VarChar(100)
+  referenceCode String?  @map("reference_code") @db.VarChar(100)
+  status        String   @default("completed") @db.VarChar(30)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([type])
+  @@index([status])
+  @@map("transactions")
+}
+
+model SupportTicket {
+  id             Int       @id @default(autoincrement())
+  code           String    @unique @db.VarChar(64)
+  userId         Int       @map("user_id")
+  subject        String    @db.VarChar(255)
+  category       String    @default("general") @db.VarChar(100)
+  priority       String    @default("normal") @db.VarChar(50)
+  status         String    @default("open") @db.VarChar(50)
+  relatedPanelId Int?      @map("related_panel_id")
+  aiSummary      String?   @map("ai_summary") @db.Text
+  lastRepliedAt  DateTime? @map("last_replied_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  user     User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages SupportTicketMessage[]
+
+  @@index([userId, status])
+  @@index([status])
+  @@index([createdAt])
+  @@map("support_tickets")
+}
+
+model SupportTicketMessage {
+  id            Int      @id @default(autoincrement())
+  ticketId      Int      @map("ticket_id")
+  senderId      Int?     @map("sender_id")
+  senderName    String   @map("sender_name") @db.VarChar(255)
+  senderRole    String   @default("customer") @map("sender_role") @db.VarChar(50)
+  content       String   @db.Text
+  isAiGenerated Boolean  @default(false) @map("is_ai_generated")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  sender User?         @relation(fields: [senderId], references: [id], onDelete: SetNull)
+
+  @@index([ticketId, createdAt])
+  @@map("support_ticket_messages")
+}
+
+model Currency {
+  id                Int       @id @default(autoincrement())
+  code              String    @unique @db.VarChar(10)
+  name              String    @db.VarChar(100)
+  symbol            String    @db.VarChar(10)
+  symbolPosition    String    @default("left") @map("symbol_position") @db.VarChar(10)
+  rate              Decimal   @default(1.000000) @db.Decimal(18, 6)
+  thousandSeparator String    @default(",") @map("thousand_separator") @db.VarChar(5)
+  decimalSeparator  String    @default(".") @map("decimal_separator") @db.VarChar(5)
+  decimalDigits     Int       @default(2) @map("decimal_digits")
+  isDefault         Boolean   @default(false) @map("is_default")
+  autoSync          Boolean   @default(true) @map("auto_sync")
+  active            Boolean   @default(true)
+  sortOrder         Int       @default(0) @map("sort_order")
+  lastSyncAt        DateTime? @map("last_sync_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  @@map("currencies")
+}
+

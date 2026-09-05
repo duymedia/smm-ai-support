@@ -166,16 +166,22 @@ export const AdminAnnouncementsView: React.FC = () => {
                 )}
               </div>
 
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleToggleActive(anc)}
-                  className="text-slate-400 hover:text-slate-700 cursor-pointer"
-                  title="Bật/Tắt hiển thị"
+                  className="inline-flex items-center gap-1 cursor-pointer focus:outline-hidden"
+                  title="Bấm để Bật/Tắt hiển thị"
                 >
                   {anc.active ? (
-                    <ToggleRight className="w-6 h-6 text-emerald-600" />
+                    <div className="flex items-center gap-1 text-emerald-600 font-bold">
+                      <ToggleRight className="w-6 h-6 text-emerald-600" />
+                      <span className="text-[10px] uppercase">Active</span>
+                    </div>
                   ) : (
-                    <ToggleLeft className="w-6 h-6 text-slate-400" />
+                    <div className="flex items-center gap-1 text-slate-400 font-bold">
+                      <ToggleLeft className="w-6 h-6 text-slate-300" />
+                      <span className="text-[10px] uppercase">Off</span>
+                    </div>
                   )}
                 </button>
                 <button
