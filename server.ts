@@ -1708,6 +1708,7 @@ async function startServer() {
             id: p.id,
             name: p.name,
             domain: p.domain,
+            apiKey: p.apiKey || null,
             cookie: p.cookie || null,
             status: p.status,
             currency: p.currency,
