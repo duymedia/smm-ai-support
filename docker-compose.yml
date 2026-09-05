@@ -1,0 +1,62 @@
+services:
+  # 1. MySQL Database Service
+  mysql:
+    image: mysql:8.0
+    container_name: smm-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: smm_panel
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # 2. RabbitMQ Message Broker
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: smm-rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # 3. Web App Panel Service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smm-panel-app
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=mysql://root:rootpassword@mysql:3306/smm_panel
+      - JWT_SECRET=nexussmm_super_secure_jwt_token_secret_key_2026
+      - JWT_EXPIRES_IN=7d
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+    command: >
+      sh -c "npx prisma db push --skip-generate --accept-data-loss && node dist/server.cjs"
+
+volumes:
+  mysql_data:
+  rabbitmq_data:
