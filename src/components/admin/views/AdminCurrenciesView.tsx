@@ -917,3 +917,6 @@ export const AdminCurrenciesView: React.FC = () => {
     </div>
   );
 };
+
+export default AdminCurrenciesView;
+
