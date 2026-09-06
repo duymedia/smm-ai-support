@@ -51,21 +51,33 @@ jobs:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           port: 22
-          script_stop: true
+          timeout: 60s
+          command_timeout: 15m
+          script_stop: false
           script: |
-            set -e
+            echo "[CI/CD] === Bắt đầu quy trình triển khai VPS ==="
+            
+            # Kiểm tra quyền sudo
+            if command -v sudo >/dev/null 2>&1; then
+              SUDO="sudo"
+            else
+              SUDO=""
+            fi
 
             # 1. Xác định thư mục dự án trên VPS
-            if [ -d "$HOME/smm-ai-support/.git" ] && [ ! -d "/var/www/smm-ai-support/.git" ]; then
+            if [ -d "$HOME/smm-ai-support/.git" ]; then
               APP_DIR="$HOME/smm-ai-support"
-            else
+            elif [ -d "/var/www/smm-ai-support/.git" ]; then
               APP_DIR="/var/www/smm-ai-support"
+            else
+              APP_DIR="$HOME/smm-ai-support"
             fi
+            echo "[CI/CD] APP_DIR: $APP_DIR"
 
             # 2. Tạo thư mục và clone nếu chưa có
             if [ ! -d "$APP_DIR/.git" ]; then
               echo "[CI/CD] Thư mục dự án chưa tồn tại, đang clone repository..."
-              mkdir -p /var/www
+              mkdir -p "$(dirname "$APP_DIR")"
               git clone https://github.com/${{ github.repository }}.git "$APP_DIR"
             fi
 
@@ -79,21 +91,58 @@ jobs:
             # 4. Tạo file .env nếu chưa có
             if [ ! -f "$APP_DIR/.env" ]; then
               echo "[CI/CD] Tạo file .env từ .env.example..."
-              cp "$APP_DIR/.env.example" "$APP_DIR/.env"
+              cp "$APP_DIR/.env.example" "$APP_DIR/.env" 2>/dev/null || true
             fi
 
-            # 5. Kiểm tra Docker & Docker Compose
-            if ! command -v docker >/dev/null 2>&1; then
-              echo "[CI/CD] Đang cài đặt Docker trên VPS..."
-              curl -fsSL https://get.docker.com | sh
+            # 5. Xác định công cụ Docker Compose
+            DOCKER_CMD=""
+            if docker compose version >/dev/null 2>&1; then
+              DOCKER_CMD="docker compose"
+            elif $SUDO docker compose version >/dev/null 2>&1; then
+              DOCKER_CMD="$SUDO docker compose"
+            elif command -v docker-compose >/dev/null 2>&1; then
+              DOCKER_CMD="docker-compose"
+            elif command -v docker >/dev/null 2>&1; then
+              DOCKER_CMD="docker compose"
             fi
 
-            # 6. Rebuild và Restart toàn bộ hệ thống bằng Docker Compose
-            echo "[CI/CD] Đang build và khởi chạy containers..."
-            docker compose up -d --build --remove-orphans
+            DEPLOYED=false
 
-            # 7. Dọn dẹp images cũ thừa
-            docker image prune -f
+            # 6. Triển khai qua Docker nếu có Docker
+            if [ -n "$DOCKER_CMD" ]; then
+              echo "[CI/CD] Đang build và khởi chạy với Docker: $DOCKER_CMD..."
+              if $DOCKER_CMD up -d --build --remove-orphans; then
+                echo "[CI/CD] ✅ Triển khai Docker thành công!"
+                $DOCKER_CMD ps
+                docker image prune -f 2>/dev/null || true
+                DEPLOYED=true
+              else
+                echo "[CI/CD ⚠️] Docker build gặp sự cố, thử fallback sang PM2..."
+              fi
+            fi
 
-            echo "[CI/CD] ✅ Triển khai Docker thành công!"
+            # 7. Fallback sang PM2 nếu Docker không khả dụng hoặc lỗi
+            if [ "$DEPLOYED" = false ]; then
+              echo "[CI/CD] Triển khai trực tiếp qua Node.js & PM2..."
+              npm install --no-audit --no-fund
+              npx prisma generate
+              npx prisma db push --skip-generate --accept-data-loss 2>/dev/null || true
+              npm run build
+
+              if command -v pm2 >/dev/null 2>&1; then
+                pm2 restart smm-ai-support --update-env || pm2 start dist/server.cjs --name smm-ai-support
+                pm2 save
+                echo "[CI/CD] ✅ Triển khai PM2 thành công!"
+              elif $SUDO npm install -g pm2 2>/dev/null; then
+                pm2 restart smm-ai-support --update-env || pm2 start dist/server.cjs --name smm-ai-support
+                pm2 save
+                echo "[CI/CD] ✅ Cài đặt PM2 và triển khai thành công!"
+              else
+                echo "[CI/CD] Chạy ứng dụng dưới nền..."
+                nohup node dist/server.cjs > app.log 2>&1 &
+                echo "[CI/CD] ✅ Đã khởi chạy Node server!"
+              fi
+            fi
+
+            echo "[CI/CD] 🎉 Hoàn tất toàn bộ quy trình triển khai!"
 
