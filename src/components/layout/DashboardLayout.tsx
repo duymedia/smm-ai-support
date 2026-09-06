@@ -28,6 +28,7 @@ import {
   CheckCircle2,
   AlertTriangle,
 } from 'lucide-react';
+import { AnimatedBackground } from '../ui/AnimatedBackground';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -170,26 +171,29 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search panels, services, orders, tickets (Press / to search)..."
-              className="w-full pl-9 pr-4 py-1.5 text-xs bg-slate-50 hover:bg-slate-100/80 focus:bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+              className="w-full pl-9 pr-12 py-1.5 text-xs bg-slate-100/70 hover:bg-slate-100 focus:bg-white border border-slate-200/90 rounded-full text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
             />
+            <kbd className="absolute right-3 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[10px] font-mono font-semibold text-slate-400 bg-white border border-slate-200 rounded shadow-2xs">
+              /
+            </kbd>
           </div>
         </div>
 
         {/* Right Action Utilities */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-2.5">
           {/* Currency Select Option Dropdown (Displays Balance + Currency Code) */}
           <div id="currency-select-container" className="relative">
             <button
               type="button"
               onClick={() => setCurrencyDropdownOpen(!currencyDropdownOpen)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-xs font-bold text-slate-900 transition-all cursor-pointer shadow-2xs"
+              className="flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-slate-200/90 bg-white hover:bg-slate-50 text-xs font-bold text-slate-900 transition-all cursor-pointer shadow-2xs press-tactile"
               title="Chọn đơn vị tiền tệ & Xem số dư"
             >
               <div className="flex items-center gap-1.5">
-                <span className="text-slate-900 font-extrabold tracking-tight">
+                <span className="text-slate-900 font-bold font-mono tabular-nums tracking-tight">
                   {formatMoney(user?.balance || 0)}
                 </span>
-                <span className="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200/60 font-mono">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200/60 font-mono">
                   {currency}
                 </span>
               </div>
@@ -197,8 +201,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
             </button>
 
             {currencyDropdownOpen && (
-              <div className="absolute right-0 mt-1.5 w-56 max-h-72 overflow-y-auto bg-white rounded-xl border border-slate-200 shadow-xl py-1.5 z-50 animate-in fade-in zoom-in-95">
-                <div className="px-3 py-1 text-[10px] font-semibold text-slate-500 border-b border-slate-100 mb-1 sticky top-0 bg-white">
+              <div className="absolute right-0 mt-2 w-56 max-h-72 overflow-y-auto bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/90 shadow-xl py-1.5 z-50 animate-in fade-in zoom-in-95">
+                <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 mb-1 sticky top-0 bg-white/95">
                   {language === 'vi' ? 'Chọn loại tiền tệ' : 'Select Currency'}
                 </div>
 
@@ -213,7 +217,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
                       setCurrency(cur.code);
                       setCurrencyDropdownOpen(false);
                     }}
-                    className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                    className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold transition-colors cursor-pointer ${
                       currency === cur.code ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50'
                     }`}
                   >
@@ -221,9 +225,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
                       <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-[11px]">
                         {cur.symbol}
                       </span>
-                      <span>{formatMoney(user?.balance || 0, cur.code)}</span>
+                      <span className="font-mono tabular-nums">{formatMoney(user?.balance || 0, cur.code)}</span>
                     </div>
-                    <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-700">
+                    <span className="px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-100 text-slate-700">
                       {cur.code}
                     </span>
                   </button>
@@ -239,22 +243,22 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
               backgroundColor: 'var(--brand-primary)',
               boxShadow: '0 2px 8px 0 var(--brand-shadow)'
             }}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold hover:brightness-95 text-white rounded-xl transition-all cursor-pointer"
+            className="hidden sm:flex items-center gap-1.5 h-9 px-4 text-xs font-bold hover:brightness-95 text-white rounded-full transition-all cursor-pointer press-tactile"
             title="Nạp tiền vào tài khoản"
           >
             <PlusCircle className="w-3.5 h-3.5" />
             <span>{language === 'vi' ? 'Nạp tiền' : 'Top Up'}</span>
           </button>
 
-          {/* Language Select Option Dropdown (Icon + Name) */}
+          {/* Language Select Option Dropdown */}
           <div id="lang-select-container" className="relative">
             <button
               type="button"
               onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-              className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-xs font-bold text-slate-800 transition-all cursor-pointer shadow-2xs"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-200/90 bg-white hover:bg-slate-50 text-xs font-bold text-slate-800 transition-all cursor-pointer shadow-2xs press-tactile"
               title="Chọn ngôn ngữ"
             >
-              <span className={`fi ${language === 'vi' ? 'fi-vn' : 'fi-us'} fis rounded-xs shadow-2xs w-4 h-3.5 inline-block`} />
+              <span className={`fi ${language === 'vi' ? 'fi-vn' : 'fi-us'} fis rounded-full shadow-2xs w-3.5 h-3.5 inline-block`} />
               <span className="hidden sm:inline font-semibold">
                 {language === 'vi' ? 'Tiếng Việt' : 'English'}
               </span>
@@ -262,7 +266,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
             </button>
 
             {langDropdownOpen && (
-              <div className="absolute right-0 mt-1.5 w-40 bg-white rounded-xl border border-slate-200 shadow-xl py-1.5 z-50 animate-in fade-in zoom-in-95">
+              <div className="absolute right-0 mt-2 w-40 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/90 shadow-xl py-1.5 z-50 animate-in fade-in zoom-in-95">
                 <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 mb-1">
                   {language === 'vi' ? 'Ngôn ngữ' : 'Language'}
                 </div>
@@ -273,12 +277,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
                     setLanguage('vi');
                     setLangDropdownOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold transition-colors cursor-pointer ${
                     language === 'vi' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50'
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="fi fi-vn fis rounded-xs w-4 h-3 inline-block shadow-2xs" />
+                    <span className="fi fi-vn fis rounded-full w-3.5 h-3.5 inline-block shadow-2xs" />
                     <span>Tiếng Việt</span>
                   </div>
                   {language === 'vi' && <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />}
@@ -290,12 +294,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
                     setLanguage('en');
                     setLangDropdownOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold transition-colors cursor-pointer ${
                     language === 'en' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50'
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="fi fi-us fis rounded-xs w-4 h-3 inline-block shadow-2xs" />
+                    <span className="fi fi-us fis rounded-full w-3.5 h-3.5 inline-block shadow-2xs" />
                     <span>English</span>
                   </div>
                   {language === 'en' && <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />}
@@ -308,7 +312,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
           <div id="notification-dropdown-container" className="relative">
             <button
               onClick={() => setNotifDropdownOpen(!notifDropdownOpen)}
-              className="p-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-600 hover:text-slate-900 relative transition-all cursor-pointer shadow-2xs"
+              className="p-2 rounded-full border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 relative transition-all cursor-pointer shadow-2xs press-tactile"
               aria-label="View notifications"
             >
               <Bell className="w-4 h-4" />
@@ -321,11 +325,11 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
             </button>
 
             {notifDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl border border-slate-200 shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95">
-                <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/90 shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95">
+                <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
                   <div className="flex items-center gap-2">
                     <h3 className="font-bold text-slate-900 text-sm">{t('nav.notifications')}</h3>
-                    <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-blue-100 text-blue-700">
+                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
                       {unreadNotifsCount} new
                     </span>
                   </div>
@@ -370,11 +374,11 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
           <div id="user-menu-container" className="relative">
             <button
               onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="flex items-center gap-2.5 p-1 rounded-xl hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-all cursor-pointer"
+              className="flex items-center gap-2.5 p-1 rounded-full hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-all cursor-pointer press-tactile"
             >
               <div
                 style={{ backgroundColor: 'var(--brand-primary)' }}
-                className="w-8 h-8 rounded-lg text-white font-bold text-xs flex items-center justify-center overflow-hidden ring-1 ring-slate-200"
+                className="w-8 h-8 rounded-full text-white font-bold text-xs flex items-center justify-center overflow-hidden ring-1 ring-slate-200"
               >
                 {user?.avatar ? (
                   <img src={user.avatar} alt={user?.name || 'User'} className="w-full h-full object-cover" />
@@ -396,13 +400,13 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
             </button>
 
             {userMenuOpen && (
-              <div className="absolute right-0 mt-2 w-60 bg-white rounded-2xl border border-slate-200 shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95">
+              <div className="absolute right-0 mt-2 w-60 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/90 shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95">
                 <div className="px-4 py-2.5 border-b border-slate-100">
                   <p className="text-xs font-bold text-slate-900 truncate">{user?.name}</p>
                   <p className="text-[11px] text-slate-500 font-mono truncate">{user?.email}</p>
-                  <div className="mt-1.5 flex items-center justify-between text-[11px] bg-slate-50 p-1.5 rounded-lg">
+                  <div className="mt-1.5 flex items-center justify-between text-[11px] bg-slate-50 p-2 rounded-xl">
                     <span className="text-slate-500 font-medium">{language === 'vi' ? 'Số dư:' : 'Balance:'}</span>
-                    <span className="font-bold text-slate-900">
+                    <span className="font-bold text-slate-900 font-mono tabular-nums">
                       {currency === 'USD'
                         ? `$${(user?.balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                         : `${Math.round((user?.balance || 0) * 25400).toLocaleString('vi-VN')} ₫`}
@@ -469,7 +473,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
       <div className="flex-1 flex overflow-hidden min-h-0">
         {/* Desktop Sidebar */}
         <aside className="hidden lg:flex flex-col w-64 border-r border-slate-200/90 bg-white p-4 justify-between shrink-0 h-full overflow-y-auto">
-          <div className="space-y-5">
+          <div className="space-y-4">
             {/* Quick Rent Action Banner */}
             <button
               onClick={() => handleNav('/packages')}
@@ -477,7 +481,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
                 background: 'linear-gradient(135deg, var(--brand-primary), var(--brand-secondary))',
                 boxShadow: '0 4px 14px 0 var(--brand-shadow)'
               }}
-              className="w-full py-2.5 px-3 hover:brightness-95 text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer group"
+              className="w-full h-10 px-4 hover:brightness-95 text-white rounded-full font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer group press-tactile"
             >
               <PlusCircle className="w-4 h-4 group-hover:rotate-90 transition-transform" />
               <span>{t('dashboard.rentNewPanel')}</span>
@@ -502,7 +506,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
                           }
                         : {}
                     }
-                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all cursor-pointer text-left ${
+                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-full text-xs font-medium transition-all cursor-pointer text-left press-tactile ${
                       isActive
                         ? 'font-bold border shadow-2xs'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 border border-transparent'
@@ -517,7 +521,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
                     </div>
 
                     {item.badge && (
-                      <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-slate-100 text-slate-700 border border-slate-200">
+                      <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-mono">
                         {item.badge}
                       </span>
                     )}
@@ -529,20 +533,20 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
 
           {/* Sidebar Footer: System Status */}
           <div className="pt-4 border-t border-slate-100 space-y-3">
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+            <div className="p-3 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-1.5">
               <div className="flex items-center justify-between text-[11px]">
                 <span className="font-semibold text-slate-600 flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                   API Bridges
                 </span>
-                <span className="text-emerald-700 font-bold">99.99% Uptime</span>
+                <span className="text-emerald-700 font-bold font-mono">99.99%</span>
               </div>
-              <p className="text-[10px] text-slate-500 leading-tight">All 6 provider API bridges operational.</p>
+              <p className="text-[10px] text-slate-500 leading-tight">All provider API bridges operational.</p>
             </div>
 
             <button
               onClick={() => handleNav('/')}
-              className="w-full flex items-center justify-center gap-1.5 text-xs text-slate-500 hover:text-slate-800 py-1 cursor-pointer transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 text-xs text-slate-500 hover:text-slate-800 py-1.5 rounded-full hover:bg-slate-100/60 cursor-pointer transition-colors"
             >
               <ExternalLink className="w-3.5 h-3.5" />
               <span>Public Landing Page</span>
@@ -557,14 +561,14 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
             <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white border-r border-slate-200 p-4 space-y-4 z-50 animate-in slide-in-from-left duration-200">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold">
+                  <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
                     <Zap className="w-4 h-4" />
                   </div>
                   <span className="font-bold text-slate-900 text-sm">NexusSMM</span>
                 </div>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  className="p-1 text-slate-400 hover:text-slate-700 rounded-lg cursor-pointer"
+                  className="p-1.5 text-slate-400 hover:text-slate-700 rounded-full cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -572,7 +576,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
 
               <button
                 onClick={() => handleNav('/packages')}
-                className="w-full py-2.5 bg-blue-600 text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-2 shadow-xs"
+                className="w-full h-10 bg-blue-600 text-white rounded-full font-semibold text-xs flex items-center justify-center gap-2 shadow-xs cursor-pointer press-tactile"
               >
                 <PlusCircle className="w-4 h-4" />
                 <span>{t('dashboard.rentNewPanel')}</span>
@@ -586,7 +590,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
                     <button
                       key={item.id}
                       onClick={() => handleNav(item.path)}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium ${
+                      className={`w-full flex items-center justify-between px-4 py-2.5 rounded-full text-xs font-medium cursor-pointer ${
                         isActive ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50'
                       }`}
                     >
@@ -594,7 +598,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
                         <Icon className="w-4 h-4" />
                         <span>{item.label}</span>
                       </div>
-                      {item.badge && <span className="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded">{item.badge}</span>}
+                      {item.badge && <span className="text-[10px] px-2 py-0.5 bg-slate-100 rounded-full font-mono">{item.badge}</span>}
                     </button>
                   );
                 })}
@@ -606,7 +610,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
                     setSidebarOpen(false);
                     logout();
                   }}
-                  className="w-full py-2 text-rose-600 hover:bg-rose-50 rounded-xl text-xs font-semibold text-center"
+                  className="w-full py-2.5 text-rose-600 hover:bg-rose-50 rounded-full text-xs font-semibold text-center cursor-pointer"
                 >
                   {t('common.logout')}
                 </button>
@@ -616,13 +620,16 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
         )}
 
         {/* Content Area & Dashboard Footer */}
-        <div className="flex-1 flex min-h-0 min-w-0 flex-col h-full w-full">
-          <main className="flex-1 overflow-y-auto w-full min-w-0 p-4 sm:p-6 lg:p-7 space-y-6 pb-24 lg:pb-6 bg-slate-50/70">
-            {children}
+        <div className="flex-1 flex min-h-0 min-w-0 flex-col h-full w-full relative">
+          <main className="flex-1 overflow-y-auto w-full min-w-0 p-4 sm:p-6 lg:p-7 space-y-6 pb-24 lg:pb-6 bg-dot-matrix bg-slate-50/70 relative">
+            <AnimatedBackground variant="dashboard" intensity="subtle" />
+            <div className="relative z-10 space-y-6">
+              {children}
+            </div>
           </main>
 
           {/* Custom Footer from Admin Site Configuration */}
-          <footer className="shrink-0 w-full border-t border-slate-200 bg-white/95 py-3 px-4 sm:px-6 lg:px-8 text-xs text-slate-500 shadow-[0_-2px_8px_rgba(15,23,42,0.04)] backdrop-blur-sm">
+          <footer className="shrink-0 w-full border-t border-slate-200/90 bg-white/95 py-3 px-4 sm:px-6 lg:px-8 text-xs text-slate-500 shadow-[0_-2px_8px_rgba(15,23,42,0.03)] backdrop-blur-sm">
             <div
               className="w-full text-center text-[12px] text-slate-500 leading-relaxed [&_p]:m-0 [&_a]:text-blue-600 [&_a]:hover:underline"
               dangerouslySetInnerHTML={{

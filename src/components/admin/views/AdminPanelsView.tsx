@@ -31,6 +31,11 @@ import {
 } from 'lucide-react';
 import { Modal } from '../../ui/Modal';
 import { Select2 } from '../../ui/Select2';
+import { Button } from '../../ui/Button';
+import { Badge } from '../../ui/Badge';
+import { Card } from '../../ui/Card';
+import { StatCard } from '../../ui/StatCard';
+import { PageHeader } from '../../ui/PageHeader';
 
 export interface AdminPanelUser {
   id: string;
@@ -329,93 +334,102 @@ export const AdminPanelsView: React.FC = () => {
   const totalFreeTrial = panels.filter((p) => p.planId === 'free-trial' || p.planName?.includes('0 VNĐ')).length;
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-200">
-      {/* 1. Header & KPI Metric Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-slate-500">
-              {language === 'vi' ? 'Tổng số panel' : 'Total SMM panels'}
-            </span>
-            <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
-              <Server className="w-4 h-4" />
-            </div>
+    <div className="space-y-6">
+      {/* 1. Page Header with Open-Design Standards */}
+      <PageHeader
+        title={language === 'vi' ? 'Quản Trị Hệ Thống SMM Panels' : 'SMM Panels Fleet Manager'}
+        description={
+          language === 'vi'
+            ? 'Giám sát và điều phối hạ tầng panel khách hàng, phân giải tên miền, API key và đồng bộ cơ sở dữ liệu.'
+            : 'Orchestrate client SMM instances, domain routing, cryptographic API credentials, and multi-tenant quotas.'
+        }
+        badge={
+          <Badge variant="blue" pulse>
+            {panels.length} {language === 'vi' ? 'Cụm node đã tạo' : 'Cluster Nodes'}
+          </Badge>
+        }
+        actions={
+          <div className="flex items-center gap-2.5">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={loadData}
+              disabled={loading}
+              title={language === 'vi' ? 'Làm mới dữ liệu' : 'Refresh Data'}
+            >
+              <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${loading ? 'animate-spin text-blue-600' : ''}`} />
+              <span>{language === 'vi' ? 'Làm mới' : 'Sync'}</span>
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setIsProvisionModalOpen(true)}
+            >
+              <Plus className="w-4 h-4 mr-1.5" />
+              <span>{language === 'vi' ? 'Cấp phát Panel cấp tốc' : 'Direct Provision'}</span>
+            </Button>
           </div>
-          <p className="text-2xl font-black text-slate-900">{panels.length}</p>
-          <span className="text-[10px] text-slate-500 font-medium flex items-center gap-1">
-            <Layers className="w-3 h-3 text-slate-400" />
-            {language === 'vi' ? 'Đã lưu MySQL database' : 'Synced with MySQL DB'}
-          </span>
-        </div>
+        }
+      />
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-slate-500">
-              {language === 'vi' ? 'Đang hoạt động' : 'Active online'}
-            </span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-              <CheckCircle2 className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-2xl font-black text-emerald-600">{totalActive}</p>
-          <span className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
-            <Zap className="w-3 h-3" />
-            {panels.length > 0 ? Math.round((totalActive / panels.length) * 100) : 100}% {language === 'vi' ? 'tỷ lệ hoạt động' : 'operational SLA'}
-          </span>
-        </div>
+      {/* 2. Telemetry KPI Metric Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          title={language === 'vi' ? 'Tổng số panels' : 'Total Panels'}
+          value={panels.length}
+          subtitle={language === 'vi' ? 'Đã lưu MySQL database' : 'Synced with MySQL DB'}
+          icon={<Server className="w-5 h-5 text-blue-600" />}
+        />
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-slate-500">
-              {language === 'vi' ? 'Gói 0đ trải nghiệm' : 'Free 0 VNĐ trials'}
-            </span>
-            <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
-              <Sparkles className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-2xl font-black text-purple-700">{totalFreeTrial}</p>
-          <span className="text-[10px] text-purple-600 font-medium flex items-center gap-1">
-            {language === 'vi' ? '7 ngày trải nghiệm' : '7-Day full access'}
-          </span>
-        </div>
+        <StatCard
+          title={language === 'vi' ? 'Đang trực tuyến' : 'Active Online'}
+          value={totalActive}
+          subtitle={`${panels.length > 0 ? Math.round((totalActive / panels.length) * 100) : 100}% ${language === 'vi' ? 'tỷ lệ SLA sẵn sàng' : 'operational SLA'}`}
+          icon={<CheckCircle2 className="w-5 h-5 text-emerald-600" />}
+          highlight={true}
+          trend={{
+            value: `${panels.length > 0 ? Math.round((totalActive / panels.length) * 100) : 100}%`,
+            positive: true,
+            label: language === 'vi' ? 'Sẵn sàng' : 'Healthy',
+          }}
+        />
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-slate-500">
-              {language === 'vi' ? 'Tạm khóa' : 'Suspended panels'}
-            </span>
-            <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold">
-              <Lock className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-2xl font-black text-rose-600">{totalSuspended}</p>
-          <span className="text-[10px] text-rose-600 font-medium">
-            {totalSuspended > 0 ? (language === 'vi' ? 'Cần kiểm tra gia hạn' : 'Pending renewal') : (language === 'vi' ? 'Hệ thống an toàn' : 'All clear')}
-          </span>
-        </div>
+        <StatCard
+          title={language === 'vi' ? 'Gói 0đ trải nghiệm' : 'Free 0 VNĐ Trials'}
+          value={totalFreeTrial}
+          subtitle={language === 'vi' ? '7 ngày trải nghiệm trọn gói' : '7-day full access tier'}
+          icon={<Sparkles className="w-5 h-5 text-purple-600" />}
+        />
+
+        <StatCard
+          title={language === 'vi' ? 'Tạm ngưng / Khóa' : 'Suspended Nodes'}
+          value={totalSuspended}
+          subtitle={totalSuspended > 0 ? (language === 'vi' ? 'Cần kiểm tra gia hạn' : 'Pending renewal') : (language === 'vi' ? 'Hệ thống tối ưu' : 'All clear')}
+          icon={<Lock className="w-5 h-5 text-rose-600" />}
+        />
       </div>
 
-      {/* 2. Search, Filters & Action Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
-        <div className="flex flex-wrap items-center gap-2.5 flex-1">
-          <div className="relative flex-1 min-w-[220px] max-w-md">
+      {/* 3. Search & Filters Bar */}
+      <div className="rounded-2xl border border-slate-200/80 bg-white/90 backdrop-blur-sm p-4 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.10)] flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3 flex-1">
+          <div className="relative flex-1 min-w-[240px] max-w-md">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder={language === 'vi' ? 'Tìm theo tên panel, domain, khách hàng...' : 'Search panel, domain, user...'}
+              placeholder={language === 'vi' ? 'Tìm theo tên panel, domain, email khách hàng...' : 'Search panel, domain, user...'}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
+              className="w-full pl-9 pr-4 py-2 rounded-full border border-slate-200 bg-slate-50/70 text-xs focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 transition-all"
             />
           </div>
 
           {/* Status Filter */}
-          <div className="w-36">
+          <div className="w-40">
             <Select2
               value={statusFilter}
               onChange={setStatusFilter}
               options={[
-                { value: 'all', label: language === 'vi' ? 'Tất cả trạng thái' : 'All Status' },
+                { value: 'all', label: language === 'vi' ? 'Tất cả trạng thái' : 'All Statuses' },
                 { value: 'active', label: language === 'vi' ? '🟢 Hoạt động' : '🟢 Active' },
                 { value: 'suspended', label: language === 'vi' ? '🔴 Tạm ngưng' : '🔴 Suspended' },
                 { value: 'expired', label: language === 'vi' ? '⚠️ Hết hạn' : '⚠️ Expired' },
@@ -425,7 +439,7 @@ export const AdminPanelsView: React.FC = () => {
           </div>
 
           {/* Plan Filter */}
-          <div className="w-44">
+          <div className="w-48">
             <Select2
               value={planFilter}
               onChange={setPlanFilter}
@@ -442,38 +456,48 @@ export const AdminPanelsView: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <button
+          <Button
+            variant="outline"
+            size="sm"
             onClick={loadData}
             disabled={loading}
-            className="p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600 transition-all cursor-pointer"
-            title={language === 'vi' ? 'Làm mới dữ liệu' : 'Refresh'}
+            title={language === 'vi' ? 'Làm mới' : 'Refresh'}
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-blue-600' : ''}`} />
-          </button>
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-blue-600' : ''}`} />
+          </Button>
 
-          <button
+          <Button
+            variant="primary"
+            size="sm"
             onClick={() => setIsProvisionModalOpen(true)}
-            className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-sm hover:shadow-md shadow-blue-500/20 transition-all"
           >
-            <Plus className="w-4 h-4" />
-            <span>{language === 'vi' ? 'Tạo panel cấp tốc' : 'Direct provision'}</span>
-          </button>
+            <Plus className="w-4 h-4 mr-1.5" />
+            <span>{language === 'vi' ? 'Tạo panel' : 'New Panel'}</span>
+          </Button>
         </div>
       </div>
 
-      {/* 3. Panels Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+      {/* 4. Panels Data Table inside Mac Window Chrome Card */}
+      <Card
+        macChrome={true}
+        macTitle="FLEET_REGISTRY // CLUSTER_NODES"
+        macBadge={
+          <Badge variant="emerald" pulse>
+            {totalActive} ONLINE
+          </Badge>
+        }
+      >
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
-            <thead className="bg-slate-50/90 border-b border-slate-200 text-slate-500 font-bold text-[11px] whitespace-nowrap">
+            <thead className="bg-slate-50/90 border-b border-slate-200/80 text-slate-500 font-bold text-[11px] whitespace-nowrap">
               <tr>
-                <th className="py-3.5 px-4 w-14 text-center">#ID</th>
+                <th className="py-3.5 px-4 w-16 text-center">#ID</th>
                 <th className="py-3.5 px-4">{language === 'vi' ? 'Khách hàng' : 'Customer'}</th>
-                <th className="py-3.5 px-4">{language === 'vi' ? 'Tên panel' : 'Panel name'}</th>
+                <th className="py-3.5 px-4">{language === 'vi' ? 'Tên panel' : 'Panel Name'}</th>
                 <th className="py-3.5 px-4">{language === 'vi' ? 'Tên miền' : 'Domain'}</th>
-                <th className="py-3.5 px-4">{language === 'vi' ? 'Gói cước' : 'Rental plan'}</th>
-                <th className="py-3.5 px-4">{language === 'vi' ? 'Số dư ví panel' : 'Panel balance'}</th>
-                <th className="py-3.5 px-4">{language === 'vi' ? 'Hạn sử dụng' : 'Expires at'}</th>
+                <th className="py-3.5 px-4">{language === 'vi' ? 'Gói cước' : 'Rental Plan'}</th>
+                <th className="py-3.5 px-4">{language === 'vi' ? 'Số dư ví' : 'Wallet Balance'}</th>
+                <th className="py-3.5 px-4">{language === 'vi' ? 'Hạn sử dụng' : 'Expires At'}</th>
                 <th className="py-3.5 px-4 text-center">{language === 'vi' ? 'Trạng thái' : 'Status'}</th>
                 <th className="py-3.5 px-4 text-right">{language === 'vi' ? 'Thao tác' : 'Actions'}</th>
               </tr>
@@ -481,14 +505,14 @@ export const AdminPanelsView: React.FC = () => {
             <tbody className="divide-y divide-slate-100 text-slate-700 whitespace-nowrap">
               {loading && panels.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="py-12 text-center text-slate-400">
+                  <td colSpan={9} className="py-14 text-center text-slate-400">
                     <RefreshCw className="w-6 h-6 animate-spin mx-auto text-blue-500 mb-2" />
-                    <p>{language === 'vi' ? 'Đang tải danh sách Panels từ MySQL...' : 'Loading panels from database...'}</p>
+                    <p className="font-medium">{language === 'vi' ? 'Đang truy vấn danh sách Panels từ MySQL Cluster...' : 'Syncing panels from database...'}</p>
                   </td>
                 </tr>
               ) : filteredPanels.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="py-12 text-center text-slate-400">
+                  <td colSpan={9} className="py-14 text-center text-slate-400">
                     <Server className="w-8 h-8 mx-auto text-slate-300 mb-2" />
                     <p className="font-semibold text-slate-600">
                       {language === 'vi' ? 'Không tìm thấy Panel nào phù hợp' : 'No panels found matching filter'}
@@ -504,50 +528,50 @@ export const AdminPanelsView: React.FC = () => {
                   const isExpired = daysLeft < 0;
 
                   return (
-                    <tr key={p.id} className="hover:bg-slate-50/80 transition-colors group">
+                    <tr key={p.id} className="hover:bg-slate-50/70 transition-colors group">
                       {/* #ID Column */}
                       <td className="py-3.5 px-4 text-center">
-                        <span className="font-mono font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg border border-blue-100 text-xs inline-block">
+                        <span className="font-mono font-bold text-blue-600 bg-blue-50/80 px-2.5 py-1 rounded-full border border-blue-200/60 text-xs inline-block tabular-nums">
                           #{p.dbId || p.id}
                         </span>
                       </td>
 
-                      {/* Khách hàng (Customer Column - Compatible with AdminOrdersView) */}
+                      {/* Customer */}
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-xl bg-slate-900 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs">
+                          <div className="w-8 h-8 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs">
                             {p.user?.name ? p.user.name.slice(0, 2).toUpperCase() : p.user?.username ? p.user.username.slice(0, 2).toUpperCase() : 'US'}
                           </div>
                           <div>
                             <div className="font-bold text-slate-900">{p.user?.name || p.user?.username || `User #${p.userId}`}</div>
-                            <div className="text-[11px] text-slate-500 font-mono">{p.user?.email || `ID: #${p.userId}`}</div>
+                            <div className="text-[11px] text-slate-400 font-mono tabular-nums">{p.user?.email || `ID: #${p.userId}`}</div>
                           </div>
                         </div>
                       </td>
 
-                      {/* Tên panel */}
+                      {/* Panel Name */}
                       <td className="py-3.5 px-4">
                         <div className="font-bold text-slate-900 flex items-center gap-1.5">
                           <span>{p.name}</span>
                           {isTrial && (
-                            <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-purple-100 text-purple-700 border border-purple-200">
+                            <Badge variant="purple" size="sm">
                               0 VNĐ
-                            </span>
+                            </Badge>
                           )}
                         </div>
                       </td>
 
-                      {/* Tên miền (Domain) */}
+                      {/* Domain */}
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-1.5">
-                          <code className="font-mono text-blue-600 font-bold text-xs bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200">
+                          <code className="font-mono text-blue-600 font-bold text-xs bg-slate-100/80 px-2 py-0.5 rounded-md border border-slate-200/70">
                             {p.domain}
                           </code>
                           <a
                             href={`https://${p.domain}`}
                             target="_blank"
                             rel="noreferrer"
-                            className="p-1 hover:bg-blue-50 text-slate-400 hover:text-blue-600 rounded transition-colors"
+                            className="p-1 hover:bg-blue-50 text-slate-400 hover:text-blue-600 rounded-md transition-colors"
                             title={language === 'vi' ? 'Mở trang web' : 'Open website'}
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
@@ -555,83 +579,67 @@ export const AdminPanelsView: React.FC = () => {
                         </div>
                       </td>
 
-                      {/* Gói cước */}
+                      {/* Plan */}
                       <td className="py-3.5 px-4">
-                        <span
-                          className={`px-2.5 py-1 rounded-lg text-xs font-bold border inline-block ${
-                            isTrial
-                              ? 'bg-purple-50 text-purple-800 border-purple-200'
-                              : 'bg-blue-50 text-blue-800 border-blue-200'
-                          }`}
-                        >
+                        <Badge variant={isTrial ? 'purple' : 'blue'}>
                           {p.planName}
-                        </span>
+                        </Badge>
                       </td>
 
-                      {/* Số dư ví panel */}
+                      {/* Balance */}
                       <td className="py-3.5 px-4">
-                        <span className="font-extrabold text-emerald-600 font-mono text-xs">
+                        <span className="font-extrabold text-emerald-600 font-mono tabular-nums text-xs">
                           {formatMoney(Number(p.balance) || 0)}
                         </span>
                       </td>
 
-                      {/* Hạn sử dụng */}
+                      {/* Expiry */}
                       <td className="py-3.5 px-4">
                         <div className="font-medium text-slate-800 flex items-center gap-1.5">
                           <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                          <span className="font-mono text-xs font-bold">{exp.toLocaleDateString()}</span>
+                          <span className="font-mono tabular-nums text-xs font-bold">{exp.toLocaleDateString()}</span>
                         </div>
-                        <div
-                          className={`text-[10px] font-bold mt-0.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md border ${
-                            isExpired
-                              ? 'bg-rose-50 text-rose-700 border-rose-200'
-                              : isExpiringSoon
-                              ? 'bg-amber-50 text-amber-700 border-amber-200 animate-pulse'
-                              : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                          }`}
-                        >
-                          <Clock className="w-3 h-3" />
-                          <span>
+                        <div className="mt-1">
+                          <Badge
+                            variant={isExpired ? 'danger' : isExpiringSoon ? 'warning' : 'success'}
+                            pulse={isExpiringSoon}
+                            size="sm"
+                          >
                             {isExpired
                               ? (language === 'vi' ? 'Đã hết hạn' : 'Expired')
                               : daysLeft === 0
                               ? (language === 'vi' ? 'Hôm nay' : 'Today')
                               : (language === 'vi' ? `Còn ${daysLeft} ngày` : `${daysLeft}d left`)}
-                          </span>
+                          </Badge>
                         </div>
                       </td>
 
-                      {/* Trạng thái */}
+                      {/* Status Toggle */}
                       <td className="py-3.5 px-4 text-center">
                         <button
                           onClick={() => handleToggleStatus(p)}
-                          className="inline-flex items-center gap-1 cursor-pointer focus:outline-hidden"
+                          className="inline-flex items-center gap-1.5 cursor-pointer focus:outline-hidden group/toggle"
                           title={language === 'vi' ? 'Bấm để bật/tắt trạng thái' : 'Click to toggle status'}
                         >
-                          {p.status === 'active' ? (
-                            <div className="flex items-center gap-1 text-emerald-600 font-bold">
-                              <ToggleRight className="w-6 h-6 text-emerald-600" />
-                              <span className="text-[10px]">Active</span>
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-1 text-slate-400 font-bold">
-                              <ToggleLeft className="w-6 h-6 text-slate-300" />
-                              <span className="text-[10px]">Off</span>
-                            </div>
-                          )}
+                          <Badge
+                            variant={p.status === 'active' ? 'emerald' : 'rose'}
+                            pulse={p.status === 'active'}
+                          >
+                            {p.status === 'active' ? 'ONLINE' : 'LOCKED'}
+                          </Badge>
                         </button>
                       </td>
 
                       {/* Actions */}
                       <td className="py-3.5 px-4 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
+                        <div className="flex items-center justify-end gap-1">
                           {/* API Key Viewer */}
                           <button
                             onClick={() => setPanelKeysToView(p)}
-                            className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50/80 rounded-full transition-colors cursor-pointer"
                             title={language === 'vi' ? 'Xem API Key' : 'View API Key'}
                           >
-                            <Key className="w-4 h-4" />
+                            <Key className="w-3.5 h-3.5" />
                           </button>
 
                           {/* Extend Duration */}
@@ -640,19 +648,19 @@ export const AdminPanelsView: React.FC = () => {
                               setPanelToExtend(p);
                               setExtendDays(30);
                             }}
-                            className="p-1.5 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50/80 rounded-full transition-colors cursor-pointer"
                             title={language === 'vi' ? 'Gia hạn thời gian' : 'Extend Duration'}
                           >
-                            <Clock className="w-4 h-4" />
+                            <Clock className="w-3.5 h-3.5" />
                           </button>
 
                           {/* Edit Modal */}
                           <button
                             onClick={() => handleOpenEdit(p)}
-                            className="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50/80 rounded-full transition-colors cursor-pointer"
                             title={language === 'vi' ? 'Chỉnh sửa cấu hình' : 'Edit Configuration'}
                           >
-                            <Edit2 className="w-4 h-4" />
+                            <Edit2 className="w-3.5 h-3.5" />
                           </button>
 
                           {/* Open Panel Link */}
@@ -660,19 +668,19 @@ export const AdminPanelsView: React.FC = () => {
                             href={`https://${p.domain}`}
                             target="_blank"
                             rel="noreferrer"
-                            className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50/80 rounded-full transition-colors cursor-pointer"
                             title={language === 'vi' ? 'Mở trang web Panel' : 'Open Panel Website'}
                           >
-                            <ExternalLink className="w-4 h-4" />
+                            <ExternalLink className="w-3.5 h-3.5" />
                           </a>
 
                           {/* Delete Modal */}
                           <button
                             onClick={() => setPanelToDelete(p)}
-                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50/80 rounded-full transition-colors cursor-pointer"
                             title={language === 'vi' ? 'Xóa Panel' : 'Delete Panel'}
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       </td>
@@ -683,7 +691,7 @@ export const AdminPanelsView: React.FC = () => {
             </tbody>
           </table>
         </div>
-      </div>
+      </Card>
 
       {/* ========================================================================= */}
       {/* MODAL 1: TẠO PANEL CẤP TỐC (DIRECT PROVISION MODAL) */}
@@ -692,13 +700,13 @@ export const AdminPanelsView: React.FC = () => {
         <Modal
           isOpen={isProvisionModalOpen}
           onClose={() => setIsProvisionModalOpen(false)}
-          title={language === 'vi' ? 'Tạo và cấp phát SMM panel cho người dùng' : 'Provision SMM panel for user'}
+          title={language === 'vi' ? 'Cấp phát SMM Panel Cấp Tốc' : 'Direct Provision SMM Panel'}
         >
-          <form onSubmit={handleProvisionSubmit} className="space-y-3.5 text-xs">
+          <form onSubmit={handleProvisionSubmit} className="space-y-4 text-xs">
             {/* 1. Chọn Người Dùng */}
             <div>
-              <label className="block font-bold text-slate-700 mb-1">
-                {language === 'vi' ? 'Chọn thành viên *' : 'Select user *'}
+              <label className="block font-bold text-slate-700 mb-1.5">
+                {language === 'vi' ? 'Chủ sở hữu Panel (User) *' : 'Assigned User *'}
               </label>
               <Select2
                 value={provisionForm.userId}
@@ -710,10 +718,10 @@ export const AdminPanelsView: React.FC = () => {
               />
             </div>
 
-            {/* 2. Chọn Gói Dịch Vụ & Tính Giá Tiền Thích Ứng (Tuần, Tháng, Năm, 7 Ngày Free) */}
+            {/* 2. Chọn Gói Dịch Vụ & Tính Giá Tiền Thích Ứng */}
             <div className="space-y-2">
               <label className="block font-bold text-slate-700 mb-1">
-                {language === 'vi' ? 'Chọn gói dịch vụ *' : 'Select package *'}
+                {language === 'vi' ? 'Gói dịch vụ đăng ký *' : 'Selected Package Plan *'}
               </label>
               <Select2
                 value={provisionForm.packageId}
@@ -771,73 +779,70 @@ export const AdminPanelsView: React.FC = () => {
                 const expDateStr = new Date(Date.now() + (Number(provisionForm.durationDays) || 30) * 24 * 60 * 60 * 1000).toLocaleDateString(language === 'vi' ? 'vi-VN' : 'en-US');
 
                 return (
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
-                    {/* Header thông tin giá cước tương thích */}
+                  <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-3">
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-1.5 font-bold text-slate-700">
                         <Clock className="w-3.5 h-3.5 text-blue-600" />
                         <span>{language === 'vi' ? 'Chu kỳ & giá cước:' : 'Billing cycle & rate:'}</span>
                         <span className="text-[11px] font-semibold text-slate-500 font-mono">({activeCycleName})</span>
                       </div>
-                      <span className="font-extrabold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-lg text-xs">
+                      <Badge variant="blue" size="md">
                         {isTrial ? '0 VNĐ (Miễn phí)' : `${formatMoney(calcPrice)}`}
-                      </span>
+                      </Badge>
                     </div>
 
-                    {/* Bộ Chọn Chu Kỳ Theo Tuần, Tháng, Năm hoặc Gói Free */}
                     {isTrial ? (
-                      <div className="p-2 rounded-lg bg-purple-50 border border-purple-200 text-purple-800 text-[11px] font-semibold flex items-center justify-between">
+                      <div className="p-2.5 rounded-xl bg-purple-50/80 border border-purple-200/60 text-purple-800 text-[11px] font-semibold flex items-center justify-between">
                         <span>🎁 Gói dùng thử trải nghiệm hệ thống (Cố định 7 ngày)</span>
-                        <span className="font-bold text-purple-900">7 ngày (0đ)</span>
+                        <span className="font-mono font-bold text-purple-900">7 ngày (0đ)</span>
                       </div>
                     ) : (
-                      <div className="grid grid-cols-3 gap-1.5">
+                      <div className="grid grid-cols-3 gap-2">
                         <button
                           type="button"
                           onClick={() => setProvisionForm({ ...provisionForm, durationDays: 7 })}
-                          className={`p-2 rounded-lg border text-center transition-all cursor-pointer ${
+                          className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
                             provisionForm.durationDays === 7
-                              ? 'bg-blue-600 border-blue-600 text-white shadow-xs'
+                              ? 'bg-slate-950 border-slate-950 text-white shadow-xs'
                               : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
                           }`}
                         >
                           <span className="block text-[10px] font-bold opacity-80">{language === 'vi' ? 'Theo tuần' : 'Weekly'}</span>
-                          <span className="block text-xs font-black mt-0.5">{formatMoney(weeklyPrice)}</span>
+                          <span className="block text-xs font-mono font-black mt-0.5">{formatMoney(weeklyPrice)}</span>
                           <span className="block text-[9px] opacity-75">7 ngày</span>
                         </button>
 
                         <button
                           type="button"
                           onClick={() => setProvisionForm({ ...provisionForm, durationDays: 30 })}
-                          className={`p-2 rounded-lg border text-center transition-all cursor-pointer relative ${
+                          className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
                             provisionForm.durationDays === 30
-                              ? 'bg-blue-600 border-blue-600 text-white shadow-xs'
+                              ? 'bg-slate-950 border-slate-950 text-white shadow-xs'
                               : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
                           }`}
                         >
                           <span className="block text-[10px] font-bold opacity-80">{language === 'vi' ? 'Theo tháng' : 'Monthly'}</span>
-                          <span className="block text-xs font-black mt-0.5">{formatMoney(monthlyPrice)}</span>
+                          <span className="block text-xs font-mono font-black mt-0.5">{formatMoney(monthlyPrice)}</span>
                           <span className="block text-[9px] opacity-75">30 ngày</span>
                         </button>
 
                         <button
                           type="button"
                           onClick={() => setProvisionForm({ ...provisionForm, durationDays: 365 })}
-                          className={`p-2 rounded-lg border text-center transition-all cursor-pointer ${
+                          className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
                             provisionForm.durationDays === 365
-                              ? 'bg-blue-600 border-blue-600 text-white shadow-xs'
+                              ? 'bg-slate-950 border-slate-950 text-white shadow-xs'
                               : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
                           }`}
                         >
                           <span className="block text-[10px] font-bold opacity-80">{language === 'vi' ? 'Theo năm' : 'Yearly'}</span>
-                          <span className="block text-xs font-black mt-0.5">{formatMoney(yearlyPrice)}</span>
+                          <span className="block text-xs font-mono font-black mt-0.5">{formatMoney(yearlyPrice)}</span>
                           <span className="block text-[9px] text-emerald-500 font-bold">{language === 'vi' ? 'Tiết kiệm' : 'Best'}</span>
                         </button>
                       </div>
                     )}
 
-                    {/* Tùy chỉnh số ngày & Ngày hết hạn */}
-                    <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-200/60 text-xs">
+                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/60 text-xs">
                       <div className="flex items-center gap-1.5">
                         <span className="text-[11px] font-semibold text-slate-500">{language === 'vi' ? 'Số ngày cấp:' : 'Days:'}</span>
                         <input
@@ -847,17 +852,16 @@ export const AdminPanelsView: React.FC = () => {
                           disabled={isTrial}
                           value={provisionForm.durationDays}
                           onChange={(e) => setProvisionForm({ ...provisionForm, durationDays: Number(e.target.value) || 1 })}
-                          className="w-16 px-2 py-1 rounded-lg border border-slate-200 bg-white font-mono font-bold text-xs text-center focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 disabled:bg-slate-100 disabled:text-slate-400"
+                          className="w-16 px-2 py-1 rounded-full border border-slate-200 bg-white font-mono tabular-nums font-bold text-xs text-center focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 disabled:bg-slate-100 disabled:text-slate-400"
                         />
                         <span className="text-[10px] text-slate-400">{language === 'vi' ? 'ngày' : 'days'}</span>
                       </div>
 
-                      <span className="text-[10px] font-bold text-emerald-700 font-mono">
+                      <span className="text-[10px] font-bold text-emerald-700 font-mono tabular-nums">
                         {language === 'vi' ? 'Hạn hết hạn: ' : 'Exp: '}{expDateStr}
                       </span>
                     </div>
 
-                    {/* Cảnh báo số dư ví không đủ */}
                     {(() => {
                       const selectedUser = (users || []).find((u) => String(u.id) === String(provisionForm.userId));
                       const uBalance = Number(selectedUser?.balance || 0);
@@ -867,7 +871,7 @@ export const AdminPanelsView: React.FC = () => {
                       if (!isShort) return null;
 
                       return (
-                        <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-medium flex items-center justify-between gap-2 mt-2">
+                        <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200/80 text-rose-800 text-xs font-medium flex items-center justify-between gap-2 mt-2">
                           <div className="flex items-center gap-1.5">
                             <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
                             <span>
@@ -876,7 +880,7 @@ export const AdminPanelsView: React.FC = () => {
                                 : `User wallet ($${uBalance.toFixed(2)}) is insufficient for ($${calcPrice.toFixed(2)})`}
                             </span>
                           </div>
-                          <span className="font-bold text-rose-700 bg-white px-2 py-0.5 rounded-md border border-rose-200 text-[11px] shrink-0">
+                          <span className="font-bold text-rose-700 bg-white px-2 py-0.5 rounded-full border border-rose-200 text-[11px] shrink-0 font-mono">
                             {language === 'vi' ? `Thiếu $${missing.toFixed(2)}` : `-$${missing.toFixed(2)}`}
                           </span>
                         </div>
@@ -898,7 +902,7 @@ export const AdminPanelsView: React.FC = () => {
                 placeholder="Ví dụ: ApexSMM Pro Hub"
                 value={provisionForm.name}
                 onChange={(e) => setProvisionForm({ ...provisionForm, name: e.target.value })}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 bg-white"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 bg-white"
               />
             </div>
 
@@ -913,7 +917,7 @@ export const AdminPanelsView: React.FC = () => {
                 placeholder="my-panel.nexussmm.store"
                 value={provisionForm.domain}
                 onChange={(e) => setProvisionForm({ ...provisionForm, domain: e.target.value })}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 font-mono text-xs bg-white"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 font-mono text-xs bg-white"
               />
             </div>
 
@@ -939,7 +943,7 @@ export const AdminPanelsView: React.FC = () => {
                   type="text"
                   value={provisionForm.apiKey}
                   onChange={(e) => setProvisionForm({ ...provisionForm, apiKey: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 font-mono text-xs text-slate-800"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 font-mono text-xs text-slate-800"
                 />
               </div>
 
@@ -953,7 +957,7 @@ export const AdminPanelsView: React.FC = () => {
                   step="0.01"
                   value={provisionForm.balance}
                   onChange={(e) => setProvisionForm({ ...provisionForm, balance: Number(e.target.value) })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 bg-white font-mono"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 bg-white font-mono"
                 />
               </div>
             </div>
@@ -983,26 +987,26 @@ export const AdminPanelsView: React.FC = () => {
                 placeholder="Ghi chú quản lý panel..."
                 value={provisionForm.notes}
                 onChange={(e) => setProvisionForm({ ...provisionForm, notes: e.target.value })}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 bg-white"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 bg-white"
               />
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200">
-              <button
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200">
+              <Button
                 type="button"
+                variant="outline"
                 onClick={() => setIsProvisionModalOpen(false)}
-                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 font-semibold cursor-pointer"
               >
                 {language === 'vi' ? 'Hủy' : 'Cancel'}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
+                variant="primary"
                 disabled={isSubmittingProvision}
-                className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold cursor-pointer shadow-xs flex items-center gap-1.5"
+                loading={isSubmittingProvision}
               >
-                {isSubmittingProvision && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
-                <span>{language === 'vi' ? 'Khởi tạo & cấp phát ngay' : 'Provision panel'}</span>
-              </button>
+                {language === 'vi' ? 'Khởi tạo & Cấp phát' : 'Provision Panel'}
+              </Button>
             </div>
           </form>
         </Modal>
@@ -1015,10 +1019,9 @@ export const AdminPanelsView: React.FC = () => {
         <Modal
           isOpen={Boolean(panelToEdit)}
           onClose={() => setPanelToEdit(null)}
-          title={language === 'vi' ? `Chỉnh sửa panel: ${panelToEdit.name}` : `Edit panel: ${panelToEdit.name}`}
+          title={language === 'vi' ? `Chỉnh sửa: ${panelToEdit.name}` : `Edit: ${panelToEdit.name}`}
         >
-          <form onSubmit={handleSaveEdit} className="space-y-3.5 text-xs">
-            {/* 1. Chọn Người Dùng */}
+          <form onSubmit={handleSaveEdit} className="space-y-4 text-xs">
             <div>
               <label className="block font-bold text-slate-700 mb-1">
                 {language === 'vi' ? 'Chủ sở hữu *' : 'Assigned user *'}
@@ -1033,7 +1036,6 @@ export const AdminPanelsView: React.FC = () => {
               />
             </div>
 
-            {/* 2. Chọn Gói Cước */}
             <div>
               <label className="block font-bold text-slate-700 mb-1">
                 {language === 'vi' ? 'Gói dịch vụ của panel *' : 'Assigned package *'}
@@ -1055,7 +1057,6 @@ export const AdminPanelsView: React.FC = () => {
               />
             </div>
 
-            {/* 3. Tên Panel */}
             <div>
               <label className="block font-bold text-slate-700 mb-1">
                 {language === 'vi' ? 'Tên hiển thị panel *' : 'Panel name *'}
@@ -1065,11 +1066,10 @@ export const AdminPanelsView: React.FC = () => {
                 required
                 value={editForm.name}
                 onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 bg-white"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 bg-white"
               />
             </div>
 
-            {/* 4. Domain */}
             <div>
               <label className="block font-bold text-slate-700 mb-1">
                 {language === 'vi' ? 'Tên miền (domain)' : 'Domain'}
@@ -1078,11 +1078,10 @@ export const AdminPanelsView: React.FC = () => {
                 type="text"
                 value={editForm.domain}
                 onChange={(e) => setEditForm({ ...editForm, domain: e.target.value })}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 font-mono bg-white"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 font-mono bg-white"
               />
             </div>
 
-            {/* 5. API Key & Số Dư */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <div className="flex items-center justify-between mb-1">
@@ -1104,7 +1103,7 @@ export const AdminPanelsView: React.FC = () => {
                   type="text"
                   value={editForm.apiKey}
                   onChange={(e) => setEditForm({ ...editForm, apiKey: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 font-mono text-xs text-slate-800"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 font-mono text-xs text-slate-800"
                 />
               </div>
 
@@ -1118,12 +1117,11 @@ export const AdminPanelsView: React.FC = () => {
                   step="0.01"
                   value={editForm.balance}
                   onChange={(e) => setEditForm({ ...editForm, balance: Number(e.target.value) })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 bg-white font-mono"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 bg-white font-mono tabular-nums"
                 />
               </div>
             </div>
 
-            {/* 6. Trạng Thái & Ngày Hết Hạn */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
@@ -1148,12 +1146,11 @@ export const AdminPanelsView: React.FC = () => {
                   type="date"
                   value={editForm.expiresAt}
                   onChange={(e) => setEditForm({ ...editForm, expiresAt: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 bg-white text-xs"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 bg-white text-xs font-mono"
                 />
               </div>
             </div>
 
-            {/* 7. Ghi Chú */}
             <div>
               <label className="block font-bold text-slate-700 mb-1">
                 {language === 'vi' ? 'Ghi chú quản trị' : 'Admin notes'}
@@ -1162,26 +1159,26 @@ export const AdminPanelsView: React.FC = () => {
                 rows={2}
                 value={editForm.notes}
                 onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 bg-white"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 bg-white"
               />
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200">
-              <button
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200">
+              <Button
                 type="button"
+                variant="outline"
                 onClick={() => setPanelToEdit(null)}
-                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 font-semibold cursor-pointer"
               >
                 {language === 'vi' ? 'Hủy' : 'Cancel'}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
+                variant="primary"
                 disabled={isSavingEdit}
-                className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold cursor-pointer shadow-xs flex items-center gap-1.5"
+                loading={isSavingEdit}
               >
-                {isSavingEdit && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
-                <span>{language === 'vi' ? 'Lưu thay đổi' : 'Save changes'}</span>
-              </button>
+                {language === 'vi' ? 'Lưu thay đổi' : 'Save Changes'}
+              </Button>
             </div>
           </form>
         </Modal>
@@ -1199,11 +1196,11 @@ export const AdminPanelsView: React.FC = () => {
           <form onSubmit={handleConfirmExtend} className="space-y-4 text-xs">
             <p className="text-slate-600">
               {language === 'vi'
-                ? `Hạn hiện tại: ${new Date(panelToExtend.expiresAt).toLocaleDateString()}. Chọn số ngày gia hạn thêm cho panel này:`
+                ? `Hạn hiện tại: ${new Date(panelToExtend.expiresAt).toLocaleDateString()}. Chọn số ngày gia hạn thêm:`
                 : `Current expiry: ${new Date(panelToExtend.expiresAt).toLocaleDateString()}. Select extension duration:`}
             </p>
 
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-2.5">
               {[
                 { days: 7, label: language === 'vi' ? '+7 ngày' : '+7 Days' },
                 { days: 30, label: language === 'vi' ? '+30 ngày' : '+30 Days' },
@@ -1216,9 +1213,9 @@ export const AdminPanelsView: React.FC = () => {
                   key={opt.days}
                   type="button"
                   onClick={() => setExtendDays(opt.days)}
-                  className={`p-3 rounded-xl border font-bold text-center transition-all cursor-pointer ${
+                  className={`p-3 rounded-2xl border font-bold text-center transition-all cursor-pointer ${
                     extendDays === opt.days
-                      ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                      ? 'bg-slate-950 text-white border-slate-950 shadow-xs'
                       : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                   }`}
                 >
@@ -1227,22 +1224,22 @@ export const AdminPanelsView: React.FC = () => {
               ))}
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200">
-              <button
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200">
+              <Button
                 type="button"
+                variant="outline"
                 onClick={() => setPanelToExtend(null)}
-                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 font-semibold cursor-pointer"
               >
                 {language === 'vi' ? 'Hủy' : 'Cancel'}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
+                variant="success"
                 disabled={isExtending}
-                className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold cursor-pointer shadow-xs flex items-center gap-1.5"
+                loading={isExtending}
               >
-                {isExtending && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
-                <span>{language === 'vi' ? `Xác nhận gia hạn (+${extendDays} ngày)` : `Confirm (+${extendDays} days)`}</span>
-              </button>
+                {language === 'vi' ? `Xác nhận (+${extendDays} ngày)` : `Confirm (+${extendDays} days)`}
+              </Button>
             </div>
           </form>
         </Modal>
@@ -1255,48 +1252,48 @@ export const AdminPanelsView: React.FC = () => {
         <Modal
           isOpen={Boolean(panelKeysToView)}
           onClose={() => setPanelKeysToView(null)}
-          title={language === 'vi' ? `Khóa bảo mật panel: ${panelKeysToView.name}` : `API Key: ${panelKeysToView.name}`}
+          title={language === 'vi' ? `Khóa bảo mật: ${panelKeysToView.name}` : `API Key: ${panelKeysToView.name}`}
         >
           <div className="space-y-4 text-xs">
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Live API Key</label>
+              <label className="block font-bold text-slate-700 mb-1.5">Live Production API Key</label>
               <div className="flex items-center gap-2">
                 <input
                   type="text"
                   readOnly
                   value={panelKeysToView.apiKey || 'sk_live_pnl_demo'}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 font-mono text-xs text-slate-800"
+                  className="w-full px-3.5 py-2.5 rounded-full border border-slate-200 bg-slate-50 font-mono text-xs text-slate-800"
                 />
-                <button
-                  type="button"
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => {
                     navigator.clipboard.writeText(panelKeysToView.apiKey || '');
                     addToast('success', language === 'vi' ? 'Đã sao chép API Key' : 'API Key copied');
                   }}
-                  className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold shrink-0 cursor-pointer"
+                  title={language === 'vi' ? 'Sao chép' : 'Copy'}
                 >
                   <Copy className="w-4 h-4" />
-                </button>
+                </Button>
               </div>
             </div>
 
-            <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-[11px] flex items-start gap-2">
+            <div className="p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200/80 text-amber-800 text-[11px] flex items-start gap-2.5">
               <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <span>
                 {language === 'vi'
-                  ? 'Bảo mật khóa này cẩn thận. Bất kỳ ai có API Key này đều có thể tạo đơn và tương tác với Panel.'
+                  ? 'Bảo mật khóa này cẩn thận. Bất kỳ ai có API Key này đều có thể tạo đơn và tương tác với Cluster Panel.'
                   : 'Keep this key secure. Anyone with this API Key can interact and place orders on this panel.'}
               </span>
             </div>
 
             <div className="flex items-center justify-end pt-2 border-t border-slate-200">
-              <button
-                type="button"
+              <Button
+                variant="outline"
                 onClick={() => setPanelKeysToView(null)}
-                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold cursor-pointer"
               >
                 {language === 'vi' ? 'Đóng' : 'Close'}
-              </button>
+              </Button>
             </div>
           </div>
         </Modal>
@@ -1309,16 +1306,16 @@ export const AdminPanelsView: React.FC = () => {
         <Modal
           isOpen={Boolean(panelToDelete)}
           onClose={() => setPanelToDelete(null)}
-          title={language === 'vi' ? 'Xác nhận xóa panel' : 'Confirm delete panel'}
+          title={language === 'vi' ? 'Xác nhận xóa panel' : 'Confirm Delete Panel'}
         >
           <div className="space-y-4 text-xs">
-            <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 flex items-start gap-3">
+            <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200/80 text-rose-800 flex items-start gap-3">
               <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
               <div>
                 <p className="font-bold text-sm text-rose-900">
                   {language === 'vi' ? 'Hành động này không thể hoàn tác!' : 'This action is irreversible!'}
                 </p>
-                <p className="mt-1">
+                <p className="mt-1 leading-relaxed">
                   {language === 'vi'
                     ? `Bạn có chắc chắn muốn xóa vĩnh viễn Panel "${panelToDelete.name}" (${panelToDelete.domain}) khỏi cơ sở dữ liệu MySQL?`
                     : `Are you sure you want to permanently delete "${panelToDelete.name}" (${panelToDelete.domain}) from MySQL database?`}
@@ -1326,23 +1323,23 @@ export const AdminPanelsView: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200">
-              <button
+            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-200">
+              <Button
                 type="button"
+                variant="outline"
                 onClick={() => setPanelToDelete(null)}
-                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 font-semibold cursor-pointer"
               >
                 {language === 'vi' ? 'Hủy' : 'Cancel'}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="danger"
                 onClick={handleConfirmDelete}
                 disabled={isDeleting}
-                className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold cursor-pointer shadow-xs flex items-center gap-1.5"
+                loading={isDeleting}
               >
-                {isDeleting && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
-                <span>{language === 'vi' ? 'Xóa vĩnh viễn' : 'Delete permanently'}</span>
-              </button>
+                {language === 'vi' ? 'Xóa Vĩnh Viễn' : 'Delete Permanently'}
+              </Button>
             </div>
           </div>
         </Modal>
@@ -1350,4 +1347,3 @@ export const AdminPanelsView: React.FC = () => {
     </div>
   );
 };
-

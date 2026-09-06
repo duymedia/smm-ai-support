@@ -123,30 +123,46 @@ export const AuthPages: React.FC<AuthPageProps> = ({ mode }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
+    <div className="min-h-screen bg-slate-50 bg-dot-matrix flex flex-col justify-between">
       <Navbar />
 
       <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
-        <div className="w-full max-w-md bg-white rounded-2xl border border-slate-200/90 shadow-xl p-6 sm:p-8">
+        <div className="w-full max-w-md glass-card-elevated border border-slate-200/90 shadow-2xl p-6 sm:p-8 relative overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          {/* Mac window header chrome */}
+          <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100/90">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-400/80 border border-rose-500/30" />
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-400/80 border border-amber-500/30" />
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400/80 border border-emerald-500/30" />
+            </div>
+            <div className="flex items-center gap-1.5 text-[10px] font-mono text-slate-400">
+              <ShieldCheck className="w-3.5 h-3.5 text-blue-500" />
+              <span>TLS 1.3 ENCRYPTED</span>
+            </div>
+          </div>
+
           {/* Header */}
           <div className="text-center mb-6">
-            <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white mx-auto shadow-md shadow-blue-500/20 mb-3">
+            <div
+              style={{ background: 'linear-gradient(135deg, var(--brand-primary), var(--brand-secondary))' }}
+              className="w-12 h-12 rounded-2xl flex items-center justify-center text-white mx-auto shadow-md shadow-blue-500/25 mb-3"
+            >
               <Zap className="w-6 h-6 fill-current" />
             </div>
 
             {mode === 'login' && (
               <>
-                <h1 className="text-xl font-bold text-slate-900">{language === 'vi' ? 'Đăng nhập' : 'Sign in'}</h1>
-                <p className="text-xs text-slate-500 mt-1">{language === 'vi' ? 'Quản lý dịch vụ, đơn hàng và hoạt động của bạn.' : 'Manage your services, orders, and operations.'}</p>
+                <h1 className="text-xl font-bold text-slate-900 tracking-tight">{language === 'vi' ? 'Đăng nhập Bảng điều khiển' : 'Sign In to Dashboard'}</h1>
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">{language === 'vi' ? 'Quản lý dịch vụ, đơn hàng và hoạt động của bạn.' : 'Manage your services, orders, and operations.'}</p>
               </>
             )}
 
             {mode === 'register' && (
               <>
-                <h1 className="text-xl font-bold text-slate-900">
-                  {language === 'vi' ? 'Đăng ký tài khoản' : 'Create an Account'}
+                <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+                  {language === 'vi' ? 'Đăng ký tài khoản mới' : 'Create an Account'}
                 </h1>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
                   {language === 'vi'
                     ? 'Bắt đầu quản lý và vận hành hệ thống SMM Panel của bạn.'
                     : 'Get started and manage your SMM Panel operations.'}
@@ -156,13 +172,24 @@ export const AuthPages: React.FC<AuthPageProps> = ({ mode }) => {
 
             {mode === 'forgot' && (
               <>
-                <h1 className="text-xl font-bold text-slate-900">
+                <h1 className="text-xl font-bold text-slate-900 tracking-tight">
                   {language === 'vi' ? 'Đặt lại mật khẩu' : 'Reset Your Password'}
                 </h1>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
                   {language === 'vi'
                     ? 'Nhập địa chỉ email đã đăng ký để nhận hướng dẫn khôi phục.'
                     : 'Enter your registered email to receive reset instructions.'}
+                </p>
+              </>
+            )}
+
+            {mode === 'reset' && (
+              <>
+                <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+                  {language === 'vi' ? 'Tạo Mật Khẩu Mới' : 'Set New Password'}
+                </h1>
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  {language === 'vi' ? 'Nhập mật khẩu an toàn mới cho tài khoản của bạn.' : 'Enter a new secure password for your account.'}
                 </p>
               </>
             )}
@@ -173,17 +200,17 @@ export const AuthPages: React.FC<AuthPageProps> = ({ mode }) => {
             <div>
               <form onSubmit={handleLoginSubmit} className="space-y-4">
                 <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      {language === 'vi' ? 'Email hoặc tên đăng nhập' : 'Email or username'}
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    {language === 'vi' ? 'Email hoặc tên đăng nhập' : 'Email or username'}
                   </label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type="text"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder={language === 'vi' ? 'Nhập email hoặc tên đăng nhập' : 'Enter email or username'}
-                      className="w-full pl-9 pr-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
+                      className="w-full pl-10 pr-3.5 h-10 text-xs bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
                       required
                     />
                   </div>
@@ -197,19 +224,19 @@ export const AuthPages: React.FC<AuthPageProps> = ({ mode }) => {
                     <button
                       type="button"
                       onClick={() => setCurrentRoute('/forgot-password')}
-                      className="text-[11px] font-medium text-blue-600 hover:text-blue-800"
+                      className="text-[11px] font-medium text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
                     >
                       {language === 'vi' ? 'Quên mật khẩu?' : 'Forgot password?'}
                     </button>
                   </div>
                   <div className="relative">
-                    <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••••••"
-                      className="w-full pl-9 pr-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
+                      className="w-full pl-10 pr-3.5 h-10 text-xs bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all font-mono"
                     />
                   </div>
                 </div>
@@ -217,7 +244,7 @@ export const AuthPages: React.FC<AuthPageProps> = ({ mode }) => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                  className="w-full h-11 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-full text-xs font-bold shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 press-tactile"
                 >
                   <span>{loading ? (language === 'vi' ? 'Đang xác thực...' : 'Authenticating...') : (language === 'vi' ? 'Đăng nhập vào Bảng điều khiển' : 'Sign In to Dashboard')}</span>
                   <ArrowRight className="w-4 h-4" />
@@ -238,7 +265,7 @@ export const AuthPages: React.FC<AuthPageProps> = ({ mode }) => {
                   <button
                     type="button"
                     onClick={() => socialLogin('google')}
-                    className="group flex items-center justify-center gap-2.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 transition-all cursor-pointer active:scale-[0.98]"
+                    className="group flex items-center justify-center gap-2.5 rounded-full border border-slate-200 bg-white h-10 px-4 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 transition-all cursor-pointer press-tactile"
                   >
                     <GoogleIcon />
                     <span>Google</span>
@@ -246,7 +273,7 @@ export const AuthPages: React.FC<AuthPageProps> = ({ mode }) => {
                   <button
                     type="button"
                     onClick={() => socialLogin('facebook')}
-                    className="group flex items-center justify-center gap-2.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 transition-all cursor-pointer active:scale-[0.98]"
+                    className="group flex items-center justify-center gap-2.5 rounded-full border border-slate-200 bg-white h-10 px-4 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 transition-all cursor-pointer press-tactile"
                   >
                     <FacebookIcon />
                     <span>Facebook</span>
@@ -264,7 +291,7 @@ export const AuthPages: React.FC<AuthPageProps> = ({ mode }) => {
                       <button
                         type="button"
                         onClick={() => setCurrentRoute('/register')}
-                        className="font-bold text-blue-600 hover:underline"
+                        className="font-bold text-blue-600 hover:underline cursor-pointer"
                       >
                         {language === 'vi' ? 'Tạo tài khoản ngay' : 'Create Account'}
                       </button>
@@ -274,17 +301,19 @@ export const AuthPages: React.FC<AuthPageProps> = ({ mode }) => {
               </form>
 
               {showTwoFactorModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4" onClick={() => setShowTwoFactorModal(false)}>
-                  <form onSubmit={handleTwoFactorSubmit} onClick={event => event.stopPropagation()} className="w-full max-w-sm space-y-5 rounded-2xl bg-white p-6 shadow-2xl">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4" onClick={() => setShowTwoFactorModal(false)}>
+                  <form onSubmit={handleTwoFactorSubmit} onClick={event => event.stopPropagation()} className="w-full max-w-sm space-y-5 rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-150">
                     <div className="text-center">
-                      <ShieldCheck className="mx-auto mb-3 h-10 w-10 text-blue-600" />
-                      <h2 className="text-lg font-bold text-slate-900">{language === 'vi' ? 'Xác thực 2FA' : 'Two-Factor Authentication'}</h2>
-                      <p className="mt-2 text-sm leading-5 text-slate-500">{language === 'vi' ? 'Mở Google Authenticator hoặc Authy và nhập mã 6 số để hoàn tất đăng nhập.' : 'Open Google Authenticator or Authy and enter the 6-digit code to finish signing in.'}</p>
+                      <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center mx-auto mb-3">
+                        <ShieldCheck className="h-6 w-6" />
+                      </div>
+                      <h2 className="text-base font-bold text-slate-900">{language === 'vi' ? 'Xác thực 2FA' : 'Two-Factor Authentication'}</h2>
+                      <p className="mt-1.5 text-xs leading-5 text-slate-500">{language === 'vi' ? 'Mở ứng dụng Google Authenticator và nhập mã 6 số.' : 'Enter the 6-digit code from your authenticator app.'}</p>
                     </div>
-                    <input autoFocus type="text" inputMode="numeric" maxLength={6} value={twoFactorCode} onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))} placeholder={language === 'vi' ? 'Nhập mã 6 số' : 'Enter 6-digit code'} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-center font-mono text-lg tracking-[0.35em] focus:border-blue-600 focus:bg-white focus:outline-none" />
-                    <div className="flex gap-3">
-                      <button type="button" onClick={() => setShowTwoFactorModal(false)} className="flex-1 rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-600">{language === 'vi' ? 'Hủy' : 'Cancel'}</button>
-                      <button type="submit" disabled={loading || twoFactorCode.length !== 6} className="flex-1 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50">{loading ? '...' : (language === 'vi' ? 'Xác thực' : 'Verify')}</button>
+                    <input autoFocus type="text" inputMode="numeric" maxLength={6} value={twoFactorCode} onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="000 000" className="w-full h-12 rounded-xl border border-slate-200 bg-slate-50 px-3 text-center font-mono text-xl tracking-[0.35em] tabular-nums focus:border-blue-600 focus:bg-white focus:outline-none" />
+                    <div className="flex gap-2.5">
+                      <button type="button" onClick={() => setShowTwoFactorModal(false)} className="flex-1 h-10 rounded-full border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer press-tactile">{language === 'vi' ? 'Hủy' : 'Cancel'}</button>
+                      <button type="submit" disabled={loading || twoFactorCode.length !== 6} className="flex-1 h-10 rounded-full bg-blue-600 text-xs font-bold text-white hover:bg-blue-700 disabled:opacity-50 cursor-pointer press-tactile">{loading ? '...' : (language === 'vi' ? 'Xác thực' : 'Verify')}</button>
                     </div>
                   </form>
                 </div>
@@ -313,157 +342,157 @@ export const AuthPages: React.FC<AuthPageProps> = ({ mode }) => {
                   <button
                     type="button"
                     onClick={() => setCurrentRoute('/login')}
-                    className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition-all cursor-pointer"
+                    className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-xs font-bold shadow-xs transition-all cursor-pointer press-tactile"
                   >
                     {language === 'vi' ? 'Quay Lại Đăng Nhập' : 'Back to Sign In'}
                   </button>
                 </div>
               ) : (
                 <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    {language === 'vi' ? 'Họ và tên' : 'Full Name'}
-                  </label>
-                  <div className="relative">
-                    <UserIcon className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      {language === 'vi' ? 'Họ và tên' : 'Full Name'}
+                    </label>
+                    <div className="relative">
+                      <UserIcon className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="e.g. Alex Morgan"
+                        className="w-full pl-10 pr-3.5 h-10 text-xs bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      {language === 'vi' ? 'Tên đăng nhập' : 'Username'}
+                    </label>
                     <input
                       type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="e.g. Alex Morgan"
-                      className="w-full pl-9 pr-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
-                      required
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder="e.g. alex_agency"
+                      className="w-full px-3.5 h-10 text-xs bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
                     />
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    {language === 'vi' ? 'Tên đăng nhập' : 'Username'}
-                  </label>
-                  <input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="e.g. alex_agency"
-                    className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
-                  />
-                </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      {language === 'vi' ? 'Địa chỉ Email' : 'Email Address'}
+                    </label>
+                    <div className="relative">
+                      <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="alex@yourdomain.com"
+                        className="w-full pl-10 pr-3.5 h-10 text-xs bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+                        required
+                      />
+                    </div>
+                  </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    {language === 'vi' ? 'Địa chỉ Email' : 'Email Address'}
-                  </label>
-                  <div className="relative">
-                    <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      {language === 'vi' ? 'Mật khẩu' : 'Password'}
+                    </label>
+                    <div className="relative">
+                      <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Ít nhất 8 ký tự"
+                        className="w-full pl-10 pr-3.5 h-10 text-xs bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all font-mono"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      {language === 'vi' ? 'Xác nhận mật khẩu' : 'Confirm Password'}
+                    </label>
+                    <div className="relative">
+                      <KeyRound className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="Nhập lại mật khẩu"
+                        className="w-full pl-10 pr-3.5 h-10 text-xs bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all font-mono"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-1">
                     <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="alex@yourdomain.com"
-                      className="w-full pl-9 pr-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
-                      required
+                      type="checkbox"
+                      id="agreeTerms"
+                      checked={agreeTerms}
+                      onChange={(e) => setAgreeTerms(e.target.checked)}
+                      className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                     />
+                    <label htmlFor="agreeTerms" className="text-xs text-slate-600 cursor-pointer select-none">
+                      {language === 'vi' ? 'Tôi đồng ý với Điều khoản dịch vụ & Chính sách bảo mật' : 'I agree to the Terms of Service & Privacy Policy'}
+                    </label>
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    {language === 'vi' ? 'Mật khẩu' : 'Password'}
-                  </label>
-                  <div className="relative">
-                    <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="At least 8 characters"
-                      className="w-full pl-9 pr-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    {language === 'vi' ? 'Xác nhận mật khẩu' : 'Confirm Password'}
-                  </label>
-                  <div className="relative">
-                    <KeyRound className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Repeat password"
-                      className="w-full pl-9 pr-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 pt-1">
-                  <input
-                    type="checkbox"
-                    id="agreeTerms"
-                    checked={agreeTerms}
-                    onChange={(e) => setAgreeTerms(e.target.checked)}
-                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <label htmlFor="agreeTerms" className="text-xs text-slate-600">
-                    {language === 'vi' ? 'Tôi đồng ý với Điều khoản dịch vụ & Chính sách bảo mật' : 'I agree to the Terms of Service & Privacy Policy'}
-                  </label>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
-                >
-                  <span>{loading ? (language === 'vi' ? 'Đang tạo tài khoản...' : 'Creating account...') : (language === 'vi' ? 'Đăng ký tài khoản' : 'Create Account')}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-
-                <div className="relative my-3">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-slate-200" />
-                  </div>
-                  <div className="relative flex justify-center">
-                    <span className="bg-white px-3 text-[11px] font-medium text-slate-400">
-                      {language === 'vi' ? 'Hoặc đăng ký nhanh bằng' : 'Or sign up with'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
                   <button
-                    type="button"
-                    onClick={() => socialLogin('google')}
-                    className="group flex items-center justify-center gap-2.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 transition-all cursor-pointer active:scale-[0.98]"
+                    type="submit"
+                    disabled={loading}
+                    className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-xs font-bold shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 press-tactile"
                   >
-                    <GoogleIcon />
-                    <span>Google</span>
+                    <span>{loading ? (language === 'vi' ? 'Đang tạo tài khoản...' : 'Creating account...') : (language === 'vi' ? 'Đăng ký tài khoản' : 'Create Account')}</span>
+                    <ArrowRight className="w-4 h-4" />
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => socialLogin('facebook')}
-                    className="group flex items-center justify-center gap-2.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 transition-all cursor-pointer active:scale-[0.98]"
-                  >
-                    <FacebookIcon />
-                    <span>Facebook</span>
-                  </button>
-                </div>
 
-                <div className="text-center pt-2 text-xs text-slate-600">
-                  {language === 'vi' ? 'Đã có tài khoản?' : 'Already have an account?'}{' '}
-                  <button
-                    type="button"
-                    onClick={() => setCurrentRoute('/login')}
-                    className="font-bold text-blue-600 hover:underline"
-                  >
-                    {language === 'vi' ? 'Đăng nhập ngay' : 'Sign In'}
-                  </button>
-                </div>
-              </form>
+                  <div className="relative my-3">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-slate-200" />
+                    </div>
+                    <div className="relative flex justify-center">
+                      <span className="bg-white px-3 text-[11px] font-medium text-slate-400">
+                        {language === 'vi' ? 'Hoặc đăng ký nhanh bằng' : 'Or sign up with'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => socialLogin('google')}
+                      className="group flex items-center justify-center gap-2.5 rounded-full border border-slate-200 bg-white h-10 px-4 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 transition-all cursor-pointer press-tactile"
+                    >
+                      <GoogleIcon />
+                      <span>Google</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => socialLogin('facebook')}
+                      className="group flex items-center justify-center gap-2.5 rounded-full border border-slate-200 bg-white h-10 px-4 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 transition-all cursor-pointer press-tactile"
+                    >
+                      <FacebookIcon />
+                      <span>Facebook</span>
+                    </button>
+                  </div>
+
+                  <div className="text-center pt-2 text-xs text-slate-600">
+                    {language === 'vi' ? 'Đã có tài khoản?' : 'Already have an account?'}{' '}
+                    <button
+                      type="button"
+                      onClick={() => setCurrentRoute('/login')}
+                      className="font-bold text-blue-600 hover:underline cursor-pointer"
+                    >
+                      {language === 'vi' ? 'Đăng nhập ngay' : 'Sign In'}
+                    </button>
+                  </div>
+                </form>
               )}
             </div>
           )}
@@ -472,15 +501,15 @@ export const AuthPages: React.FC<AuthPageProps> = ({ mode }) => {
           {mode === 'forgot' && (
             <div className="space-y-4">
               {resetSent ? (
-                <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-center space-y-2">
+                <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-200/80 text-center space-y-2.5">
                   <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
                   <h3 className="text-sm font-bold text-emerald-900">Check Your Inbox</h3>
-                  <p className="text-xs text-emerald-700">
-                    We've dispatched a secure password reset link to <strong>{email}</strong>.
+                  <p className="text-xs text-emerald-700 leading-relaxed">
+                    We've dispatched a secure password reset link to <strong className="font-mono">{email}</strong>.
                   </p>
                   <button
                     onClick={() => setCurrentRoute('/login')}
-                    className="mt-3 px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-xl"
+                    className="mt-3 h-10 px-5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-full cursor-pointer press-tactile"
                   >
                     Back to Log In
                   </button>
@@ -490,13 +519,13 @@ export const AuthPages: React.FC<AuthPageProps> = ({ mode }) => {
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">Your Registered Email</label>
                     <div className="relative">
-                      <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="alex.morgan@nexussmm.io"
-                        className="w-full pl-9 pr-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-hidden"
+                        className="w-full pl-10 pr-3.5 h-10 text-xs bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
                         required
                       />
                     </div>
@@ -505,7 +534,7 @@ export const AuthPages: React.FC<AuthPageProps> = ({ mode }) => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs cursor-pointer"
+                    className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-xs font-bold shadow-xs cursor-pointer press-tactile disabled:opacity-60"
                   >
                     {loading ? 'Sending Link...' : 'Send Password Reset Link'}
                   </button>
@@ -514,7 +543,7 @@ export const AuthPages: React.FC<AuthPageProps> = ({ mode }) => {
                     <button
                       type="button"
                       onClick={() => setCurrentRoute('/login')}
-                      className="font-bold text-slate-700 hover:underline"
+                      className="font-bold text-slate-700 hover:underline cursor-pointer"
                     >
                       ← Back to Log In
                     </button>
@@ -574,13 +603,13 @@ export const AuthPages: React.FC<AuthPageProps> = ({ mode }) => {
                     {language === 'vi' ? 'Mật khẩu mới:' : 'New Password:'}
                   </label>
                   <div className="relative">
-                    <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Ít nhất 8 ký tự"
-                      className="w-full pl-9 pr-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-hidden"
+                      className="w-full pl-10 pr-3.5 h-10 text-xs bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all font-mono"
                       required
                     />
                   </div>
@@ -591,13 +620,13 @@ export const AuthPages: React.FC<AuthPageProps> = ({ mode }) => {
                     {language === 'vi' ? 'Xác nhận mật khẩu mới:' : 'Confirm New Password:'}
                   </label>
                   <div className="relative">
-                    <KeyRound className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <KeyRound className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type="password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Nhập lại mật khẩu"
-                      className="w-full pl-9 pr-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-hidden"
+                      className="w-full pl-10 pr-3.5 h-10 text-xs bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all font-mono"
                       required
                     />
                   </div>
@@ -606,7 +635,7 @@ export const AuthPages: React.FC<AuthPageProps> = ({ mode }) => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs cursor-pointer disabled:opacity-50"
+                  className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-xs font-bold shadow-xs cursor-pointer disabled:opacity-50 press-tactile"
                 >
                   {loading
                     ? (language === 'vi' ? 'Đang cập nhật mật khẩu...' : 'Updating...')
@@ -617,7 +646,7 @@ export const AuthPages: React.FC<AuthPageProps> = ({ mode }) => {
                   <button
                     type="button"
                     onClick={() => setCurrentRoute('/login')}
-                    className="font-bold text-slate-700 hover:underline"
+                    className="font-bold text-slate-700 hover:underline cursor-pointer"
                   >
                     ← {language === 'vi' ? 'Quay lại Đăng nhập' : 'Back to Log In'}
                   </button>
@@ -628,7 +657,7 @@ export const AuthPages: React.FC<AuthPageProps> = ({ mode }) => {
         </div>
       </div>
 
-      <div className="text-center py-4 px-4 text-xs text-slate-400 border-t border-slate-200 space-y-1">
+      <div className="text-center py-4 px-4 text-xs text-slate-400 border-t border-slate-200/80 space-y-1">
         <div>{language === 'vi' ? 'Kết nối bảo mật • Mã hóa SSL 256-bit' : 'Secure connection • 256-bit SSL encryption'}</div>
         {siteConfig?.footerCopyright && (
           <div

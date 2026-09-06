@@ -22,6 +22,10 @@ import {
 } from 'lucide-react';
 import { EmptyState } from '../ui/EmptyState';
 import { Transaction } from '../../types';
+import { Button } from '../ui/Button';
+import { Badge } from '../ui/Badge';
+import { Card } from '../ui/Card';
+import { StatCard } from '../ui/StatCard';
 
 export const TransactionsPage: React.FC = () => {
   const { user, transactions, formatMoney, addToast, language, t } = useApp();
@@ -151,9 +155,9 @@ export const TransactionsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-5 animate-in fade-in duration-200 w-full min-w-0">
+    <div className="space-y-6 animate-in fade-in duration-200 w-full min-w-0">
       {/* 1. Header & Export Button */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <Card className="p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="w-11 h-11 rounded-2xl bg-blue-50 border border-blue-200/80 text-blue-600 flex items-center justify-center font-bold shadow-2xs shrink-0">
             <History className="w-5 h-5" />
@@ -161,11 +165,11 @@ export const TransactionsPage: React.FC = () => {
           <div>
             <h1 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
               <span>{language === 'vi' ? 'Lịch sử giao dịch & Biến động số dư' : 'Transaction History & Balance Ledger'}</span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700 font-mono">
+              <Badge variant="brand" size="sm">
                 {effectiveTxs.length} {language === 'vi' ? 'giao dịch' : 'entries'}
-              </span>
+              </Badge>
             </h1>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-slate-500 mt-1">
               {language === 'vi'
                 ? 'Theo dõi chi tiết các giao dịch nạp tiền, chi phí thuê gói và biến động số dư tài khoản.'
                 : 'Detailed ledger of wallet deposits, subscription rentals, and balance changes.'}
@@ -173,110 +177,69 @@ export const TransactionsPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
+        <div className="flex items-center gap-2.5">
+          <Button
             onClick={fetchTransactions}
             disabled={loading}
-            className="p-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
+            variant="outline"
+            size="icon"
             title={language === 'vi' ? 'Làm mới' : 'Refresh'}
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-blue-600' : 'text-slate-500'}`} />
-          </button>
-          <button
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-blue-600' : 'text-slate-500'}`} />
+          </Button>
+          <Button
             onClick={handleExportCsv}
-            className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+            variant="secondary"
+            size="md"
           >
-            <Download className="w-3.5 h-3.5 text-slate-600" />
+            <Download className="w-4 h-4 mr-1.5 text-slate-600" />
             <span>{language === 'vi' ? 'Xuất CSV' : 'Export CSV'}</span>
-          </button>
+          </Button>
         </div>
-      </div>
+      </Card>
 
       {/* 2. Primary Stat Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-              {language === 'vi' ? 'Số dư hiện tại' : 'Current balance'}
-            </span>
-            <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
-              <Wallet className="w-3.5 h-3.5" />
-            </div>
-          </div>
-          <p className="text-lg font-bold font-mono text-slate-900">
-            {formatMoney(user?.balance || 0)}
-          </p>
-          <p className="text-[10px] text-slate-400 font-medium">
-            {language === 'vi' ? 'Khả dụng thanh toán' : 'Available for orders'}
-          </p>
-        </div>
-
-        <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-              {language === 'vi' ? 'Tổng nạp vào' : 'Total deposits'}
-            </span>
-            <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-              <TrendingUp className="w-3.5 h-3.5" />
-            </div>
-          </div>
-          <p className="text-lg font-bold font-mono text-emerald-600">
-            +{formatMoney(totalDeposited)}
-          </p>
-          <p className="text-[10px] text-slate-400 font-medium">
-            {language === 'vi' ? 'Nạp tiền thành công' : 'Successfully deposited'}
-          </p>
-        </div>
-
-        <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-              {language === 'vi' ? 'Tổng chi tiêu' : 'Total spent'}
-            </span>
-            <div className="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center font-bold">
-              <TrendingDown className="w-3.5 h-3.5" />
-            </div>
-          </div>
-          <p className="text-lg font-bold font-mono text-rose-600">
-            -{formatMoney(totalSpent)}
-          </p>
-          <p className="text-[10px] text-slate-400 font-medium">
-            {language === 'vi' ? 'Thuê panel & gia hạn' : 'Subscriptions & renewals'}
-          </p>
-        </div>
-
-        <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-              {language === 'vi' ? 'Tổng giao dịch' : 'Total transactions'}
-            </span>
-            <div className="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
-              <History className="w-3.5 h-3.5" />
-            </div>
-          </div>
-          <p className="text-lg font-bold font-mono text-slate-900">
-            {effectiveTxs.length}
-          </p>
-          <p className="text-[10px] text-slate-400 font-medium">
-            {language === 'vi' ? 'Bản ghi trên hệ thống' : 'Total ledger entries'}
-          </p>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          title={language === 'vi' ? 'Số dư hiện tại' : 'Current balance'}
+          value={formatMoney(user?.balance || 0)}
+          subtitle={language === 'vi' ? 'Khả dụng thanh toán' : 'Available for orders'}
+          icon={<Wallet className="w-5 h-5 text-blue-600" />}
+        />
+        <StatCard
+          title={language === 'vi' ? 'Tổng nạp vào' : 'Total deposits'}
+          value={`+${formatMoney(totalDeposited)}`}
+          subtitle={language === 'vi' ? 'Nạp tiền thành công' : 'Successfully deposited'}
+          icon={<TrendingUp className="w-5 h-5 text-emerald-600" />}
+        />
+        <StatCard
+          title={language === 'vi' ? 'Tổng chi tiêu' : 'Total spent'}
+          value={`-${formatMoney(totalSpent)}`}
+          subtitle={language === 'vi' ? 'Thuê panel & gia hạn' : 'Subscriptions & renewals'}
+          icon={<TrendingDown className="w-5 h-5 text-rose-600" />}
+        />
+        <StatCard
+          title={language === 'vi' ? 'Tổng giao dịch' : 'Total transactions'}
+          value={effectiveTxs.length}
+          subtitle={language === 'vi' ? 'Bản ghi trên hệ thống' : 'Total ledger entries'}
+          icon={<History className="w-5 h-5 text-purple-600" />}
+        />
       </div>
 
       {/* 3. Filters & Search */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="relative w-full sm:w-72">
-          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+        <div className="relative w-full sm:w-80">
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={language === 'vi' ? 'Tìm theo #ID, nội dung...' : 'Search by #ID or description...'}
-            className="w-full pl-8.5 pr-3 py-1.5 text-xs bg-white border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
+            className="w-full pl-9 pr-3.5 py-2 text-xs bg-white border border-slate-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-colors"
           />
         </div>
 
-        <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+        <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 p-1 bg-slate-100/90 rounded-full border border-slate-200/80">
           {[
             { id: 'all', label: language === 'vi' ? 'Tất cả' : 'All' },
             { id: 'deposit', label: language === 'vi' ? 'Nạp tiền' : 'Deposits' },
@@ -287,10 +250,10 @@ export const TransactionsPage: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setFilterType(tab.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors cursor-pointer shrink-0 ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer shrink-0 ${
                 filterType === tab.id
-                  ? 'bg-blue-600 text-white shadow-2xs font-semibold'
-                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                  ? 'bg-blue-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               {tab.label}
@@ -300,21 +263,30 @@ export const TransactionsPage: React.FC = () => {
       </div>
 
       {/* 4. Transactions Ledger Table */}
-      <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden">
+      <Card
+        macChrome
+        macTitle="Financial Ledger & Audit Trail"
+        macBadge={
+          <Badge variant="brand" size="sm" pulse>
+            Audit Ready
+          </Badge>
+        }
+        className="w-full min-w-0"
+      >
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead className="bg-slate-50/90 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px] whitespace-nowrap">
+          <table className="w-full text-left text-xs border-collapse min-w-[850px]">
+            <thead className="bg-slate-50/90 border-b border-slate-200/80 text-slate-500 font-semibold text-[11px] whitespace-nowrap">
               <tr>
-                <th className="py-2.5 px-3 w-16 text-center">#ID</th>
-                <th className="py-2.5 px-3">{language === 'vi' ? 'Thời gian' : 'Timestamp'}</th>
-                <th className="py-2.5 px-3 min-w-[200px]">{language === 'vi' ? 'Nội dung giao dịch' : 'Description'}</th>
-                <th className="py-2.5 px-3 text-center">{language === 'vi' ? 'Loại' : 'Type'}</th>
-                <th className="py-2.5 px-3 text-right">{language === 'vi' ? 'Số dư trước' : 'Balance before'}</th>
-                <th className="py-2.5 px-3 text-right">{language === 'vi' ? 'Biến động' : 'Amount'}</th>
-                <th className="py-2.5 px-3 text-right">{language === 'vi' ? 'Số dư sau' : 'Balance after'}</th>
-                <th className="py-2.5 px-3">{language === 'vi' ? 'Phương thức' : 'Method'}</th>
-                <th className="py-2.5 px-3 text-center">{language === 'vi' ? 'Trạng thái' : 'Status'}</th>
-                <th className="py-2.5 px-3 text-center w-12">{language === 'vi' ? 'Chi tiết' : 'Action'}</th>
+                <th className="py-3 px-4 w-16 text-center">#ID</th>
+                <th className="py-3 px-4">{language === 'vi' ? 'Thời gian' : 'Timestamp'}</th>
+                <th className="py-3 px-4 min-w-[200px]">{language === 'vi' ? 'Nội dung giao dịch' : 'Description'}</th>
+                <th className="py-3 px-4 text-center">{language === 'vi' ? 'Loại' : 'Type'}</th>
+                <th className="py-3 px-4 text-right">{language === 'vi' ? 'Số dư trước' : 'Balance before'}</th>
+                <th className="py-3 px-4 text-right">{language === 'vi' ? 'Biến động' : 'Amount'}</th>
+                <th className="py-3 px-4 text-right">{language === 'vi' ? 'Số dư sau' : 'Balance after'}</th>
+                <th className="py-3 px-4">{language === 'vi' ? 'Phương thức' : 'Method'}</th>
+                <th className="py-3 px-4 text-center">{language === 'vi' ? 'Trạng thái' : 'Status'}</th>
+                <th className="py-3 px-4 text-center w-12">{language === 'vi' ? 'Chi tiết' : 'Action'}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700 whitespace-nowrap">
@@ -341,45 +313,58 @@ export const TransactionsPage: React.FC = () => {
                   return (
                     <tr key={tx.id} className="hover:bg-slate-50/80 transition-colors">
                       {/* #ID */}
-                      <td className="py-2.5 px-3 text-center">
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-mono text-[11px] font-semibold border border-slate-200/60">
+                      <td className="py-3 px-4 text-center">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-mono tabular-nums text-[11px] font-semibold border border-slate-200/80">
                           #{tx.id}
                         </span>
                       </td>
 
                       {/* Thời gian */}
-                      <td className="py-2.5 px-3 text-slate-600 font-mono text-[11px]">
-                        <div className="font-medium text-slate-800">{new Date(tx.date).toLocaleDateString()}</div>
+                      <td className="py-3 px-4 text-slate-600 font-mono tabular-nums text-[11px]">
+                        <div className="font-semibold text-slate-800">{new Date(tx.date).toLocaleDateString()}</div>
                         <div className="text-[10px] text-slate-400">{new Date(tx.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                       </td>
 
                       {/* Nội dung */}
-                      <td className="py-2.5 px-3 max-w-xs">
+                      <td className="py-3 px-4 max-w-xs">
                         <div className="font-medium text-slate-800 truncate" title={tx.description}>
                           {tx.description}
                         </div>
                         {tx.code && tx.code !== String(tx.id) && (
-                          <div className="text-[10px] font-mono text-slate-400 truncate">
+                          <div className="text-[10px] font-mono tabular-nums text-slate-400 truncate">
                             Code: {tx.code}
                           </div>
                         )}
                       </td>
 
                       {/* Loại */}
-                      <td className="py-2.5 px-3 text-center">
-                        <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold border ${getTypeBadgeClass(tx.type)}`}>
+                      <td className="py-3 px-4 text-center">
+                        <Badge
+                          variant={
+                            tx.type === 'deposit'
+                              ? 'emerald'
+                              : tx.type === 'renewal'
+                              ? 'brand'
+                              : (tx.type as string) === 'trial'
+                              ? 'purple'
+                              : tx.type === 'refund'
+                              ? 'amber'
+                              : 'blue'
+                          }
+                          size="sm"
+                        >
                           {getTypeText(tx.type)}
-                        </span>
+                        </Badge>
                       </td>
 
                       {/* Số tiền ban đầu (Balance Before) */}
-                      <td className="py-2.5 px-3 text-right font-mono text-slate-500 text-[11px]">
+                      <td className="py-3 px-4 text-right font-mono tabular-nums text-slate-500 text-[11px]">
                         {formatMoney(balanceBeforeVal)}
                       </td>
 
                       {/* Biến động số dư (+ / - Amount) */}
                       <td
-                        className={`py-2.5 px-3 text-right font-bold font-mono text-xs ${
+                        className={`py-3 px-4 text-right font-bold font-mono tabular-nums text-xs ${
                           isZero
                             ? 'text-purple-600'
                             : isPositive
@@ -395,42 +380,44 @@ export const TransactionsPage: React.FC = () => {
                       </td>
 
                       {/* Số tiền sau khi thay đổi (Balance After) */}
-                      <td className="py-2.5 px-3 text-right font-bold font-mono text-slate-900 text-[11px]">
+                      <td className="py-3 px-4 text-right font-bold font-mono tabular-nums text-slate-900 text-[11px]">
                         {formatMoney(tx.balanceAfter)}
                       </td>
 
                       {/* Phương thức */}
-                      <td className="py-2.5 px-3 text-slate-600 text-[11px] max-w-[120px] truncate" title={tx.paymentMethod || ''}>
+                      <td className="py-3 px-4 text-slate-600 text-[11px] max-w-[120px] truncate" title={tx.paymentMethod || ''}>
                         {tx.paymentMethod || (language === 'vi' ? 'Số dư ví' : 'Wallet balance')}
                       </td>
 
                       {/* Trạng thái */}
-                      <td className="py-2.5 px-3 text-center">
-                        <span
-                          className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
+                      <td className="py-3 px-4 text-center">
+                        <Badge
+                          variant={
                             tx.status === 'completed'
-                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200/80'
+                              ? 'emerald'
                               : tx.status === 'pending'
-                              ? 'bg-amber-50 text-amber-700 border-amber-200/80'
-                              : 'bg-rose-50 text-rose-700 border-rose-200/80'
-                          }`}
+                              ? 'amber'
+                              : 'rose'
+                          }
+                          pulse={tx.status === 'pending'}
+                          size="sm"
                         >
                           {tx.status === 'completed'
                             ? (language === 'vi' ? 'Hoàn thành' : 'Completed')
                             : tx.status === 'pending'
                             ? (language === 'vi' ? 'Đang xử lý' : 'Pending')
                             : (language === 'vi' ? 'Thất bại' : 'Failed')}
-                        </span>
+                        </Badge>
                       </td>
 
                       {/* Biên lai */}
-                      <td className="py-2.5 px-3 text-center">
+                      <td className="py-3 px-4 text-center">
                         <button
                           onClick={() => setSelectedTx(tx)}
-                          className="p-1 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
+                          className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors cursor-pointer"
                           title={language === 'vi' ? 'Xem biên lai' : 'View receipt'}
                         >
-                          <FileText className="w-3.5 h-3.5" />
+                          <FileText className="w-4 h-4" />
                         </button>
                       </td>
                     </tr>
@@ -440,28 +427,28 @@ export const TransactionsPage: React.FC = () => {
             </tbody>
           </table>
         </div>
-      </div>
+      </Card>
 
       {/* 5. Modal Chi Tiết Biên Lai Giao Dịch */}
       {selectedTx && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white w-full max-w-lg rounded-3xl border border-slate-200 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-white/95 backdrop-blur-md w-full max-w-lg rounded-3xl border border-slate-200/80 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150">
             {/* Modal Header */}
-            <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50 to-blue-50/40">
+            <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-500/20 font-bold">
-                  <FileText className="w-4 h-4" />
+                <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-500/20 font-bold">
+                  <FileText className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-slate-900">
                     {language === 'vi' ? 'Biên lai giao dịch điện tử' : 'Official Transaction Receipt'}
                   </h3>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="text-xs font-mono font-semibold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100">
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="text-xs font-mono tabular-nums font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
                       #{selectedTx.id}
                     </span>
                     {selectedTx.code && selectedTx.code !== String(selectedTx.id) && (
-                      <span className="text-[11px] font-mono text-slate-400">
+                      <span className="text-[11px] font-mono tabular-nums text-slate-400">
                         ({selectedTx.code})
                       </span>
                     )}
@@ -471,21 +458,21 @@ export const TransactionsPage: React.FC = () => {
 
               <button
                 onClick={() => setSelectedTx(null)}
-                className="w-7 h-7 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
+                className="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Content */}
-            <div className="p-5 space-y-4 text-xs">
+            <div className="p-6 space-y-4 text-xs">
               {/* Highlight Box */}
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 text-center space-y-1">
-                <span className="text-[11px] font-semibold text-slate-500">
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center space-y-1.5">
+                <span className="text-[11px] font-medium text-slate-500">
                   {language === 'vi' ? 'Biến động số dư' : 'Amount transaction'}
                 </span>
                 <p
-                  className={`text-xl font-black font-mono ${
+                  className={`text-2xl font-bold font-mono tabular-nums ${
                     selectedTx.amount > 0 ? 'text-emerald-600' : selectedTx.amount === 0 ? 'text-purple-600' : 'text-slate-900'
                   }`}
                 >
@@ -495,27 +482,31 @@ export const TransactionsPage: React.FC = () => {
                     ? '0 VNĐ (Miễn phí)'
                     : `-${formatMoney(Math.abs(selectedTx.amount))}`}
                 </p>
-                <span
-                  className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold border ${getTypeBadgeClass(
-                    selectedTx.type
-                  )}`}
-                >
-                  {getTypeText(selectedTx.type)} • {selectedTx.status.toUpperCase()}
-                </span>
+                <div className="flex items-center justify-center gap-1.5">
+                  <Badge variant="brand" size="sm">
+                    {getTypeText(selectedTx.type)}
+                  </Badge>
+                  <Badge
+                    variant={selectedTx.status === 'completed' ? 'emerald' : selectedTx.status === 'pending' ? 'amber' : 'rose'}
+                    size="sm"
+                  >
+                    {selectedTx.status.toUpperCase()}
+                  </Badge>
+                </div>
               </div>
 
               {/* Detail Rows */}
-              <div className="space-y-2 pt-1">
+              <div className="space-y-2.5 pt-1">
                 <div className="flex justify-between py-1.5 border-b border-slate-100">
                   <span className="text-slate-500">{language === 'vi' ? 'Mã định danh (#ID):' : 'Transaction ID:'}</span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-mono font-bold text-slate-800">#{selectedTx.id}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono tabular-nums font-bold text-slate-800">#{selectedTx.id}</span>
                     <button
                       onClick={() => handleCopyCode(`#${selectedTx.id}`)}
-                      className="text-slate-400 hover:text-blue-600 cursor-pointer"
+                      className="p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-blue-600 transition-colors cursor-pointer"
                       title="Copy #ID"
                     >
-                      {copiedId ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3 text-slate-400 hover:text-blue-600" />}
+                      {copiedId ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                     </button>
                   </div>
                 </div>
@@ -523,14 +514,14 @@ export const TransactionsPage: React.FC = () => {
                 {selectedTx.code && selectedTx.code !== String(selectedTx.id) && (
                   <div className="flex justify-between py-1.5 border-b border-slate-100">
                     <span className="text-slate-500">{language === 'vi' ? 'Mã tham chiếu (Code):' : 'Reference Code:'}</span>
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-mono text-slate-700 text-[11px]">{selectedTx.code}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono tabular-nums text-slate-700 text-[11px]">{selectedTx.code}</span>
                       <button
                         onClick={() => handleCopyCode(selectedTx.code!)}
-                        className="text-slate-400 hover:text-blue-600 cursor-pointer"
+                        className="p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-blue-600 transition-colors cursor-pointer"
                         title="Copy Code"
                       >
-                        <Copy className="w-3 h-3 text-slate-400 hover:text-blue-600" />
+                        <Copy className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
@@ -538,30 +529,30 @@ export const TransactionsPage: React.FC = () => {
 
                 <div className="flex justify-between py-1.5 border-b border-slate-100">
                   <span className="text-slate-500">{language === 'vi' ? 'Thời gian giao dịch:' : 'Timestamp:'}</span>
-                  <span className="font-mono font-semibold text-slate-700">
+                  <span className="font-mono tabular-nums font-medium text-slate-700">
                     {new Date(selectedTx.date).toLocaleString()}
                   </span>
                 </div>
 
                 <div className="flex justify-between py-1.5 border-b border-slate-100">
                   <span className="text-slate-500">{language === 'vi' ? 'Nội dung giao dịch:' : 'Description:'}</span>
-                  <span className="font-semibold text-slate-800 text-right max-w-[240px]">
+                  <span className="font-medium text-slate-800 text-right max-w-[240px]">
                     {selectedTx.description}
                   </span>
                 </div>
 
                 {/* Số dư trước */}
-                <div className="flex justify-between py-1.5 border-b border-slate-100 bg-slate-50/70 px-2.5 rounded-lg">
+                <div className="flex justify-between py-2 border-b border-slate-100 bg-slate-50/80 px-3 rounded-xl">
                   <span className="text-slate-600 font-medium">{language === 'vi' ? 'Số dư trước giao dịch:' : 'Balance before:'}</span>
-                  <span className="font-mono font-bold text-slate-700">
+                  <span className="font-mono tabular-nums font-semibold text-slate-700">
                     {formatMoney(selectedTx.balanceBefore !== undefined ? selectedTx.balanceBefore : selectedTx.balanceAfter - selectedTx.amount)}
                   </span>
                 </div>
 
                 {/* Số dư sau */}
-                <div className="flex justify-between py-1.5 border-b border-slate-100 bg-blue-50/50 px-2.5 rounded-lg">
-                  <span className="text-blue-900 font-bold">{language === 'vi' ? 'Số dư sau giao dịch:' : 'Balance after:'}</span>
-                  <span className="font-mono font-extrabold text-blue-700">
+                <div className="flex justify-between py-2 border-b border-slate-100 bg-blue-50/50 px-3 rounded-xl">
+                  <span className="text-blue-900 font-semibold">{language === 'vi' ? 'Số dư sau giao dịch:' : 'Balance after:'}</span>
+                  <span className="font-mono tabular-nums font-bold text-blue-700">
                     {formatMoney(selectedTx.balanceAfter)}
                   </span>
                 </div>
@@ -574,27 +565,29 @@ export const TransactionsPage: React.FC = () => {
                 {selectedTx.referenceCode && (
                   <div className="flex justify-between py-1.5 border-b border-slate-100">
                     <span className="text-slate-500">{language === 'vi' ? 'Mã đối soát:' : 'Reference code:'}</span>
-                    <span className="font-mono font-semibold text-slate-700">{selectedTx.referenceCode}</span>
+                    <span className="font-mono tabular-nums font-medium text-slate-700">{selectedTx.referenceCode}</span>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2">
-              <button
+            <div className="p-4 bg-slate-50/90 border-t border-slate-100 flex items-center justify-end gap-2.5">
+              <Button
+                variant="outline"
+                size="md"
                 onClick={() => window.print()}
-                className="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-semibold flex items-center gap-1.5 cursor-pointer text-xs"
               >
-                <Printer className="w-3.5 h-3.5" />
+                <Printer className="w-4 h-4 mr-1.5" />
                 <span>{language === 'vi' ? 'In biên lai' : 'Print'}</span>
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="brand"
+                size="md"
                 onClick={() => setSelectedTx(null)}
-                className="px-4 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold cursor-pointer text-xs"
               >
                 {language === 'vi' ? 'Đóng' : 'Close'}
-              </button>
+              </Button>
             </div>
           </div>
         </div>

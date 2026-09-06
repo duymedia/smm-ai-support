@@ -27,6 +27,10 @@ import {
 import { EmptyState } from '../ui/EmptyState';
 import { Select2 } from '../ui/Select2';
 import { Modal } from '../ui/Modal';
+import { Button } from '../ui/Button';
+import { Badge } from '../ui/Badge';
+import { Card } from '../ui/Card';
+import { StatCard } from '../ui/StatCard';
 
 export interface UserSubscriptionItem {
   id: number | string;
@@ -279,9 +283,9 @@ export const SubscriptionsPage: React.FC = () => {
   const expiredCount = items.filter((i) => i.status === 'expired').length;
 
   return (
-    <div className="space-y-4 sm:space-y-5 animate-in fade-in duration-200 w-full min-w-0">
+    <div className="space-y-6 animate-in fade-in duration-200 w-full min-w-0">
       {/* 1. Header & Summary Metrics */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <Card className="p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="w-11 h-11 rounded-2xl bg-blue-50 border border-blue-200/80 text-blue-600 flex items-center justify-center font-bold shadow-2xs shrink-0">
             <Repeat className="w-5 h-5" />
@@ -289,11 +293,11 @@ export const SubscriptionsPage: React.FC = () => {
           <div>
             <h1 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
               <span>{language === 'vi' ? 'Quản lý gói đang thuê' : 'Rented Packages'}</span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">
+              <Badge variant="brand" size="sm">
                 {items.length} {language === 'vi' ? 'gói' : 'plans'}
-              </span>
+              </Badge>
             </h1>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-slate-500 mt-1">
               {language === 'vi'
                 ? 'Kiểm tra ngày bắt đầu thuê, thời gian hết hạn chính xác và gia hạn các gói dịch vụ của bạn.'
                 : 'Monitor active package subscriptions, start dates, exact expiration countdowns, and renewal options.'}
@@ -301,83 +305,66 @@ export const SubscriptionsPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center flex-wrap gap-2">
-          <button
+        <div className="flex items-center flex-wrap gap-2.5">
+          <Button
             onClick={() => setCurrentRoute('/packages')}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+            variant="brand"
+            size="md"
           >
-            <PlusCircle className="w-4 h-4" />
+            <PlusCircle className="w-4 h-4 mr-1.5" />
             <span>{language === 'vi' ? 'Thuê thêm gói mới' : 'Rent New Package'}</span>
-          </button>
+          </Button>
 
-          <button
+          <Button
             onClick={loadSubscriptions}
             disabled={loading}
-            className="p-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs transition-colors cursor-pointer"
+            variant="outline"
+            size="icon"
             title={language === 'vi' ? 'Làm mới' : 'Refresh'}
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-          </button>
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          </Button>
         </div>
-      </div>
+      </Card>
 
-      {/* 2. Status Counter Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-3.5 shadow-2xs flex items-center justify-between">
-          <div>
-            <div className="text-[11px] font-bold text-slate-500 tracking-tight">
-              {language === 'vi' ? 'Đang hoạt động' : 'Active Subscriptions'}
-            </div>
-            <div className="text-xl font-black text-emerald-600 mt-0.5 font-mono">{activeCount}</div>
-            <div className="text-[10px] text-slate-500 mt-0.5">{language === 'vi' ? 'Được bảo đảm 24/7' : 'Full access enabled'}</div>
-          </div>
-          <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-            <CheckCircle2 className="w-4.5 h-4.5" />
-          </div>
-        </div>
-
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-3.5 shadow-2xs flex items-center justify-between">
-          <div>
-            <div className="text-[11px] font-bold text-slate-500 tracking-tight">
-              {language === 'vi' ? 'Sắp hết hạn (≤ 3 ngày)' : 'Expiring Soon'}
-            </div>
-            <div className="text-xl font-black text-amber-600 mt-0.5 font-mono">{expiringCount}</div>
-            <div className="text-[10px] text-slate-500 mt-0.5">{language === 'vi' ? 'Cần gia hạn sớm' : 'Action needed'}</div>
-          </div>
-          <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
-            <AlertTriangle className="w-4.5 h-4.5" />
-          </div>
-        </div>
-
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-3.5 shadow-2xs flex items-center justify-between">
-          <div>
-            <div className="text-[11px] font-bold text-slate-500 tracking-tight">
-              {language === 'vi' ? 'Đã hết hạn' : 'Expired'}
-            </div>
-            <div className="text-xl font-black text-rose-600 mt-0.5 font-mono">{expiredCount}</div>
-            <div className="text-[10px] text-slate-500 mt-0.5">{language === 'vi' ? 'Bấm để kích hoạt lại' : 'Click to reactivate'}</div>
-          </div>
-          <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold">
-            <XCircle className="w-4.5 h-4.5" />
-          </div>
-        </div>
+      {/* 2. Status Counter StatCards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <StatCard
+          title={language === 'vi' ? 'Đang hoạt động' : 'Active Subscriptions'}
+          value={activeCount}
+          subtitle={language === 'vi' ? 'Được bảo đảm 24/7' : 'Full access enabled'}
+          icon={<CheckCircle2 className="w-5 h-5 text-emerald-600" />}
+        />
+        <StatCard
+          title={language === 'vi' ? 'Sắp hết hạn (≤ 3 ngày)' : 'Expiring Soon'}
+          value={expiringCount}
+          subtitle={language === 'vi' ? 'Cần gia hạn sớm' : 'Action needed'}
+          icon={<AlertTriangle className="w-5 h-5 text-amber-600" />}
+          highlight={expiringCount > 0}
+        />
+        <StatCard
+          title={language === 'vi' ? 'Đã hết hạn' : 'Expired'}
+          value={expiredCount}
+          subtitle={language === 'vi' ? 'Bấm để kích hoạt lại' : 'Click to reactivate'}
+          icon={<XCircle className="w-5 h-5 text-rose-600" />}
+        />
       </div>
 
       {/* 3. Toolbar (Search & Filter & View Mode) */}
-      <div className="bg-white border border-slate-200/90 p-3 rounded-2xl shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs">
-        <div className="w-full sm:w-auto flex-1 flex items-center gap-2">
+      <Card className="p-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+        <div className="w-full sm:w-auto flex-1 flex items-center gap-2.5">
           <div className="relative flex-1">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder={language === 'vi' ? 'Tìm theo tên gói, mã đơn, domain...' : 'Search by package, order ID, domain...'}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-8.5 pr-3 py-1.5 rounded-xl bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-hidden focus:border-blue-500 transition-colors"
+              className="w-full pl-9 pr-3.5 py-2 rounded-full bg-slate-50/80 hover:bg-white focus:bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
             />
           </div>
 
-          <div className="w-44 shrink-0">
+          <div className="w-48 shrink-0">
             <Select2
               value={statusFilter}
               onChange={(val) => setStatusFilter(val)}
@@ -392,11 +379,11 @@ export const SubscriptionsPage: React.FC = () => {
         </div>
 
         {/* View mode toggle */}
-        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl shrink-0 self-end sm:self-auto">
+        <div className="flex items-center gap-1 bg-slate-100/90 p-1 rounded-full shrink-0 self-end sm:self-auto border border-slate-200/80">
           <button
             onClick={() => setViewMode('table')}
-            className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer ${
-              viewMode === 'table' ? 'bg-white text-blue-600 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+              viewMode === 'table' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <List className="w-3.5 h-3.5" />
@@ -404,15 +391,15 @@ export const SubscriptionsPage: React.FC = () => {
           </button>
           <button
             onClick={() => setViewMode('cards')}
-            className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer ${
-              viewMode === 'cards' ? 'bg-white text-blue-600 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+              viewMode === 'cards' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <LayoutGrid className="w-3.5 h-3.5" />
             <span>{language === 'vi' ? 'Thẻ' : 'Cards'}</span>
           </button>
         </div>
-      </div>
+      </Card>
 
       {/* 4. Subscriptions List */}
       {filteredItems.length === 0 ? (
@@ -421,20 +408,30 @@ export const SubscriptionsPage: React.FC = () => {
           title={language === 'vi' ? 'Không có gói thuê nào' : 'No active subscriptions'}
           description={language === 'vi' ? 'Bạn chưa thuê gói nào hoặc không có gói nào phù hợp bộ lọc.' : 'You do not have any matching package rentals.'}
           action={
-            <button
+            <Button
               onClick={() => setCurrentRoute('/packages')}
-              className="rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow-xs transition-colors hover:bg-blue-700 cursor-pointer"
+              variant="brand"
+              size="md"
             >
               {language === 'vi' ? 'Xem bảng giá & thuê gói' : 'Browse Packages'}
-            </button>
+            </Button>
           }
         />
       ) : viewMode === 'table' ? (
         /* PREMIUM COMPACT TABLE VIEW */
-        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden w-full min-w-0 max-w-full">
+        <Card
+          macChrome
+          macTitle="Storefront Fleet Subscriptions"
+          macBadge={
+            <Badge variant="brand" size="sm" pulse>
+              {filteredItems.length} Instances
+            </Badge>
+          }
+          className="w-full min-w-0 max-w-full"
+        >
           <div className="overflow-x-auto w-full overscroll-x-contain touch-pan-x" style={{ WebkitOverflowScrolling: 'touch' }}>
             <table className="w-full text-left text-xs border-collapse min-w-[800px]">
-              <thead className="bg-slate-50/90 border-b border-slate-200 text-slate-500 font-bold text-[11px] whitespace-nowrap">
+              <thead className="bg-slate-50/90 border-b border-slate-200/80 text-slate-500 font-semibold text-[11px] whitespace-nowrap">
                 <tr>
                   <th className="py-3 px-4 w-16 text-center">{language === 'vi' ? '#Mã đơn' : '#Order ID'}</th>
                   <th className="py-3 px-4">{language === 'vi' ? 'Gói dịch vụ đã thuê' : 'Rented Package'}</th>
@@ -450,10 +447,10 @@ export const SubscriptionsPage: React.FC = () => {
                   const isTrial = sub.packageCode === 'free-trial' || sub.total === 0;
 
                   return (
-                    <tr key={sub.id} className="hover:bg-slate-50/90 transition-colors">
+                    <tr key={sub.id} className="hover:bg-slate-50/80 transition-colors">
                       {/* #ID */}
                       <td className="py-3 px-4 text-center">
-                        <span className="font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100 text-xs">
+                        <span className="font-mono tabular-nums font-bold text-blue-600 bg-blue-50/80 px-2.5 py-1 rounded-full border border-blue-100 text-xs">
                           #{sub.id}
                         </span>
                       </td>
@@ -461,26 +458,23 @@ export const SubscriptionsPage: React.FC = () => {
                       {/* Package Name */}
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2">
-                          <span
-                            className={`px-2 py-0.5 rounded-md text-[11px] font-bold border inline-flex items-center gap-1 ${
-                              isTrial
-                                ? 'bg-purple-50 text-purple-700 border-purple-200'
-                                : 'bg-blue-50 text-blue-700 border-blue-200'
-                            }`}
+                          <Badge
+                            variant={isTrial ? 'purple' : 'brand'}
+                            size="sm"
                           >
-                            {isTrial ? <Sparkles className="w-3 h-3 text-purple-600" /> : <Package className="w-3 h-3" />}
+                            {isTrial ? <Sparkles className="w-3 h-3 mr-1 text-purple-600" /> : <Package className="w-3 h-3 mr-1" />}
                             <span>{sub.packageName}</span>
-                          </span>
+                          </Badge>
                         </div>
                       </td>
 
                       {/* Linked Panel / Domain */}
                       <td className="py-3 px-4">
                         {sub.linkedPanel ? (
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex items-center gap-2">
                             <Server className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                            <span className="font-bold text-slate-800 text-xs">{sub.linkedPanel.name}</span>
-                            <code className="font-mono text-blue-600 text-[11px] bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200">
+                            <span className="font-semibold text-slate-800 text-xs">{sub.linkedPanel.name}</span>
+                            <code className="font-mono text-blue-600 text-[11px] bg-slate-50 px-2 py-0.5 rounded-full border border-slate-200">
                               {sub.linkedPanel.domain}
                             </code>
                           </div>
@@ -493,8 +487,8 @@ export const SubscriptionsPage: React.FC = () => {
 
                       {/* Price & Billing Cycle */}
                       <td className="py-3 px-4">
-                        <div className="flex items-center gap-1">
-                          <span className="font-mono font-extrabold text-slate-900 text-xs">
+                        <div className="flex items-center gap-1.5 font-mono tabular-nums">
+                          <span className="font-bold text-slate-900 text-xs">
                             {isTrial ? '0 VNĐ' : `$${Number(sub.total).toFixed(2)} USD`}
                           </span>
                           <span className="text-[10px] text-slate-400 font-medium">
@@ -505,40 +499,44 @@ export const SubscriptionsPage: React.FC = () => {
 
                       {/* Rental Period (Start -> End) */}
                       <td className="py-3 px-4">
-                        <div className="text-[11px] text-slate-600 font-mono">
+                        <div className="text-[11px] text-slate-600 font-mono tabular-nums">
                           <span>{new Date(sub.startDate).toLocaleDateString()}</span>
                           <span className="text-slate-400 mx-1">➔</span>
-                          <span className="font-bold text-slate-900">{new Date(sub.endDate).toLocaleDateString()}</span>
+                          <span className="font-semibold text-slate-900">{new Date(sub.endDate).toLocaleDateString()}</span>
                         </div>
                       </td>
 
                       {/* Expiration Countdown */}
                       <td className="py-3 px-4">
-                        <span
-                          className={`font-bold px-2 py-0.5 rounded-md text-[10px] inline-flex items-center gap-1 border ${
+                        <Badge
+                          variant={
                             sub.status === 'active'
-                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                              ? 'emerald'
                               : sub.status === 'expiring_soon'
-                              ? 'bg-amber-50 text-amber-700 border-amber-200 animate-pulse'
-                              : 'bg-rose-50 text-rose-700 border-rose-200'
-                          }`}
+                              ? 'warning'
+                              : 'danger'
+                          }
+                          pulse={sub.status === 'expiring_soon'}
+                          size="sm"
                         >
-                          <Clock className="w-3 h-3" />
+                          <Clock className="w-3 h-3 mr-1" />
                           <span>{sub.label}</span>
-                        </span>
+                        </Badge>
                       </td>
 
                       {/* Actions */}
                       <td className="py-3 px-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
-                          <button
+                          <Button
                             onClick={() => setExtendingItem(sub)}
-                            className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200/80 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
+                            variant="secondary"
+                            size="sm"
+                            className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200/80"
                             title={language === 'vi' ? 'Gia hạn thời gian sử dụng' : 'Extend'}
                           >
-                            <Zap className="w-3.5 h-3.5 text-emerald-600" />
+                            <Zap className="w-3.5 h-3.5 text-emerald-600 mr-1" />
                             <span>{language === 'vi' ? 'Gia hạn' : 'Extend'}</span>
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -549,132 +547,123 @@ export const SubscriptionsPage: React.FC = () => {
           </div>
 
           {/* Table Bottom Toolbar */}
-          <div className="p-3 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+          <div className="p-3.5 bg-slate-50/90 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 font-mono tabular-nums">
             <div className="flex items-center gap-2">
               <span>
                 {language === 'vi'
                   ? `Hiển thị ${filteredItems.length} trên tổng số ${items.length} gói đã thuê`
                   : `Showing ${filteredItems.length} of ${items.length} rented packages`}
               </span>
-              <span className="sm:hidden text-[10px] text-blue-600 bg-blue-50 border border-blue-200 px-1.5 py-0.5 rounded-md font-medium">
+              <span className="sm:hidden text-[10px] text-blue-600 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full font-medium">
                 {language === 'vi' ? '← Kéo ngang để xem tiếp →' : '← Swipe to see more →'}
               </span>
             </div>
           </div>
-        </div>
+        </Card>
       ) : (
         /* COMPACT CARDS VIEW */
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredItems.map((sub) => {
             const isTrial = sub.packageCode === 'free-trial' || sub.total === 0;
 
             return (
-              <div
+              <Card
                 key={sub.id}
-                className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs flex flex-col justify-between space-y-3.5 hover:border-blue-200 transition-all"
+                className="p-5 flex flex-col justify-between space-y-4 hover:border-blue-300 transition-all"
               >
                 <div>
                   {/* Top Badge & Package Name */}
                   <div className="flex items-start justify-between gap-3">
-                    <div className="space-y-1">
+                    <div className="space-y-1.5">
                       <div className="flex items-center gap-2">
-                        <span
-                          className={`px-2.5 py-0.5 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 border ${
-                            isTrial
-                              ? 'bg-purple-50 text-purple-700 border-purple-200'
-                              : 'bg-blue-50 text-blue-700 border-blue-200'
-                          }`}
+                        <Badge
+                          variant={isTrial ? 'purple' : 'brand'}
+                          size="sm"
                         >
-                          {isTrial ? <Sparkles className="w-3.5 h-3.5 text-purple-600" /> : <Package className="w-3.5 h-3.5" />}
+                          {isTrial ? <Sparkles className="w-3.5 h-3.5 mr-1 text-purple-600" /> : <Package className="w-3.5 h-3.5 mr-1" />}
                           <span>{sub.packageName}</span>
-                        </span>
-                        <span className="font-mono text-[11px] text-slate-400">#{sub.id}</span>
+                        </Badge>
+                        <span className="font-mono tabular-nums text-[11px] text-slate-400">#{sub.id}</span>
                       </div>
 
                       {sub.linkedPanel ? (
-                        <div className="flex items-center gap-1.5 text-xs text-slate-700 pt-0.5">
+                        <div className="flex items-center gap-2 text-xs text-slate-700 pt-1">
                           <Server className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                          <span className="font-bold">{sub.linkedPanel.name}:</span>
-                          <code className="font-mono text-blue-600 text-[11px]">{sub.linkedPanel.domain}</code>
+                          <span className="font-semibold">{sub.linkedPanel.name}:</span>
+                          <code className="font-mono text-blue-600 text-[11px] bg-slate-50 px-2 py-0.5 rounded-full border border-slate-200">{sub.linkedPanel.domain}</code>
                         </div>
                       ) : (
-                        <p className="text-[11px] text-slate-400 italic pt-0.5">
+                        <p className="text-[11px] text-slate-400 italic pt-1">
                           {language === 'vi' ? 'Chưa gán cho panel nào' : 'No panel assigned'}
                         </p>
                       )}
                     </div>
 
                     <div className="text-right shrink-0">
-                      <div className="text-sm font-black text-slate-900 font-mono">
+                      <div className="text-sm font-bold text-slate-900 font-mono tabular-nums">
                         {isTrial ? '0 VNĐ' : `$${Number(sub.total).toFixed(2)} USD`}
                       </div>
-                      <div className="text-[10px] text-slate-400 font-semibold uppercase">
+                      <div className="text-[10px] text-slate-400 font-medium uppercase font-mono">
                         / {isTrial ? (language === 'vi' ? '7 ngày' : '7 days') : sub.billingCycle}
                       </div>
                     </div>
                   </div>
 
                   {/* Expiration Details Box */}
-                  <div className="mt-3 p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-2 text-xs">
+                  <div className="mt-4 p-3.5 rounded-2xl bg-slate-50/80 border border-slate-100 space-y-2.5 text-xs">
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-500 flex items-center gap-1.5 text-[11px]">
+                      <span className="text-slate-500 flex items-center gap-2 text-[11px]">
                         <Calendar className="w-3.5 h-3.5 text-slate-400" />
                         <span>{language === 'vi' ? 'Bắt đầu thuê:' : 'Start Date:'}</span>
                       </span>
-                      <span className="font-bold text-slate-800 font-mono text-xs">
+                      <span className="font-medium text-slate-800 font-mono tabular-nums text-xs">
                         {new Date(sub.startDate).toLocaleDateString()}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-500 flex items-center gap-1.5 text-[11px]">
+                      <span className="text-slate-500 flex items-center gap-2 text-[11px]">
                         <Clock className="w-3.5 h-3.5 text-slate-400" />
                         <span>{language === 'vi' ? 'Hết hạn:' : 'Expiration:'}</span>
                       </span>
-                      <span className="font-bold text-slate-900 font-mono text-xs">
+                      <span className="font-medium text-slate-900 font-mono tabular-nums text-xs">
                         {new Date(sub.endDate).toLocaleDateString()}
                       </span>
                     </div>
 
-                    <div className="pt-1.5 border-t border-slate-200/80 flex items-center justify-between">
+                    <div className="pt-2 border-t border-slate-200/80 flex items-center justify-between">
                       <span className="text-slate-600 font-semibold text-[11px]">
                         {language === 'vi' ? 'Thời hạn còn lại:' : 'Remaining:'}
                       </span>
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center gap-1 border ${
+                      <Badge
+                        variant={
                           sub.status === 'active'
-                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            ? 'emerald'
                             : sub.status === 'expiring_soon'
-                            ? 'bg-amber-50 text-amber-700 border-amber-200'
-                            : 'bg-rose-50 text-rose-700 border-rose-200'
-                        }`}
+                            ? 'warning'
+                            : 'danger'
+                        }
+                        pulse={sub.status === 'expiring_soon'}
+                        size="sm"
                       >
-                        <span
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            sub.status === 'active'
-                              ? 'bg-emerald-500'
-                              : sub.status === 'expiring_soon'
-                              ? 'bg-amber-500 animate-pulse'
-                              : 'bg-rose-500'
-                          }`}
-                        />
                         <span>{sub.label}</span>
-                      </span>
+                      </Badge>
                     </div>
                   </div>
                 </div>
 
                 {/* Card Bottom Actions */}
-                <div className="pt-2.5 border-t border-slate-100 flex items-center justify-end gap-2 text-xs">
-                  <button
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2 text-xs">
+                  <Button
                     onClick={() => setExtendingItem(sub)}
-                    className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-xs transition-all cursor-pointer flex items-center gap-1.5 text-xs"
+                    variant="brand"
+                    size="sm"
                   >
-                    <Zap className="w-3.5 h-3.5 text-amber-300" />
+                    <Zap className="w-3.5 h-3.5 text-amber-300 mr-1.5" />
                     <span>{language === 'vi' ? 'Gia hạn ngay' : 'Extend Plan'}</span>
-                  </button>
+                  </Button>
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>
@@ -735,30 +724,32 @@ export const SubscriptionsPage: React.FC = () => {
           >
             <div className="space-y-4 text-xs">
               {/* Package Summary Box */}
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 grid grid-cols-2 sm:grid-cols-3 gap-3">
                 <div>
                   <span className="text-[11px] text-slate-500 font-semibold block">{language === 'vi' ? 'Gói dịch vụ:' : 'Package:'}</span>
                   <span className="font-bold text-blue-600 text-xs truncate block">{matchingPkg?.name || extendingItem.packageName}</span>
                 </div>
                 <div>
                   <span className="text-[11px] text-slate-500 font-semibold block">{language === 'vi' ? 'Hạn hiện tại:' : 'Current expiry:'}</span>
-                  <span className="font-bold text-slate-900 font-mono text-xs">{new Date(extendingItem.endDate).toLocaleDateString()}</span>
+                  <span className="font-bold text-slate-900 font-mono tabular-nums text-xs">{new Date(extendingItem.endDate).toLocaleDateString()}</span>
                 </div>
                 <div className="col-span-2 sm:col-span-1">
                   <span className="text-[11px] text-slate-500 font-semibold block">{language === 'vi' ? 'Số dư ví:' : 'Your balance:'}</span>
-                  <span className="font-extrabold text-emerald-600 font-mono text-xs">{formatMoney(userBalance)}</span>
+                  <span className="font-bold text-emerald-600 font-mono tabular-nums text-xs">{formatMoney(userBalance)}</span>
                 </div>
               </div>
 
               {/* Package features brief */}
-              {matchingPkg?.features && matchingPkg.features.length > 0 && (
-                <div className="p-2.5 rounded-xl bg-blue-50/50 border border-blue-100 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-slate-600">
-                  {matchingPkg.features.slice(0, 3).map((feat, idx) => (
-                    <span key={idx} className="flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3 text-blue-600 shrink-0" />
-                      <span>{feat}</span>
-                    </span>
-                  ))}
+              {matchingPkg?.features && Object.keys(matchingPkg.features).length > 0 && (
+                <div className="p-3 rounded-xl bg-blue-50/50 border border-blue-100 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-slate-600">
+                  <span className="flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                    <span>{matchingPkg.features.uptimeSla} SLA Uptime</span>
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                    <span>{matchingPkg.features.panelsCount} Panels</span>
+                  </span>
                 </div>
               )}
 
@@ -773,28 +764,28 @@ export const SubscriptionsPage: React.FC = () => {
                       key={opt.days}
                       type="button"
                       onClick={() => setSelectedExtendDays(opt.days)}
-                      className={`p-3 rounded-2xl border text-left transition-all cursor-pointer relative flex flex-col justify-between ${
+                      className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer relative flex flex-col justify-between ${
                         selectedExtendDays === opt.days
                           ? 'border-blue-600 bg-blue-50/70 ring-2 ring-blue-500/20 shadow-xs'
-                          : 'border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50/50'
+                          : 'border-slate-200/80 hover:border-slate-300 bg-white hover:bg-slate-50/50'
                       }`}
                     >
                       {opt.popular && (
-                        <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-[8px] font-bold bg-blue-600 text-white">
+                        <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold bg-blue-600 text-white">
                           PHỔ BIẾN
                         </span>
                       )}
                       {opt.badge && (
-                        <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-[8px] font-bold bg-emerald-600 text-white">
+                        <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-600 text-white">
                           {opt.badge}
                         </span>
                       )}
                       <div>
-                        <span className="block font-bold text-slate-900 text-xs">{opt.title}</span>
-                        <span className="block text-[11px] text-slate-500 font-medium mt-0.5">{opt.durationText}</span>
+                        <span className="block font-semibold text-slate-900 text-xs">{opt.title}</span>
+                        <span className="block text-[11px] text-slate-500 mt-0.5">{opt.durationText}</span>
                       </div>
-                      <div className="mt-2.5 pt-2 border-t border-slate-100">
-                        <span className="text-xs font-extrabold text-blue-600 font-mono">${opt.cost.toFixed(2)} USD</span>
+                      <div className="mt-3 pt-2.5 border-t border-slate-100">
+                        <span className="text-xs font-bold text-blue-600 font-mono tabular-nums">${opt.cost.toFixed(2)} USD</span>
                       </div>
                     </button>
                   ))}
@@ -802,57 +793,60 @@ export const SubscriptionsPage: React.FC = () => {
               </div>
 
               {/* Expiry preview & Balance check */}
-              <div className="p-3 rounded-xl bg-blue-50/60 border border-blue-100 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-1.5">
+              <div className="p-3.5 rounded-xl bg-blue-50/60 border border-blue-100 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-blue-600 shrink-0" />
                   <div>
                     <span className="text-slate-600 text-[11px] block">{language === 'vi' ? 'Thời hạn sau khi gia hạn:' : 'New expiry date:'}</span>
-                    <span className="font-bold text-slate-900 font-mono text-xs">{newExpiryDate.toLocaleDateString()}</span>
+                    <span className="font-bold text-slate-900 font-mono tabular-nums text-xs">{newExpiryDate.toLocaleDateString()}</span>
                   </div>
                 </div>
                 <div className="text-right">
                   <span className="text-slate-600 text-[11px] block">{language === 'vi' ? 'Tổng thanh toán:' : 'Total due:'}</span>
-                  <span className="font-extrabold text-blue-700 font-mono text-xs">${activeCost.toFixed(2)} USD</span>
+                  <span className="font-bold text-blue-700 font-mono tabular-nums text-xs">${activeCost.toFixed(2)} USD</span>
                 </div>
               </div>
 
               {!hasEnoughBalance && (
-                <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center justify-between">
+                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center justify-between">
                   <span>
                     {language === 'vi'
                       ? `Số dư không đủ (Thiếu $${(activeCost - userBalance).toFixed(2)})`
                       : `Insufficient balance (Need +$${(activeCost - userBalance).toFixed(2)})`}
                   </span>
-                  <button
+                  <Button
                     type="button"
                     onClick={() => {
                       setExtendingItem(null);
                       setCurrentRoute('/wallet');
                     }}
-                    className="px-2.5 py-1 bg-rose-600 text-white rounded-lg text-[10px] font-bold hover:bg-rose-700 cursor-pointer"
+                    variant="danger"
+                    size="sm"
                   >
                     {language === 'vi' ? 'Nạp tiền ngay' : 'Deposit'}
-                  </button>
+                  </Button>
                 </div>
               )}
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                <button
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="md"
                   onClick={() => setExtendingItem(null)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors"
                 >
                   {language === 'vi' ? 'Hủy' : 'Cancel'}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="success"
+                  size="md"
                   onClick={handleConfirmExtend}
                   disabled={extendingLoading || !hasEnoughBalance}
-                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                  loading={extendingLoading}
                 >
-                  {extendingLoading && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
                   <span>{language === 'vi' ? 'Xác nhận & Thanh toán' : 'Confirm & Pay'}</span>
-                </button>
+                </Button>
               </div>
             </div>
           </Modal>

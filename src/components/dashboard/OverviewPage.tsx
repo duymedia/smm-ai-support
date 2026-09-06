@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import {
   Wallet,
@@ -10,9 +10,7 @@ import {
   ExternalLink,
   ShieldCheck,
   CheckCircle2,
-  AlertTriangle,
   ArrowUpRight,
-  ArrowDownRight,
   Layers,
   Zap,
   LifeBuoy,
@@ -20,13 +18,12 @@ import {
   BarChart3,
   PieChart as PieChartIcon,
   LineChart as LineChartIcon,
-  Clock,
-  Globe,
-  Radio,
-  Sparkles,
   Check,
-  Percent,
 } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
+import { Button } from '../ui/Button';
+import { Badge } from '../ui/Badge';
+import { StatCard } from '../ui/StatCard';
 
 export const OverviewPage: React.FC = () => {
   const {
@@ -97,7 +94,6 @@ export const OverviewPage: React.FC = () => {
   const maxBarOrders = Math.max(1, ...currentBarData.map((d) => d.orders));
 
   // 2. DATA BIỂU ĐỒ TRÒN (DONUT / PIE CHARTS)
-  // 2.1 Phân bố nền tảng dịch vụ SMM
   const platformStats = [
     { name: 'TikTok', percent: hasData ? 38 : 0, count: hasData ? `${Math.round(totalOrders * 0.38).toLocaleString()} orders` : '0 orders', color: '#ec4899', bgClass: 'bg-pink-500' },
     { name: 'Instagram', percent: hasData ? 28 : 0, count: hasData ? `${Math.round(totalOrders * 0.28).toLocaleString()} orders` : '0 orders', color: '#8b5cf6', bgClass: 'bg-purple-500' },
@@ -106,7 +102,6 @@ export const OverviewPage: React.FC = () => {
     { name: 'Telegram / Khác', percent: hasData ? 5 : 0, count: hasData ? `${Math.round(totalOrders * 0.05).toLocaleString()} orders` : '0 orders', color: '#10b981', bgClass: 'bg-emerald-500' },
   ];
 
-  // 2.2 Phân bố trạng thái xử lý đơn hàng
   const fulfillmentStats = [
     { name: language === 'vi' ? 'Hoàn thành' : 'Completed', percent: hasData ? 84 : 0, count: hasData ? Math.round(totalOrders * 0.84).toLocaleString() : '0', color: '#10b981', bgClass: 'bg-emerald-500' },
     { name: language === 'vi' ? 'Đang xử lý' : 'In Progress', percent: hasData ? 11 : 0, count: hasData ? Math.round(totalOrders * 0.11).toLocaleString() : '0', color: '#3b82f6', bgClass: 'bg-blue-500' },
@@ -114,7 +109,6 @@ export const OverviewPage: React.FC = () => {
     { name: language === 'vi' ? 'Hủy / Hoàn tiền' : 'Refunded', percent: hasData ? 2 : 0, count: hasData ? Math.round(totalOrders * 0.02).toLocaleString() : '0', color: '#ef4444', bgClass: 'bg-rose-500' },
   ];
 
-  // 3. DATA BIỂU ĐỒ ĐƯỜNG (LINE CHART - Tốc độ tin nhắn & API Throughput)
   const lineThroughputData = [
     { hour: '00:00', requests: hasData ? Math.round(totalMessages * 0.05) : 0, latency: hasData ? 120 : 0 },
     { hour: '04:00', requests: hasData ? Math.round(totalMessages * 0.03) : 0, latency: hasData ? 110 : 0 },
@@ -130,14 +124,15 @@ export const OverviewPage: React.FC = () => {
       {/* Welcome & Quick Action Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white/90 backdrop-blur-sm p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.10)]">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 mb-2">
-            <span className="inline-flex size-4 items-center justify-center rounded-full bg-blue-500/10">
-              <span className="size-2 rounded-full bg-blue-600 animate-pulse" />
-            </span>
-            <span className="tracking-wider uppercase font-mono text-[11px]">NexusSMM Fleet Core</span>
+          <div className="inline-flex items-center gap-2 text-xs font-semibold text-blue-600 mb-2">
+            <Badge variant="blue" pulse size="sm">
+              FLEET OPERATIONAL
+            </Badge>
+            <span className="font-mono text-[11px] text-slate-400">NEXUS CORE v2.8</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900">
-            {t('dashboard.welcomeBack')}, <span className="text-blue-600">{user?.name || user?.username}</span>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
+            {t('dashboard.welcomeBack')},{' '}
+            <span className="text-blue-600 font-extrabold">{user?.name || user?.username}</span>
           </h1>
           <p className="text-xs text-slate-500 mt-1 max-w-xl leading-relaxed">
             {language === 'vi'
@@ -146,28 +141,40 @@ export const OverviewPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 shrink-0">
-          <button
+        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+          <Button
+            variant="outline"
+            size="md"
             onClick={handleRunGlobalScan}
             disabled={scanningHealth}
-            className="h-10 px-4 bg-slate-100/80 hover:bg-slate-200/80 text-slate-700 rounded-full text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50 border border-slate-200/60"
+            icon={
+              <RefreshCw
+                className={`w-3.5 h-3.5 ${scanningHealth ? 'animate-spin text-blue-600' : 'text-slate-500'}`}
+              />
+            }
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${scanningHealth ? 'animate-spin text-blue-600' : 'text-slate-500'}`} />
-            <span>{scanningHealth ? (language === 'vi' ? 'Đang kiểm tra...' : 'Diagnosing...') : (language === 'vi' ? 'Quét sức khỏe hệ thống' : 'Health Scan')}</span>
-          </button>
+            {scanningHealth
+              ? language === 'vi'
+                ? 'Đang kiểm tra...'
+                : 'Diagnosing...'
+              : language === 'vi'
+              ? 'Quét sức khỏe hệ thống'
+              : 'Health Scan'}
+          </Button>
 
-          <button
+          <Button
+            variant="primary"
+            size="md"
             onClick={() => setCurrentRoute('/packages')}
-            className="h-10 px-5 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-xs font-bold shadow-xs hover:shadow-md shadow-blue-500/20 flex items-center gap-2 transition-all cursor-pointer"
+            icon={<PlusCircle className="w-4 h-4" />}
           >
-            <PlusCircle className="w-4 h-4" />
-            <span>{t('dashboard.rentNewPanel')}</span>
-          </button>
+            {t('dashboard.rentNewPanel')}
+          </Button>
         </div>
       </div>
 
       {healthScanSuccess && (
-        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center gap-3 text-xs text-emerald-900 animate-in fade-in">
+        <div className="p-4 rounded-2xl bg-emerald-50/90 border border-emerald-200 flex items-center gap-3 text-xs text-emerald-900 animate-in fade-in">
           <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
           <div>
             <strong>{language === 'vi' ? 'Quét chẩn đoán hoàn tất:' : 'Diagnostic Scan Complete:'}</strong>{' '}
@@ -180,156 +187,131 @@ export const OverviewPage: React.FC = () => {
 
       {/* 4 PRIMARY STAT / KPI CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* KPI 1: Wallet Balance */}
-        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">{t('dashboard.totalBalance')}</span>
-            <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
-              <Wallet className="w-4.5 h-4.5" />
-            </div>
-          </div>
-          <div className="mt-3">
-            <div className="text-2xl font-black text-slate-900 tracking-tight">{formatMoney(user?.balance || 0)}</div>
-            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[11px]">
-              <span className="text-slate-500">{language === 'vi' ? 'Tiền tệ tài khoản' : 'Wallet Currency'}</span>
-              <button
-                onClick={() => setCurrentRoute('/add-funds')}
-                className="font-bold text-blue-600 hover:text-blue-800 flex items-center gap-0.5 cursor-pointer"
-              >
-                + {language === 'vi' ? 'Nạp thêm tiền' : 'Add Funds'} <ArrowUpRight className="w-3 h-3" />
-              </button>
-            </div>
-          </div>
-        </div>
+        <StatCard
+          title={t('dashboard.totalBalance')}
+          value={formatMoney(user?.balance || 0)}
+          subtitle={language === 'vi' ? 'Số dư khả dụng trong ví' : 'Available wallet balance'}
+          icon={<Wallet className="w-4.5 h-4.5 text-blue-600" />}
+          trend={{
+            value: '+ Nạp tiền ví',
+            positive: true,
+            label: '',
+          }}
+          className="cursor-pointer"
+        />
 
-        {/* KPI 2: Active Rented Panels */}
-        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">{t('dashboard.activePanelsCount')}</span>
-            <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
-              <Server className="w-4.5 h-4.5" />
-            </div>
-          </div>
-          <div className="mt-3">
-            <div className="text-2xl font-black text-slate-900 tracking-tight">
-              {activePanelsCount} <span className="text-sm font-semibold text-slate-400">/ {userPanels.length}</span>
-            </div>
-            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[11px]">
-              <span className="text-emerald-600 font-medium flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                {userPanels.length > 0 ? (language === 'vi' ? 'Đang hoạt động' : 'Serving Traffic') : (language === 'vi' ? 'Chưa thuê panel' : 'No Active Panels')}
-              </span>
-              <button
-                onClick={() => setCurrentRoute('/panels')}
-                className="font-semibold text-slate-600 hover:text-slate-900 cursor-pointer"
-              >
-                {language === 'vi' ? 'Quản lý' : 'Manage'} →
-              </button>
-            </div>
-          </div>
-        </div>
+        <StatCard
+          title={t('dashboard.activePanelsCount')}
+          value={`${activePanelsCount} / ${userPanels.length}`}
+          subtitle={
+            userPanels.length > 0
+              ? language === 'vi'
+                ? 'Panel đang phục vụ khách'
+                : 'Serving live traffic'
+              : language === 'vi'
+              ? 'Chưa thuê panel'
+              : 'No Active Panels'
+          }
+          icon={<Server className="w-4.5 h-4.5 text-indigo-600" />}
+          trend={{
+            value: '99.98% uptime',
+            positive: true,
+          }}
+        />
 
-        {/* KPI 3: Monthly Orders */}
-        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">{t('dashboard.monthlyOrders')}</span>
-            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-              <TrendingUp className="w-4.5 h-4.5" />
-            </div>
-          </div>
-          <div className="mt-3">
-            <div className="text-2xl font-black text-slate-900 tracking-tight">{(totalOrders || 0).toLocaleString()}</div>
-            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[11px]">
-              <span className="text-slate-500">{language === 'vi' ? 'Doanh thu tháng' : 'Monthly Rev'}</span>
-              <span className="font-bold text-emerald-600">{formatMoney(monthlyRevenue)}</span>
-            </div>
-          </div>
-        </div>
+        <StatCard
+          title={t('dashboard.monthlyOrders')}
+          value={(totalOrders || 0).toLocaleString()}
+          subtitle={`Doanh thu: ${formatMoney(monthlyRevenue)}`}
+          icon={<TrendingUp className="w-4.5 h-4.5 text-emerald-600" />}
+          trend={{
+            value: '+28.4%',
+            positive: true,
+            label: 'tháng này',
+          }}
+        />
 
-        {/* KPI 4: Infrastructure Uptime & Messages */}
-        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">{t('dashboard.uptimeRate')}</span>
-            <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
-              <Activity className="w-4.5 h-4.5" />
-            </div>
-          </div>
-          <div className="mt-3">
-            <div className="text-2xl font-black text-slate-900 tracking-tight">99.98%</div>
-            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[11px]">
-              <span className="text-slate-500">{language === 'vi' ? 'Tin nhắn API' : 'API Messages'}</span>
-              <span className="font-bold text-indigo-600">{(totalMessages || 0).toLocaleString()} req</span>
-            </div>
-          </div>
-        </div>
+        <StatCard
+          title={t('dashboard.uptimeRate')}
+          value="99.98%"
+          subtitle={`${(totalMessages || 0).toLocaleString()} yêu cầu API`}
+          icon={<Activity className="w-4.5 h-4.5 text-amber-600" />}
+          trend={{
+            value: '142ms',
+            positive: true,
+            label: 'avg latency',
+          }}
+        />
       </div>
 
-      {/* SECTION: BIỂU ĐỒ CỘT (BAR CHART) & BIỂU ĐỒ TRÒN (DONUT CHART) */}
+      {/* SECTION: BAR CHART & DONUT CHART */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* LEFT 2 COLS: BIỂU ĐỒ CỘT DOANH THU & ĐƠN HÀNG (BAR CHART) */}
-        <div className="lg:col-span-2 p-5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-4">
+        {/* LEFT 2 COLS: BAR CHART */}
+        <Card className="lg:col-span-2 p-5 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
-            <div>
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                  <BarChart3 className="w-4 h-4" />
-                </div>
-                <div>
-                  <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                    <span>
-                      {activeMetric === 'revenue'
-                        ? (language === 'vi' ? 'Biểu Đồ Doanh Thu' : 'Revenue Performance')
-                        : (language === 'vi' ? 'Biểu Đồ Số Lượng Đơn Hàng' : 'Order Volume Throughput')}
-                    </span>
-                    <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
-                      +28.4% ↑
-                    </span>
-                  </h2>
-                  <p className="text-[11px] text-slate-500">
-                    {language === 'vi'
-                      ? 'Theo dõi tốc độ tăng trưởng kinh doanh trên toàn bộ các Panel bạn đã thuê'
-                      : 'Real-time performance velocity across your provisioned storefront fleet'}
-                  </p>
-                </div>
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                <BarChart3 className="w-4 h-4" />
+              </div>
+              <div>
+                <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <span>
+                    {activeMetric === 'revenue'
+                      ? language === 'vi'
+                        ? 'Biểu Đồ Doanh Thu'
+                        : 'Revenue Performance'
+                      : language === 'vi'
+                      ? 'Biểu Đồ Số Lượng Đơn Hàng'
+                      : 'Order Volume Throughput'}
+                  </span>
+                  <Badge variant="emerald" size="sm">
+                    +28.4% ↑
+                  </Badge>
+                </h2>
+                <p className="text-[11px] text-slate-500">
+                  {language === 'vi'
+                    ? 'Theo dõi tốc độ tăng trưởng kinh doanh trên toàn bộ các Panel bạn đã thuê'
+                    : 'Real-time performance velocity across your provisioned storefront fleet'}
+                </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 self-start sm:self-auto">
+            <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
               {/* Metric Switcher */}
-              <div className="flex items-center bg-slate-100/90 rounded-xl p-1 text-xs font-semibold">
+              <div className="flex items-center bg-slate-100/90 rounded-full p-1 text-xs font-semibold">
                 <button
                   onClick={() => setActiveMetric('revenue')}
-                  className={`px-3 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                  className={`px-3 py-1 rounded-full transition-all cursor-pointer flex items-center gap-1.5 ${
                     activeMetric === 'revenue'
-                      ? 'bg-white text-blue-700 shadow-xs font-bold'
+                      ? 'bg-white text-blue-700 shadow-2xs font-bold'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <TrendingUp className="w-3.5 h-3.5" />
+                  <TrendingUp className="w-3 h-3" />
                   <span>{language === 'vi' ? 'Doanh Thu' : 'Revenue'}</span>
                 </button>
                 <button
                   onClick={() => setActiveMetric('orders')}
-                  className={`px-3 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                  className={`px-3 py-1 rounded-full transition-all cursor-pointer flex items-center gap-1.5 ${
                     activeMetric === 'orders'
-                      ? 'bg-white text-blue-700 shadow-xs font-bold'
+                      ? 'bg-white text-blue-700 shadow-2xs font-bold'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <Layers className="w-3.5 h-3.5" />
+                  <Layers className="w-3 h-3" />
                   <span>{language === 'vi' ? 'Đơn Hàng' : 'Orders'}</span>
                 </button>
               </div>
 
               {/* Timeframe Filter */}
-              <div className="flex items-center bg-slate-100/90 rounded-xl p-1 text-xs font-semibold">
+              <div className="flex items-center bg-slate-100/90 rounded-full p-1 text-xs font-semibold">
                 {(['7d', '30d', '90d'] as const).map((period) => (
                   <button
                     key={period}
                     onClick={() => setTimeframe(period)}
-                    className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-full transition-all cursor-pointer ${
                       timeframe === period
-                        ? 'bg-blue-600 text-white shadow-xs font-bold'
+                        ? 'bg-blue-600 text-white shadow-2xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
@@ -343,7 +325,6 @@ export const OverviewPage: React.FC = () => {
           {/* Interactive Bar Chart Graphic with Subtle Y-Grid Reference */}
           <div className="pt-2">
             <div className="relative h-56 w-full flex items-end justify-between gap-1 sm:gap-3 px-3 pt-6 pb-2 border-b border-slate-100">
-              {/* Subtle Horizontal Reference Grid Lines */}
               <div className="absolute inset-x-0 top-6 border-b border-dashed border-slate-100 pointer-events-none" />
               <div className="absolute inset-x-0 top-1/2 border-b border-dashed border-slate-100 pointer-events-none" />
 
@@ -367,15 +348,14 @@ export const OverviewPage: React.FC = () => {
                       }`}
                     >
                       <span className="text-[9px] text-slate-400 font-medium">{d.label}</span>
-                      <span className="text-white font-black tracking-tight">
+                      <span className="text-white font-bold font-mono tracking-tight tabular-nums">
                         {activeMetric === 'revenue' ? formatMoney(d.revenue) : `${d.orders.toLocaleString()} đơn`}
                       </span>
-                      {/* Tooltip Caret */}
                       <div className="w-2 h-2 bg-slate-900 transform rotate-45 -mb-1 mt-0.5" />
                     </div>
 
                     {/* Solid Proportional Bar Container */}
-                    <div className="w-8 sm:w-10 md:w-12 max-w-[48px] bg-slate-100/90 rounded-t-xl sm:rounded-t-2xl relative flex items-end h-44 overflow-hidden border border-slate-100">
+                    <div className="w-8 sm:w-10 md:w-12 max-w-[48px] bg-slate-100/80 rounded-t-xl sm:rounded-t-2xl relative flex items-end h-44 overflow-hidden border border-slate-100">
                       <div
                         style={{
                           height: `${heightPercent}%`,
@@ -406,31 +386,31 @@ export const OverviewPage: React.FC = () => {
 
             {/* Bottom 3 Summary Metric Pill Badges */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4">
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+              <div className="p-3 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between">
                 <span className="text-[11px] font-medium text-slate-500">
                   {language === 'vi' ? 'Tổng toàn kỳ' : 'Period Total'}
                 </span>
-                <span className="text-xs font-bold text-slate-900">
+                <span className="text-xs font-bold font-mono tabular-nums text-slate-900">
                   {activeMetric === 'revenue'
                     ? formatMoney(currentBarData.reduce((a, b) => a + b.revenue, 0))
                     : `${currentBarData.reduce((a, b) => a + b.orders, 0).toLocaleString()} đơn`}
                 </span>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+              <div className="p-3 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between">
                 <span className="text-[11px] font-medium text-slate-500">
                   {language === 'vi' ? 'Đỉnh cao nhất' : 'Peak Volume'}
                 </span>
-                <span className="text-xs font-bold text-blue-600">
+                <span className="text-xs font-bold font-mono tabular-nums text-blue-600">
                   {activeMetric === 'revenue' ? formatMoney(maxBarRevenue) : `${maxBarOrders.toLocaleString()} đơn`}
                 </span>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+              <div className="p-3 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between">
                 <span className="text-[11px] font-medium text-slate-500">
                   {language === 'vi' ? 'Trung bình ngày' : 'Daily Average'}
                 </span>
-                <span className="text-xs font-bold text-emerald-600">
+                <span className="text-xs font-bold font-mono tabular-nums text-emerald-600">
                   {activeMetric === 'revenue'
                     ? formatMoney(Math.round(currentBarData.reduce((a, b) => a + b.revenue, 0) / currentBarData.length))
                     : `${Math.round(currentBarData.reduce((a, b) => a + b.orders, 0) / currentBarData.length).toLocaleString()} đơn`}
@@ -438,33 +418,39 @@ export const OverviewPage: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
+        </Card>
 
-        {/* RIGHT COL: BIỂU ĐỒ TRÒN / DONUT CHART (PIE CHART) */}
-        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-4 flex flex-col justify-between">
+        {/* RIGHT COL: DONUT CHART */}
+        <Card className="p-5 space-y-4 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <PieChartIcon className="w-4 h-4 text-purple-600" />
+                <div className="w-8 h-8 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
+                  <PieChartIcon className="w-4 h-4" />
+                </div>
                 <h3 className="text-sm font-bold text-slate-900">
-                  {language === 'vi' ? 'Biểu Đồ Tròn Phân Bố' : 'Distribution Analytics'}
+                  {language === 'vi' ? 'Phân Bố Thị Phần' : 'Distribution Analytics'}
                 </h3>
               </div>
 
               {/* Sub Tab Switcher */}
-              <div className="flex items-center bg-slate-100 rounded-lg p-0.5 text-[11px] font-semibold">
+              <div className="flex items-center bg-slate-100 rounded-full p-0.5 text-[11px] font-semibold">
                 <button
                   onClick={() => setActiveDonutTab('platforms')}
-                  className={`px-2 py-0.5 rounded-md transition-all cursor-pointer ${
-                    activeDonutTab === 'platforms' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                  className={`px-2.5 py-0.5 rounded-full transition-all cursor-pointer ${
+                    activeDonutTab === 'platforms'
+                      ? 'bg-white text-slate-900 font-bold shadow-2xs'
+                      : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
                   {language === 'vi' ? 'Nền Tảng' : 'Platforms'}
                 </button>
                 <button
                   onClick={() => setActiveDonutTab('status')}
-                  className={`px-2 py-0.5 rounded-md transition-all cursor-pointer ${
-                    activeDonutTab === 'status' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                  className={`px-2.5 py-0.5 rounded-full transition-all cursor-pointer ${
+                    activeDonutTab === 'status'
+                      ? 'bg-white text-slate-900 font-bold shadow-2xs'
+                      : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
                   {language === 'vi' ? 'Trạng Thái' : 'Status'}
@@ -477,34 +463,24 @@ export const OverviewPage: React.FC = () => {
               <svg className="w-36 h-36 transform -rotate-90" viewBox="0 0 100 100">
                 {activeDonutTab === 'platforms' ? (
                   <>
-                    {/* TikTok 38% */}
                     <circle cx="50" cy="50" r="38" fill="transparent" stroke="#ec4899" strokeWidth="14" strokeDasharray="90.7 238.7" strokeDashoffset="0" />
-                    {/* Instagram 28% */}
                     <circle cx="50" cy="50" r="38" fill="transparent" stroke="#8b5cf6" strokeWidth="14" strokeDasharray="66.8 238.7" strokeDashoffset="-90.7" />
-                    {/* Facebook 18% */}
                     <circle cx="50" cy="50" r="38" fill="transparent" stroke="#3b82f6" strokeWidth="14" strokeDasharray="43.0 238.7" strokeDashoffset="-157.5" />
-                    {/* YouTube 11% */}
                     <circle cx="50" cy="50" r="38" fill="transparent" stroke="#ef4444" strokeWidth="14" strokeDasharray="26.2 238.7" strokeDashoffset="-200.5" />
-                    {/* Telegram/Other 5% */}
                     <circle cx="50" cy="50" r="38" fill="transparent" stroke="#10b981" strokeWidth="14" strokeDasharray="12.0 238.7" strokeDashoffset="-226.7" />
                   </>
                 ) : (
                   <>
-                    {/* Completed 84% */}
                     <circle cx="50" cy="50" r="38" fill="transparent" stroke="#10b981" strokeWidth="14" strokeDasharray="200.5 238.7" strokeDashoffset="0" />
-                    {/* In Progress 11% */}
                     <circle cx="50" cy="50" r="38" fill="transparent" stroke="#3b82f6" strokeWidth="14" strokeDasharray="26.2 238.7" strokeDashoffset="-200.5" />
-                    {/* Pending 3% */}
                     <circle cx="50" cy="50" r="38" fill="transparent" stroke="#f59e0b" strokeWidth="14" strokeDasharray="7.2 238.7" strokeDashoffset="-226.7" />
-                    {/* Refunded 2% */}
                     <circle cx="50" cy="50" r="38" fill="transparent" stroke="#ef4444" strokeWidth="14" strokeDasharray="4.8 238.7" strokeDashoffset="-233.9" />
                   </>
                 )}
               </svg>
 
-              {/* Center Donut Label */}
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-                <span className="text-xl font-extrabold text-slate-900">
+                <span className="text-xl font-extrabold font-mono tabular-nums text-slate-900">
                   {activeDonutTab === 'platforms' ? '100%' : '84%'}
                 </span>
                 <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-tight">
@@ -513,7 +489,7 @@ export const OverviewPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Donut Legend List with Percentages */}
+            {/* Donut Legend List */}
             <div className="space-y-2 text-xs pt-1">
               {(activeDonutTab === 'platforms' ? platformStats : fulfillmentStats).map((item, idx) => (
                 <div key={idx} className="flex items-center justify-between py-1 border-b border-slate-50 last:border-none">
@@ -522,8 +498,8 @@ export const OverviewPage: React.FC = () => {
                     <span className="font-semibold text-slate-700">{item.name}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-slate-400 font-mono text-[11px]">{item.count}</span>
-                    <span className="font-bold text-slate-900 bg-slate-100 px-1.5 py-0.5 rounded text-[11px]">
+                    <span className="text-slate-400 font-mono text-[11px] tabular-nums">{item.count}</span>
+                    <span className="font-bold font-mono text-slate-900 bg-slate-100 px-1.5 py-0.5 rounded-full text-[11px] tabular-nums">
                       {item.percent}%
                     </span>
                   </div>
@@ -538,19 +514,23 @@ export const OverviewPage: React.FC = () => {
               <Check className="w-3.5 h-3.5" /> 100% {language === 'vi' ? 'Khớp dữ liệu' : 'Synced'}
             </span>
           </div>
-        </div>
+        </Card>
       </div>
 
-      {/* SECTION: BIỂU ĐỒ ĐƯỜNG (LINE CHART) - API SPEED & TELEMETRY */}
+      {/* SECTION: LINE CHART & TELEMETRY */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left 2 Cols: BIỂU ĐỒ ĐƯỜNG XU HƯỚNG LƯU LƯỢNG API & WEBHOOKS */}
-        <div className="lg:col-span-2 p-5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-4">
+        {/* Left 2 Cols: LINE CHART */}
+        <Card className="lg:col-span-2 p-5 space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100">
             <div>
               <div className="flex items-center gap-2">
-                <LineChartIcon className="w-4 h-4 text-indigo-600" />
+                <div className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+                  <LineChartIcon className="w-4 h-4" />
+                </div>
                 <h3 className="text-sm font-bold text-slate-900">
-                  {language === 'vi' ? 'Biểu Đồ Đường: Lưu Lượng API & Độ Trễ (Latency)' : 'Line Chart: API Throughput & Latency Curve'}
+                  {language === 'vi'
+                    ? 'Biểu Đồ Đường: Lưu Lượng API & Độ Trễ (Latency)'
+                    : 'Line Chart: API Throughput & Latency Curve'}
                 </h3>
               </div>
               <p className="text-xs text-slate-500 mt-0.5">
@@ -561,13 +541,12 @@ export const OverviewPage: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-200">
+              <Badge variant="blue" size="sm">
                 Avg: 142ms
-              </span>
+              </Badge>
             </div>
           </div>
 
-          {/* SVG Smooth Line & Area Chart */}
           <div className="pt-2">
             <div className="relative h-44 w-full">
               <svg className="w-full h-full overflow-visible" viewBox="0 0 700 150" preserveAspectRatio="none">
@@ -578,18 +557,15 @@ export const OverviewPage: React.FC = () => {
                   </linearGradient>
                 </defs>
 
-                {/* Grid horizontal lines */}
                 <line x1="0" y1="30" x2="700" y2="30" stroke="#f1f5f9" strokeWidth="1" />
                 <line x1="0" y1="75" x2="700" y2="75" stroke="#f1f5f9" strokeWidth="1" />
                 <line x1="0" y1="120" x2="700" y2="120" stroke="#f1f5f9" strokeWidth="1" />
 
-                {/* Filled Area */}
                 <path
                   d="M 0 130 Q 100 140, 200 80 T 400 30 T 600 20 T 700 70 L 700 150 L 0 150 Z"
                   fill="url(#lineGrad)"
                 />
 
-                {/* Curved Main Line */}
                 <path
                   d="M 0 130 Q 100 140, 200 80 T 400 30 T 600 20 T 700 70"
                   fill="none"
@@ -598,7 +574,6 @@ export const OverviewPage: React.FC = () => {
                   strokeLinecap="round"
                 />
 
-                {/* Plot Points */}
                 {[
                   { cx: 0, cy: 130, val: '45 req' },
                   { cx: 116, cy: 140, val: '28 req' },
@@ -609,80 +584,71 @@ export const OverviewPage: React.FC = () => {
                   { cx: 700, cy: 70, val: '190 req' },
                 ].map((pt, idx) => (
                   <g key={idx} className="group cursor-pointer">
-                    <circle cx={pt.cx} cy={pt.cy} r="5" fill="#ffffff" stroke="#4f46e5" strokeWidth="3" />
+                    <circle cx={pt.cx} cy={pt.cy} r="4.5" fill="#ffffff" stroke="#4f46e5" strokeWidth="2.5" />
                   </g>
                 ))}
               </svg>
             </div>
 
-            {/* Time labels under line chart */}
-            <div className="flex justify-between text-[11px] text-slate-400 font-mono pt-2 border-t border-slate-100">
+            <div className="flex justify-between text-[11px] text-slate-400 font-mono pt-2 border-t border-slate-100 tabular-nums">
               {lineThroughputData.map((d, i) => (
                 <span key={i}>{d.hour}</span>
               ))}
             </div>
           </div>
-        </div>
+        </Card>
 
-        {/* Right Col: Fleet Operations & Telemetry */}
-        <div className="rounded-2xl border border-slate-800 bg-slate-950 text-white shadow-xl overflow-hidden flex flex-col justify-between">
-          <div>
-            {/* Mac-style traffic lights header */}
-            <div className="flex items-center justify-between border-b border-slate-800 bg-slate-900/80 px-4 py-2.5 backdrop-blur-sm">
-              <div className="flex items-center gap-2">
-                <span className="size-2.5 rounded-full bg-rose-500/80" />
-                <span className="size-2.5 rounded-full bg-yellow-500/80" />
-                <span className="size-2.5 rounded-full bg-emerald-500/80" />
-                <span className="text-[11px] font-mono text-slate-400 ml-2">fleet-engine-core</span>
-              </div>
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" /> Live 24/7
-              </span>
-            </div>
-
-            <div className="p-5 space-y-4">
+        {/* Right Col: Fleet Operations & Telemetry with Mac Chrome */}
+        <Card macChrome macTitle="fleet-engine-core" className="flex flex-col justify-between">
+          <div className="p-5 space-y-4">
+            <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-base font-semibold text-white tracking-tight">
-                  {language === 'vi' ? 'Tự Động Hóa Vận Hành 24/7' : 'Autonomous Operations Active'}
+                <h3 className="text-base font-bold text-slate-900 tracking-tight">
+                  {language === 'vi' ? 'Tự Động Hóa Vận Hành' : 'Autonomous Fleet Engine'}
                 </h3>
-                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
                   {language === 'vi'
-                    ? 'Hệ thống tự động phát hiện lỗi nhà cung cấp, tự động chuyển luồng failover và chạy auto-refill.'
-                    : 'System continuously inspects error rates and prevents failed deliveries before customers notice.'}
+                    ? 'Hệ thống tự động phát hiện lỗi nhà cung cấp và chuyển luồng failover.'
+                    : 'System continuously inspects error rates and executes automatic failovers.'}
                 </p>
               </div>
+              <Badge variant="emerald" pulse size="sm">
+                LIVE 24/7
+              </Badge>
+            </div>
 
-              <div className="space-y-2 text-xs font-mono">
-                <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-                  <span className="text-slate-300">FastSMMApi #14 Bridge</span>
-                  <span className="text-emerald-400 font-bold">142ms • OK</span>
-                </div>
-                <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-                  <span className="text-slate-300">GlobalStream API #08</span>
-                  <span className="text-emerald-400 font-bold">198ms • OK</span>
-                </div>
-                <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-                  <span className="text-slate-300">Auto-Refill Worker</span>
-                  <span className="text-blue-400 font-semibold">Running (Every 10m)</span>
-                </div>
+            <div className="space-y-2 text-xs font-mono">
+              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
+                <span className="text-slate-700">FastSMMApi #14 Bridge</span>
+                <span className="text-emerald-600 font-bold tabular-nums">142ms • OK</span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
+                <span className="text-slate-700">GlobalStream API #08</span>
+                <span className="text-emerald-600 font-bold tabular-nums">198ms • OK</span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
+                <span className="text-slate-700">Auto-Refill Worker</span>
+                <span className="text-blue-600 font-semibold">Running (Every 10m)</span>
               </div>
             </div>
           </div>
 
           <div className="p-5 pt-0">
-            <button
+            <Button
+              variant="primary"
+              size="md"
+              className="w-full"
               onClick={() => setCurrentRoute('/support')}
-              className="w-full h-10 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+              icon={<LifeBuoy className="w-4 h-4" />}
             >
-              <LifeBuoy className="w-4 h-4" />
-              <span>{language === 'vi' ? 'Mở Trung Tâm Hỗ Trợ AI' : 'Open Support Center'}</span>
-            </button>
+              {language === 'vi' ? 'Mở Trung Tâm Hỗ Trợ AI' : 'Open Support Center'}
+            </Button>
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* RENTED SMM PANELS LIST */}
-      <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-4">
+      <Card className="p-5 space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-sm font-bold text-slate-900">{t('panels.title')}</h2>
@@ -701,23 +667,28 @@ export const OverviewPage: React.FC = () => {
         </div>
 
         {userPanels.length === 0 ? (
-          <div className="p-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200 space-y-2">
-            <Server className="w-8 h-8 text-slate-400 mx-auto" />
-            <h4 className="text-sm font-bold text-slate-800">
-              {language === 'vi' ? 'Bạn chưa thuê SMM Panel nào' : 'No Rented Panels Yet'}
-            </h4>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              {language === 'vi'
-                ? 'Thuê gói SMM Panel ngay để bắt đầu bán dịch vụ mạng xã hội và kiếm lợi nhuận.'
-                : 'Rent a panel package to launch your SMM agency storefront today.'}
-            </p>
-            <button
+          <div className="p-8 text-center bg-slate-50/70 rounded-2xl border border-dashed border-slate-200 space-y-3">
+            <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
+              <Server className="w-6 h-6" />
+            </div>
+            <div className="space-y-1">
+              <h4 className="text-sm font-bold text-slate-800">
+                {language === 'vi' ? 'Bạn chưa thuê SMM Panel nào' : 'No Rented Panels Yet'}
+              </h4>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                {language === 'vi'
+                  ? 'Thuê gói SMM Panel ngay để bắt đầu bán dịch vụ mạng xã hội và kiếm lợi nhuận.'
+                  : 'Rent a panel package to launch your SMM agency storefront today.'}
+              </p>
+            </div>
+            <Button
+              variant="primary"
+              size="md"
               onClick={() => setCurrentRoute('/packages')}
-              className="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold shadow-xs hover:bg-blue-700 cursor-pointer inline-flex items-center gap-1.5"
+              icon={<PlusCircle className="w-4 h-4" />}
             >
-              <PlusCircle className="w-4 h-4" />
-              <span>{t('dashboard.rentNewPanel')}</span>
-            </button>
+              {t('dashboard.rentNewPanel')}
+            </Button>
           </div>
         ) : (
           <div className="divide-y divide-slate-100">
@@ -730,15 +701,13 @@ export const OverviewPage: React.FC = () => {
                   <div>
                     <div className="flex items-center gap-2">
                       <h4 className="text-sm font-bold text-slate-900">{panel.name}</h4>
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                          panel.status === 'active'
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            : 'bg-rose-50 text-rose-700 border border-rose-200'
-                        }`}
+                      <Badge
+                        variant={panel.status === 'active' ? 'emerald' : 'rose'}
+                        pulse={panel.status === 'active'}
+                        size="sm"
                       >
                         {panel.status.toUpperCase()}
-                      </span>
+                      </Badge>
                     </div>
                     <p className="text-xs text-slate-500 font-mono mt-0.5">
                       {panel.customDomain || panel.domain} • Plan: {panel.planName}
@@ -748,25 +717,30 @@ export const OverviewPage: React.FC = () => {
 
                 <div className="flex items-center gap-3">
                   <div className="text-right hidden md:block">
-                    <p className="text-xs font-bold text-slate-900">{(panel.totalOrders || 0).toLocaleString()} orders</p>
-                    <p className="text-[11px] text-slate-500">Rev: {formatMoney(panel.monthlyRevenue)}</p>
+                    <p className="text-xs font-bold font-mono tabular-nums text-slate-900">
+                      {(panel.totalOrders || 0).toLocaleString()} orders
+                    </p>
+                    <p className="text-[11px] font-mono tabular-nums text-slate-500">
+                      Rev: {formatMoney(panel.monthlyRevenue)}
+                    </p>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <button
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => {
                         setSelectedPanelForDetail(panel);
                         setCurrentRoute(`/panels/${panel.id}`);
                       }}
-                      className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition-colors cursor-pointer"
                     >
                       {t('panels.manage')}
-                    </button>
+                    </Button>
                     <a
                       href={`https://${panel.customDomain || panel.domain}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                      className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors"
                       title="Open storefront"
                     >
                       <ExternalLink className="w-4 h-4" />
@@ -777,10 +751,10 @@ export const OverviewPage: React.FC = () => {
             ))}
           </div>
         )}
-      </div>
+      </Card>
 
       {/* RECENT TRANSACTIONS */}
-      <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-4">
+      <Card className="p-5 space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-sm font-bold text-slate-900">{t('dashboard.recentTransactions')}</h2>
@@ -801,40 +775,42 @@ export const OverviewPage: React.FC = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-slate-100 text-slate-400 font-semibold">
-                <th className="pb-2">ID</th>
-                <th className="pb-2">{language === 'vi' ? 'Ngày' : 'Date'}</th>
-                <th className="pb-2">{language === 'vi' ? 'Mô tả' : 'Description'}</th>
-                <th className="pb-2">{language === 'vi' ? 'Phương thức' : 'Method'}</th>
-                <th className="pb-2 text-right">{language === 'vi' ? 'Số tiền' : 'Amount'}</th>
-                <th className="pb-2 text-right">{language === 'vi' ? 'Trạng thái' : 'Status'}</th>
+              <tr className="border-b border-slate-100 text-slate-400 font-semibold uppercase text-[10px] tracking-wider">
+                <th className="pb-2.5">ID</th>
+                <th className="pb-2.5">{language === 'vi' ? 'Ngày' : 'Date'}</th>
+                <th className="pb-2.5">{language === 'vi' ? 'Mô tả' : 'Description'}</th>
+                <th className="pb-2.5">{language === 'vi' ? 'Phương thức' : 'Method'}</th>
+                <th className="pb-2.5 text-right">{language === 'vi' ? 'Số tiền' : 'Amount'}</th>
+                <th className="pb-2.5 text-right">{language === 'vi' ? 'Trạng thái' : 'Status'}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-slate-100">
               {transactions.slice(0, 4).map((tx) => (
-                <tr key={tx.id} className="hover:bg-slate-50/60">
-                  <td className="py-2.5 font-mono text-slate-500">{tx.id}</td>
-                  <td className="py-2.5 text-slate-500">{new Date(tx.date).toLocaleDateString()}</td>
-                  <td className="py-2.5 font-medium text-slate-900">{tx.description}</td>
-                  <td className="py-2.5 text-slate-500">{tx.paymentMethod || 'Wallet'}</td>
+                <tr key={tx.id} className="hover:bg-slate-50/60 transition-colors">
+                  <td className="py-3 font-mono text-slate-500">{tx.id}</td>
+                  <td className="py-3 text-slate-500 font-mono tabular-nums">
+                    {new Date(tx.date).toLocaleDateString()}
+                  </td>
+                  <td className="py-3 font-medium text-slate-900">{tx.description}</td>
+                  <td className="py-3 text-slate-500">{tx.paymentMethod || 'Wallet'}</td>
                   <td
-                    className={`py-2.5 text-right font-bold ${
+                    className={`py-3 text-right font-mono font-bold tabular-nums ${
                       tx.amount > 0 ? 'text-emerald-600' : 'text-slate-900'
                     }`}
                   >
                     {tx.amount > 0 ? `+${formatMoney(tx.amount)}` : formatMoney(tx.amount)}
                   </td>
-                  <td className="py-2.5 text-right">
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <td className="py-3 text-right">
+                    <Badge variant="emerald" size="sm">
                       {tx.status}
-                    </span>
+                    </Badge>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

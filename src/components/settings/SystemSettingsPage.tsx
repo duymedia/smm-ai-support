@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { Button } from '../ui/Button';
+import { Badge } from '../ui/Badge';
+import { Card } from '../ui/Card';
+import { PageHeader } from '../ui/PageHeader';
 import {
   Settings,
   Sliders,
@@ -15,7 +19,9 @@ import {
   Layers,
   Server,
   Download,
-  Trash2,
+  ShieldCheck,
+  ToggleLeft,
+  ToggleRight
 } from 'lucide-react';
 
 export const SystemSettingsPage: React.FC = () => {
@@ -116,43 +122,34 @@ export const SystemSettingsPage: React.FC = () => {
 
   return (
     <div className="space-y-6 w-full pb-12">
-      {/* Header Banner */}
-      <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600">
-            <Settings className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold text-slate-900">
-                {language === 'vi' ? 'Cài Đặt Hệ Thống & Tự Động Hóa' : 'System Settings & Automation'}
-              </h1>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">
-                CORE CONFIG
-              </span>
-            </div>
-            <p className="text-xs text-slate-500 mt-0.5">
-              {language === 'vi'
-                ? 'Thiết lập chu kỳ đồng bộ đơn hàng NCC, tỷ suất lợi nhuận, thông báo Webhook, tỷ giá tiền tệ và bảo trì'
-                : 'Configure order sync frequency, default profit margins, webhook alerts, currency exchange rates, and maintenance'}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button
+      {/* Page Header */}
+      <PageHeader
+        title={language === 'vi' ? 'Cài Đặt Hệ Thống & Tự Động Hóa' : 'System Settings & Automation'}
+        description={
+          language === 'vi'
+            ? 'Thiết lập chu kỳ đồng bộ đơn hàng NCC, tỷ suất lợi nhuận, thông báo Webhook, tỷ giá tiền tệ và bảo trì.'
+            : 'Configure order sync frequency, default profit margins, webhook alerts, currency exchange rates, and maintenance.'
+        }
+        badge={
+          <Badge variant="brand" pulse>
+            CORE CONFIG
+          </Badge>
+        }
+        actions={
+          <Button
+            variant="primary"
+            size="md"
+            loading={saving}
             onClick={handleSaveSettings}
-            disabled={saving}
-            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs hover:shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
+            icon={<Check className="w-4 h-4" />}
           >
-            {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-            <span>{saving ? t('common.loading') : (language === 'vi' ? 'Lưu Cài Đặt Hệ Thống' : 'Save System Settings')}</span>
-          </button>
-        </div>
-      </div>
+            {saving ? (language === 'vi' ? 'Đang Lưu...' : 'Saving...') : (language === 'vi' ? 'Lưu Cài Đặt Hệ Thống' : 'Save System Settings')}
+          </Button>
+        }
+      />
 
-      {/* Settings Navigation Tabs */}
-      <div className="bg-white p-2 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center gap-1.5">
+      {/* Settings Navigation Tabs (Pill style) */}
+      <div className="flex flex-wrap items-center gap-2 p-1.5 rounded-full bg-slate-100/80 border border-slate-200/80 w-fit">
         {[
           { id: 'automation', label: language === 'vi' ? 'Tự Động Hóa & Vận Hành' : 'Automation & Operations', icon: Sliders },
           { id: 'notifications', label: language === 'vi' ? 'Thông Báo & Webhook' : 'Alerts & Webhooks', icon: Bell },
@@ -166,14 +163,14 @@ export const SystemSettingsPage: React.FC = () => {
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`flex items-center gap-2 py-2 px-4 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                 isActive
-                  ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                  ? 'bg-slate-900 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
               }`}
             >
-              <Icon className="w-4 h-4 shrink-0" />
-              <span className="truncate">{tab.label}</span>
+              <Icon className="w-3.5 h-3.5 shrink-0" />
+              <span>{tab.label}</span>
             </button>
           );
         })}
@@ -182,23 +179,28 @@ export const SystemSettingsPage: React.FC = () => {
       {/* TAB 1: AUTOMATION & OPERATIONS */}
       {activeTab === 'automation' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+          <Card
+            macChrome
+            macTitle="ORDER_ENGINE // QUEUE & FAILOVER"
+            macBadge={<Badge variant="amber" size="sm">Sync 3m</Badge>}
+            className="p-6 space-y-4"
+          >
             <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
               <Zap className="w-4 h-4 text-amber-500" />
-              <h2 className="text-sm font-bold text-slate-900">
+              <h2 className="text-xs font-mono uppercase tracking-wider text-slate-700 font-bold">
                 {language === 'vi' ? 'Cấu Hình Đồng Bộ & Xử Lý Đơn' : 'Order Sync & Queue Engine'}
               </h2>
             </div>
 
             <div className="space-y-4 text-xs">
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
+              <div className="space-y-1.5">
+                <label className="block font-semibold text-slate-700">
                   {language === 'vi' ? 'Tần suất kiểm tra trạng thái đơn NCC:' : 'Provider Status Polling Interval:'}
                 </label>
                 <select
                   value={syncInterval}
                   onChange={(e) => setSyncInterval(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-hidden"
+                  className="w-full px-4 py-2.5 rounded-full border border-slate-200 bg-slate-50/80 focus:bg-white focus-ring text-xs"
                 >
                   <option value="1">Mỗi 1 phút (Nhanh nhất - Instant Polling)</option>
                   <option value="3">Mỗi 3 phút (Khuyên dùng - Recommended)</option>
@@ -207,15 +209,15 @@ export const SystemSettingsPage: React.FC = () => {
                 </select>
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
+              <div className="space-y-1.5">
+                <label className="block font-semibold text-slate-700">
                   {language === 'vi' ? 'Ngưỡng cảnh báo số dư NCC sắp hết ($):' : 'Low Provider Balance Alert ($):'}
                 </label>
                 <input
                   type="number"
                   value={lowBalanceAlertThreshold}
                   onChange={(e) => setLowBalanceAlertThreshold(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-hidden font-mono"
+                  className="w-full px-4 py-2.5 rounded-full border border-slate-200 bg-slate-50/80 focus:bg-white focus-ring font-mono tabular-nums text-xs"
                   placeholder="50"
                 />
                 <p className="text-[11px] text-slate-500 mt-1">
@@ -255,19 +257,24 @@ export const SystemSettingsPage: React.FC = () => {
                 </label>
               </div>
             </div>
-          </div>
+          </Card>
 
-          <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+          <Card
+            macChrome
+            macTitle="PRICING_RULES // MARGINS & SAFETY"
+            macBadge={<Badge variant="emerald" size="sm">Margin +25%</Badge>}
+            className="p-6 space-y-4"
+          >
             <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
               <DollarSign className="w-4 h-4 text-emerald-600" />
-              <h2 className="text-sm font-bold text-slate-900">
+              <h2 className="text-xs font-mono uppercase tracking-wider text-slate-700 font-bold">
                 {language === 'vi' ? 'Quy Tắc Lợi Nhuận & Dịch Vụ Mặc Định' : 'Default Margins & Pricing Rules'}
               </h2>
             </div>
 
             <div className="space-y-4 text-xs">
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
+              <div className="space-y-1.5">
+                <label className="block font-semibold text-slate-700">
                   {language === 'vi' ? 'Tỷ lệ lợi nhuận mặc định khi nhập dịch vụ mới (%):' : 'Global Default Profit Markup (%):'}
                 </label>
                 <div className="relative">
@@ -275,10 +282,10 @@ export const SystemSettingsPage: React.FC = () => {
                     type="number"
                     value={defaultProfitMargin}
                     onChange={(e) => setDefaultProfitMargin(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-hidden font-mono pr-8"
+                    className="w-full px-4 py-2.5 rounded-full border border-slate-200 bg-slate-50/80 focus:bg-white focus-ring font-mono tabular-nums pr-8 text-xs"
                     placeholder="25"
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-slate-400">%</span>
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-slate-400">%</span>
                 </div>
                 <p className="text-[11px] text-slate-500 mt-1">
                   {language === 'vi'
@@ -287,10 +294,10 @@ export const SystemSettingsPage: React.FC = () => {
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+              <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200 space-y-2">
                 <div className="flex items-center gap-2">
                   <Shield className="w-4 h-4 text-indigo-600" />
-                  <span className="font-bold text-slate-800">Bộ Lọc An Toàn Nội Dung</span>
+                  <span className="font-semibold text-slate-800">Bộ Lọc An Toàn Nội Dung</span>
                 </div>
                 <label className="flex items-center gap-2 cursor-pointer select-none">
                   <input
@@ -307,25 +314,30 @@ export const SystemSettingsPage: React.FC = () => {
                 </label>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       )}
 
       {/* TAB 2: NOTIFICATIONS & WEBHOOKS */}
       {activeTab === 'notifications' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+          <Card
+            macChrome
+            macTitle="ALERT_CHANNELS // EMAIL & TELEGRAM"
+            macBadge={<Badge variant="blue" size="sm">4 Alerts</Badge>}
+            className="p-6 space-y-4"
+          >
             <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
               <Bell className="w-4 h-4 text-blue-600" />
-              <h2 className="text-sm font-bold text-slate-900">
+              <h2 className="text-xs font-mono uppercase tracking-wider text-slate-700 font-bold">
                 {language === 'vi' ? 'Thông Báo Qua Email & Telegram' : 'Email & Telegram Channels'}
               </h2>
             </div>
 
             <div className="space-y-3 text-xs">
-              <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer">
+              <label className="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200/80 bg-slate-50/60 cursor-pointer">
                 <div>
-                  <p className="font-bold text-slate-800">Thông báo Email khi có đơn hàng lớn</p>
+                  <p className="font-semibold text-slate-800">Thông báo Email khi có đơn hàng lớn</p>
                   <p className="text-[11px] text-slate-500">Nhận email khi có đơn trị giá trên $20</p>
                 </div>
                 <input
@@ -336,9 +348,9 @@ export const SystemSettingsPage: React.FC = () => {
                 />
               </label>
 
-              <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer">
+              <label className="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200/80 bg-slate-50/60 cursor-pointer">
                 <div>
-                  <p className="font-bold text-slate-800">Cảnh báo Email khi số dư ví thấp</p>
+                  <p className="font-semibold text-slate-800">Cảnh báo Email khi số dư ví thấp</p>
                   <p className="text-[11px] text-slate-500">Nhận email nhắc nạp tiền duy trì thuê panel</p>
                 </div>
                 <input
@@ -349,9 +361,9 @@ export const SystemSettingsPage: React.FC = () => {
                 />
               </label>
 
-              <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer">
+              <label className="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200/80 bg-slate-50/60 cursor-pointer">
                 <div>
-                  <p className="font-bold text-slate-800">Cảnh báo Telegram trước ngày hết hạn Panel</p>
+                  <p className="font-semibold text-slate-800">Cảnh báo Telegram trước ngày hết hạn Panel</p>
                   <p className="text-[11px] text-slate-500">Gửi bot nhắc nhở trước 3 ngày và 24 giờ</p>
                 </div>
                 <input
@@ -362,10 +374,10 @@ export const SystemSettingsPage: React.FC = () => {
                 />
               </label>
 
-              <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer">
+              <label className="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200/80 bg-slate-50/60 cursor-pointer">
                 <div>
-                  <p className="font-bold text-slate-800">Báo cáo sự cố kết nối API NCC</p>
-                  <p className="text-[11px] text-slate-500">Thông báo tức thời khi upstream provider trả mã lỗi HTTP 500/502</p>
+                  <p className="font-semibold text-slate-800">Báo cáo sự cố kết nối API NCC</p>
+                  <p className="text-[11px] text-slate-500">Thông báo tức thời khi upstream trả mã HTTP 500/502</p>
                 </div>
                 <input
                   type="checkbox"
@@ -375,121 +387,131 @@ export const SystemSettingsPage: React.FC = () => {
                 />
               </label>
             </div>
-          </div>
+          </Card>
 
-          <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+          <Card
+            macChrome
+            macTitle="WEBHOOK_BUS // SYSTEM INTEGRATION"
+            macBadge={<Badge variant="purple" size="sm">TLS Events</Badge>}
+            className="p-6 space-y-4"
+          >
             <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
               <Layers className="w-4 h-4 text-indigo-600" />
-              <h2 className="text-sm font-bold text-slate-900">
+              <h2 className="text-xs font-mono uppercase tracking-wider text-slate-700 font-bold">
                 {language === 'vi' ? 'Cấu Hình Webhook Toàn Hệ Thống' : 'Global Webhooks Integration'}
               </h2>
             </div>
 
             <div className="space-y-4 text-xs">
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Webhook Endpoint URL:</label>
+              <div className="space-y-1.5">
+                <label className="block font-semibold text-slate-700">Webhook Endpoint URL:</label>
                 <input
                   type="url"
                   value={webhookUrl}
                   onChange={(e) => setWebhookUrl(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white font-mono"
+                  className="w-full px-4 py-2.5 rounded-full border border-slate-200 bg-slate-50/80 focus:bg-white focus-ring font-mono text-xs"
                   placeholder="https://yourdomain.com/webhook/nexussmm"
                 />
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Webhook Signing Secret:</label>
+              <div className="space-y-1.5">
+                <label className="block font-semibold text-slate-700">Webhook Signing Secret:</label>
                 <input
                   type="text"
                   value={webhookSecret}
                   onChange={(e) => setWebhookSecret(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white font-mono"
+                  className="w-full px-4 py-2.5 rounded-full border border-slate-200 bg-slate-50/80 focus:bg-white focus-ring font-mono text-xs"
                 />
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 space-y-1">
-                <p className="font-bold text-slate-800">Các sự kiện được kích hoạt gửi Webhook:</p>
-                <p>• <code>order.created</code>, <code>order.completed</code>, <code>order.refunded</code></p>
-                <p>• <code>panel.provisioned</code>, <code>panel.renewed</code>, <code>panel.expired</code></p>
-                <p>• <code>wallet.deposited</code></p>
+              <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200 text-[11px] text-slate-600 space-y-1.5">
+                <p className="font-semibold text-slate-800">Các sự kiện được kích hoạt gửi Webhook:</p>
+                <p>• <code className="font-mono text-indigo-600">order.created</code>, <code className="font-mono text-indigo-600">order.completed</code>, <code className="font-mono text-indigo-600">order.refunded</code></p>
+                <p>• <code className="font-mono text-indigo-600">panel.provisioned</code>, <code className="font-mono text-indigo-600">panel.renewed</code>, <code className="font-mono text-indigo-600">panel.expired</code></p>
+                <p>• <code className="font-mono text-indigo-600">wallet.deposited</code></p>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       )}
 
       {/* TAB 3: LOCALIZATION & RATES */}
       {activeTab === 'localization' && (
-        <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs space-y-5">
+        <Card
+          macChrome
+          macTitle="LOCALIZATION // CURRENCY & RATES"
+          macBadge={<Badge variant="blue" size="sm">Multi-currency</Badge>}
+          className="p-6 space-y-5"
+        >
           <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
             <Globe className="w-4 h-4 text-blue-600" />
-            <h2 className="text-sm font-bold text-slate-900">
+            <h2 className="text-xs font-mono uppercase tracking-wider text-slate-700 font-bold">
               {language === 'vi' ? 'Ngôn Ngữ & Thiết Lập Tỷ Giá Tiền Tệ' : 'Localization & Currency Exchange Rates'}
             </h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-            <div>
-              <label className="block font-bold text-slate-700 mb-1">
+            <div className="space-y-1.5">
+              <label className="block font-semibold text-slate-700">
                 {language === 'vi' ? 'Ngôn ngữ mặc định:' : 'Default Interface Language:'}
               </label>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => setLanguage('vi')}
-                  className={`px-3 py-2 rounded-xl border flex items-center justify-center gap-2 font-bold transition-all cursor-pointer ${
+                  className={`px-4 py-2.5 rounded-full border flex items-center justify-center gap-2 font-semibold transition-all cursor-pointer ${
                     language === 'vi'
                       ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-2xs'
-                      : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+                      : 'border-slate-200 bg-slate-50/80 text-slate-700 hover:bg-slate-100'
                   }`}
                 >
-                  <span className="fi fi-vn fis rounded-xs shadow-2xs w-4 h-3.5 inline-block" />
+                  <span className="fi fi-vn fis rounded-full shadow-2xs w-4 h-4 inline-block" />
                   <span>Tiếng Việt</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setLanguage('en')}
-                  className={`px-3 py-2 rounded-xl border flex items-center justify-center gap-2 font-bold transition-all cursor-pointer ${
+                  className={`px-4 py-2.5 rounded-full border flex items-center justify-center gap-2 font-semibold transition-all cursor-pointer ${
                     language === 'en'
                       ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-2xs'
-                      : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+                      : 'border-slate-200 bg-slate-50/80 text-slate-700 hover:bg-slate-100'
                   }`}
                 >
-                  <span className="fi fi-us fis rounded-xs shadow-2xs w-4 h-3.5 inline-block" />
+                  <span className="fi fi-us fis rounded-full shadow-2xs w-4 h-4 inline-block" />
                   <span>English</span>
                 </button>
               </div>
             </div>
 
-            <div>
-              <label className="block font-bold text-slate-700 mb-1">
+            <div className="space-y-1.5">
+              <label className="block font-semibold text-slate-700">
                 {language === 'vi' ? 'Tiền tệ thanh toán mặc định:' : 'Default Base Currency:'}
               </label>
               <select
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value as any)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white"
+                className="w-full px-4 py-2.5 rounded-full border border-slate-200 bg-slate-50/80 focus:bg-white focus-ring text-xs"
               >
                 <option value="USD">$ USD - United States Dollar</option>
                 <option value="VND">₫ VND - Đồng Việt Nam</option>
               </select>
             </div>
 
-            <div className="sm:col-span-2 p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+            <div className="sm:col-span-2 p-4 rounded-2xl bg-slate-50/80 border border-slate-200 space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                  <p className="font-bold text-slate-900 text-xs">Tỷ Giá Quy Đổi (USD ➔ VND)</p>
+                  <p className="font-semibold text-slate-900 text-xs">Tỷ Giá Quy Đổi (USD ➔ VND)</p>
                   <p className="text-[11px] text-slate-500">1 USD = bao nhiêu VND cho các hóa đơn và bảng giá</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-slate-800 text-xs font-mono">$1.00 USD =</span>
+                  <span className="font-semibold text-slate-800 text-xs font-mono tabular-nums">$1.00 USD =</span>
                   <input
                     type="number"
                     value={exchangeRateVND}
                     onChange={(e) => setExchangeRateVND(e.target.value)}
-                    className="w-32 px-3 py-1.5 rounded-lg border border-slate-300 bg-white font-mono font-bold text-xs text-right"
+                    className="w-32 px-3 py-1.5 rounded-full border border-slate-300 bg-white font-mono tabular-nums font-bold text-xs text-right focus-ring"
                   />
-                  <span className="font-bold text-slate-700 text-xs">₫ VND</span>
+                  <span className="font-semibold text-slate-700 text-xs font-mono">₫ VND</span>
                 </div>
               </div>
 
@@ -504,44 +526,48 @@ export const SystemSettingsPage: React.FC = () => {
               </label>
             </div>
           </div>
-        </div>
+        </Card>
       )}
 
       {/* TAB 4: MAINTENANCE & BACKUP */}
       {activeTab === 'maintenance' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Edge Cache & Maintenance Mode */}
-          <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+          <Card
+            macChrome
+            macTitle="MAINTENANCE // CDN EDGE & HEALTH"
+            macBadge={<Badge variant="rose" size="sm">Ops Deck</Badge>}
+            className="p-6 space-y-4"
+          >
             <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
               <Server className="w-4 h-4 text-rose-600" />
-              <h2 className="text-sm font-bold text-slate-900">
+              <h2 className="text-xs font-mono uppercase tracking-wider text-slate-700 font-bold">
                 {language === 'vi' ? 'Vận Hành & Bảo Trì Máy Chủ' : 'Server Operations & CDN Cache'}
               </h2>
             </div>
 
             <div className="space-y-4 text-xs">
-              <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-bold text-slate-900">Xóa Bộ Nhớ Đệm Toàn Sàn (Purge Edge Cache)</p>
-                    <p className="text-[11px] text-slate-500">Làm mới dữ liệu DNS & CDN cho toàn bộ các Panel đang chạy.</p>
-                  </div>
+              <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50/80 space-y-3">
+                <div>
+                  <p className="font-semibold text-slate-900">Xóa Bộ Nhớ Đệm Toàn Sàn (Purge Edge Cache)</p>
+                  <p className="text-[11px] text-slate-500">Làm mới dữ liệu DNS &amp; CDN cho toàn bộ các Panel đang chạy.</p>
                 </div>
-                <button
+                <Button
                   type="button"
+                  variant="primary"
+                  size="sm"
                   onClick={handlePurgeGlobalCache}
-                  disabled={isPurgingCache}
-                  className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  loading={isPurgingCache}
+                  icon={<RefreshCw className="w-3.5 h-3.5" />}
                 >
-                  <RefreshCw className={`w-3.5 h-3.5 ${isPurgingCache ? 'animate-spin' : ''}`} />
-                  <span>{isPurgingCache ? 'Đang xóa cache...' : 'Xóa Toàn Bộ CDN Cache'}</span>
-                </button>
+                  {isPurgingCache ? 'Đang xóa cache...' : 'Xóa Toàn Bộ CDN Cache'}
+                </Button>
               </div>
 
-              <div className="p-3.5 rounded-xl border border-amber-200 bg-amber-50/50 space-y-2">
+              <div className="p-4 rounded-2xl border border-amber-200 bg-amber-50/50 space-y-2">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-bold text-amber-900">Chế Độ Bảo Trì Hệ Thống</p>
+                    <p className="font-semibold text-amber-900">Chế Độ Bảo Trì Hệ Thống</p>
                     <p className="text-[11px] text-amber-700">Tạm thời khóa đặt đơn mới trên tất cả các Panel để bảo trì.</p>
                   </div>
                   <input
@@ -559,13 +585,18 @@ export const SystemSettingsPage: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
 
           {/* Backup & Export */}
-          <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+          <Card
+            macChrome
+            macTitle="BACKUP_ENGINE // ENCRYPTED EXPORT"
+            macBadge={<Badge variant="emerald" size="sm">JSON v2.4</Badge>}
+            className="p-6 space-y-4"
+          >
             <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
               <Database className="w-4 h-4 text-emerald-600" />
-              <h2 className="text-sm font-bold text-slate-900">
+              <h2 className="text-xs font-mono uppercase tracking-wider text-slate-700 font-bold">
                 {language === 'vi' ? 'Sao Lưu & Xuất Dữ Liệu' : 'Backup & Export Configuration'}
               </h2>
             </div>
@@ -577,16 +608,18 @@ export const SystemSettingsPage: React.FC = () => {
                   : 'Export all automation rules, system variables, webhook configs, and pricing settings into an encrypted JSON file.'}
               </p>
 
-              <button
+              <Button
                 type="button"
+                variant="success"
+                size="md"
                 onClick={handleExportBackup}
-                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-xs cursor-pointer transition-colors"
+                icon={<Download className="w-4 h-4" />}
+                className="w-full"
               >
-                <Download className="w-4 h-4" />
-                <span>{language === 'vi' ? 'Xuất File Sao Lưu Cài Đặt (.JSON)' : 'Export Settings Backup (.JSON)'}</span>
-              </button>
+                {language === 'vi' ? 'Xuất File Sao Lưu Cài Đặt (.JSON)' : 'Export Settings Backup (.JSON)'}
+              </Button>
             </div>
-          </div>
+          </Card>
         </div>
       )}
     </div>

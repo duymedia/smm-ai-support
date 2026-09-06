@@ -126,17 +126,17 @@ export const Navbar: React.FC = () => {
           </button>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-1.5 bg-slate-100/70 p-1 rounded-full border border-slate-200/80">
             {navLinks.map((link) => {
               const isActive = currentRoute === link.path || (currentRoute === '/' && link.path === '/#');
               return (
                 <button
                   key={link.path}
                   onClick={() => handleNav(link.path, link.sectionId)}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
+                  className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 cursor-pointer ${
                     isActive
-                      ? 'text-blue-700 bg-blue-50/90 font-bold'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                      ? 'text-blue-700 bg-white shadow-2xs font-bold'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
                   }`}
                 >
                   {link.label}
@@ -147,6 +147,15 @@ export const Navbar: React.FC = () => {
 
           {/* Right Utilities: Currency, Language Switcher, Auth CTA */}
           <div className="hidden lg:flex items-center gap-2.5">
+            {/* System Online Status Indicator */}
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-[11px] font-mono font-semibold text-emerald-700">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              </span>
+              <span className="tracking-tight text-[10px] uppercase">Online</span>
+            </div>
+
             {/* Currency Dropdown Selector */}
             <div ref={currRef} className="relative">
               <button
@@ -155,10 +164,10 @@ export const Navbar: React.FC = () => {
                   setCurrencyDropdownOpen(!currencyDropdownOpen);
                   setLangDropdownOpen(false);
                 }}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-xs font-bold text-slate-800 transition-all cursor-pointer shadow-2xs"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200/90 bg-white hover:bg-slate-50 text-xs font-bold text-slate-800 transition-all cursor-pointer shadow-2xs press-tactile"
                 title="Chọn tiền tệ / Select currency"
               >
-                <span className="w-4 h-4 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[10px] font-black font-mono">
+                <span className="w-4 h-4 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-[10px] font-black font-mono">
                   {currentCurrencyObj?.symbol || (currency === 'USD' ? '$' : '₫')}
                 </span>
                 <span className="font-mono text-xs font-bold">{currency}</span>
@@ -166,8 +175,8 @@ export const Navbar: React.FC = () => {
               </button>
 
               {currencyDropdownOpen && (
-                <div className="absolute right-0 mt-1.5 w-48 max-h-72 overflow-y-auto bg-white rounded-xl border border-slate-200 shadow-xl py-1.5 z-50 animate-in fade-in zoom-in-95">
-                  <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 mb-1 sticky top-0 bg-white">
+                <div className="absolute right-0 mt-2 w-48 max-h-72 overflow-y-auto bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/90 shadow-xl py-1.5 z-50 animate-in fade-in zoom-in-95">
+                  <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 mb-1 sticky top-0 bg-white/95">
                     {language === 'vi' ? 'Tiền tệ hiển thị' : 'Display Currency'}
                   </div>
                   {(currencies && currencies.length > 0 ? currencies.filter(c => c.active) : [
@@ -181,7 +190,7 @@ export const Navbar: React.FC = () => {
                         setCurrency(cur.code);
                         setCurrencyDropdownOpen(false);
                       }}
-                      className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                      className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold transition-colors cursor-pointer ${
                         currency === cur.code ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50'
                       }`}
                     >
@@ -189,7 +198,7 @@ export const Navbar: React.FC = () => {
                         <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-[11px]">
                           {cur.symbol}
                         </span>
-                        <span>{cur.code} ({cur.symbol})</span>
+                        <span className="font-mono">{cur.code} ({cur.symbol})</span>
                       </div>
                       {currency === cur.code && <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />}
                     </button>
@@ -198,7 +207,7 @@ export const Navbar: React.FC = () => {
               )}
             </div>
 
-            {/* Language Dropdown Selector (Matching DashboardLayout) */}
+            {/* Language Dropdown Selector */}
             <div ref={langRef} className="relative">
               <button
                 type="button"
@@ -206,18 +215,18 @@ export const Navbar: React.FC = () => {
                   setLangDropdownOpen(!langDropdownOpen);
                   setCurrencyDropdownOpen(false);
                 }}
-                className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-xs font-bold text-slate-800 transition-all cursor-pointer shadow-2xs"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-200/90 bg-white hover:bg-slate-50 text-xs font-bold text-slate-800 transition-all cursor-pointer shadow-2xs press-tactile"
                 title="Chọn ngôn ngữ / Select language"
               >
-                <span className={`fi ${language === 'vi' ? 'fi-vn' : 'fi-us'} fis rounded-xs shadow-2xs w-4 h-3.5 inline-block`} />
+                <span className={`fi ${language === 'vi' ? 'fi-vn' : 'fi-us'} fis rounded-full shadow-2xs w-3.5 h-3.5 inline-block`} />
                 <span className="font-semibold text-xs text-slate-800">
-                  {language === 'vi' ? 'Tiếng Việt' : 'English'}
+                  {language === 'vi' ? 'VI' : 'EN'}
                 </span>
                 <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${langDropdownOpen ? 'rotate-180 text-blue-600' : ''}`} />
               </button>
 
               {langDropdownOpen && (
-                <div className="absolute right-0 mt-1.5 w-40 bg-white rounded-xl border border-slate-200 shadow-xl py-1.5 z-50 animate-in fade-in zoom-in-95">
+                <div className="absolute right-0 mt-2 w-40 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/90 shadow-xl py-1.5 z-50 animate-in fade-in zoom-in-95">
                   <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 mb-1">
                     {language === 'vi' ? 'Ngôn ngữ' : 'Language'}
                   </div>
@@ -228,12 +237,12 @@ export const Navbar: React.FC = () => {
                       setLanguage('vi');
                       setLangDropdownOpen(false);
                     }}
-                    className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                    className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold transition-colors cursor-pointer ${
                       language === 'vi' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50'
                     }`}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="fi fi-vn fis rounded-xs shadow-2xs w-4 h-3.5 inline-block" />
+                      <span className="fi fi-vn fis rounded-full shadow-2xs w-3.5 h-3.5 inline-block" />
                       <span>Tiếng Việt</span>
                     </div>
                     {language === 'vi' && <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />}
@@ -245,12 +254,12 @@ export const Navbar: React.FC = () => {
                       setLanguage('en');
                       setLangDropdownOpen(false);
                     }}
-                    className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                    className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold transition-colors cursor-pointer ${
                       language === 'en' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50'
                     }`}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="fi fi-us fis rounded-xs shadow-2xs w-4 h-3.5 inline-block" />
+                      <span className="fi fi-us fis rounded-full shadow-2xs w-3.5 h-3.5 inline-block" />
                       <span>English</span>
                     </div>
                     {language === 'en' && <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />}
@@ -259,11 +268,11 @@ export const Navbar: React.FC = () => {
               )}
             </div>
 
-            {/* User button or Log In / Register */}
+            {/* User button or Log In / Register Pill Buttons */}
             {user ? (
               <button
                 onClick={() => handleNav('/dashboard')}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all cursor-pointer"
+                className="flex items-center gap-2 h-10 px-5 rounded-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all cursor-pointer press-tactile"
               >
                 <span>{t('nav.dashboard')}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -272,14 +281,14 @@ export const Navbar: React.FC = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleNav('/login')}
-                  className="px-3.5 py-2 text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100/80 rounded-xl transition-colors cursor-pointer"
+                  className="h-10 px-4 rounded-full text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer press-tactile"
                 >
                   {t('nav.login')}
                 </button>
                 {siteConfig?.allowUserRegistration !== false && (
                   <button
                     onClick={() => handleNav('/register')}
-                    className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-xs hover:shadow-md shadow-blue-600/20 transition-all cursor-pointer"
+                    className="flex items-center gap-1.5 h-10 px-5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-full shadow-xs hover:shadow-md shadow-blue-600/20 transition-all cursor-pointer press-tactile"
                   >
                     <span>{t('nav.register')}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -293,14 +302,14 @@ export const Navbar: React.FC = () => {
           <div className="flex items-center gap-2 md:hidden">
             <button
               onClick={() => setLanguage(language === 'en' ? 'vi' : 'en')}
-              className="p-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 flex items-center gap-1.5 bg-slate-50"
+              className="px-2.5 py-1 rounded-full border border-slate-200 text-xs font-bold text-slate-800 flex items-center gap-1.5 bg-white shadow-2xs"
             >
-              <span className={`fi ${language === 'vi' ? 'fi-vn' : 'fi-us'} fis rounded-xs w-4 h-3 inline-block`} />
+              <span className={`fi ${language === 'vi' ? 'fi-vn' : 'fi-us'} fis rounded-full w-3.5 h-3.5 inline-block`} />
               <span>{language.toUpperCase()}</span>
             </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+              className="p-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-full transition-colors cursor-pointer"
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -311,13 +320,13 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-slate-200 bg-white px-4 pt-3 pb-6 space-y-3 animate-in slide-in-from-top-2">
+        <div className="md:hidden border-b border-slate-200/90 bg-white/95 backdrop-blur-md px-4 pt-3 pb-6 space-y-3 animate-in slide-in-from-top-2">
           <div className="flex flex-col space-y-1">
             {navLinks.map((link) => (
               <button
                 key={link.path}
                 onClick={() => handleNav(link.path, link.sectionId)}
-                className={`text-left px-3 py-2.5 rounded-xl text-xs font-semibold ${
+                className={`text-left px-4 py-2.5 rounded-full text-xs font-semibold ${
                   currentRoute === link.path || (currentRoute === '/' && link.path === '/#')
                     ? 'bg-blue-50 text-blue-700 font-bold'
                     : 'text-slate-700 hover:bg-slate-50'
@@ -332,7 +341,7 @@ export const Navbar: React.FC = () => {
             {user ? (
               <button
                 onClick={() => handleNav('/dashboard')}
-                className="w-full py-2.5 bg-slate-900 text-white rounded-xl font-bold text-xs text-center shadow-xs"
+                className="w-full h-11 bg-slate-900 text-white rounded-full font-bold text-xs text-center shadow-xs cursor-pointer press-tactile"
               >
                 {t('nav.dashboard')}
               </button>
@@ -340,13 +349,13 @@ export const Navbar: React.FC = () => {
               <>
                 <button
                   onClick={() => handleNav('/login')}
-                  className="w-full py-2.5 border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl font-semibold text-xs"
+                  className="w-full h-11 border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-full font-semibold text-xs cursor-pointer press-tactile"
                 >
                   {t('nav.login')}
                 </button>
                 <button
                   onClick={() => handleNav('/register')}
-                  className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-xs"
+                  className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-bold text-xs shadow-xs cursor-pointer press-tactile"
                 >
                   {t('nav.register')}
                 </button>

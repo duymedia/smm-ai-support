@@ -41,6 +41,9 @@ import {
 } from 'lucide-react';
 import { ProviderDispatchConfig, ProviderTicketItem, ProviderTelegramItem, ProviderWhatsAppItem, DispatchMethod } from '../../types';
 import { Select2, Select2Option } from '../ui/Select2';
+import { Button } from '../ui/Button';
+import { Badge } from '../ui/Badge';
+import { Card } from '../ui/Card';
 
 export const DispatchConfigPage: React.FC = () => {
   const { panels, addToast, language } = useApp();
@@ -1123,9 +1126,9 @@ export const DispatchConfigPage: React.FC = () => {
   return (
     <div className="space-y-6 w-full pb-12 animate-in fade-in duration-200">
       {/* Header Banner */}
-      <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <Card className="p-5 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 font-bold">
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 font-bold shrink-0">
             <Send className="w-6 h-6" />
           </div>
           <div>
@@ -1133,11 +1136,11 @@ export const DispatchConfigPage: React.FC = () => {
               <h1 className="text-lg font-bold text-slate-900 tracking-tight">
                 {language === 'vi' ? 'Cấu hình gửi tin nhắn tới nhà cung cấp' : 'Provider message & ticket dispatch'}
               </h1>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 uppercase">
+              <Badge variant="brand" size="sm" pulse>
                 3 Phương thức
-              </span>
+              </Badge>
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-slate-500 mt-1">
               {language === 'vi'
                 ? 'Gửi tin nhắn qua Ticket NCC (nhiều domain Perfect Panel), Telegram (User/Nhóm), WhatsApp (User/Nhóm)'
                 : 'Dispatch messages via Provider Ticket, Telegram (User/Group), or WhatsApp (User/Group)'}
@@ -1145,18 +1148,20 @@ export const DispatchConfigPage: React.FC = () => {
           </div>
         </div>
 
-        <button
+        <Button
           onClick={() => handleSaveConfig()}
           disabled={saving}
-          className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-2 cursor-pointer disabled:opacity-50"
+          loading={saving}
+          variant="brand"
+          size="md"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${saving ? 'animate-spin' : ''}`} />
+          {!saving && <RefreshCw className="w-4 h-4 mr-1.5" />}
           <span>{saving ? (language === 'vi' ? 'Đang lưu...' : 'Saving...') : (language === 'vi' ? 'Lưu cấu hình' : 'Save configuration')}</span>
-        </button>
-      </div>
+        </Button>
+      </Card>
 
       {/* 1. Chọn Panel Cấu Hình */}
-      <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-3">
+      <Card className="p-5 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2">
             <Server className="w-4 h-4 text-blue-600" />
@@ -1171,14 +1176,15 @@ export const DispatchConfigPage: React.FC = () => {
             </span>
             <button
               onClick={() => setEnabled(!enabled)}
-              className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                enabled
-                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                  : 'bg-slate-100 text-slate-500 border border-slate-200'
-              }`}
+              className="cursor-pointer focus-visible:outline-none"
             >
-              <span className={`w-1.5 h-1.5 rounded-full ${enabled ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
-              {enabled ? (language === 'vi' ? 'Đang bật' : 'Active') : (language === 'vi' ? 'Đang tắt' : 'Disabled')}
+              <Badge
+                variant={enabled ? 'emerald' : 'neutral'}
+                pulse={enabled}
+                size="sm"
+              >
+                {enabled ? (language === 'vi' ? 'Đang bật' : 'Active') : (language === 'vi' ? 'Đang tắt' : 'Disabled')}
+              </Badge>
             </button>
           </div>
         </div>
@@ -1192,19 +1198,19 @@ export const DispatchConfigPage: React.FC = () => {
                 key={p.id}
                 type="button"
                 onClick={() => setSelectedPanelId(p.id)}
-                className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer relative flex flex-col justify-between gap-2 ${
+                className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative flex flex-col justify-between gap-2.5 ${
                   isSelected
                     ? 'border-blue-600 bg-blue-50/50 ring-2 ring-blue-500/20 shadow-xs'
-                    : 'border-slate-200 hover:border-slate-300 bg-white'
+                    : 'border-slate-200/80 hover:border-slate-300 bg-white'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-xs text-slate-900 truncate">{p.name}</span>
-                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-50 text-blue-700 border border-blue-100">
+                  <span className="font-semibold text-xs text-slate-900 truncate">{p.name}</span>
+                  <Badge variant="brand" size="sm">
                     {p.planName || 'Standard'}
-                  </span>
+                  </Badge>
                 </div>
-                <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono tabular-nums">
                   <span className="truncate max-w-[170px]">{p.customDomain || p.domain}</span>
                   <span className="font-bold text-blue-600 text-[10px]">#{p.id}</span>
                 </div>
@@ -1212,12 +1218,12 @@ export const DispatchConfigPage: React.FC = () => {
             );
           })}
         </div>
-      </div>
+      </Card>
 
       {/* Form Cấu Hình 3 Kênh */}
       <div className="space-y-4">
         {/* Thanh chọn 3 Kênh */}
-        <div className="bg-slate-100 p-1.5 rounded-2xl border border-slate-200 grid grid-cols-3 gap-1.5">
+        <div className="bg-slate-100/90 p-1 rounded-full border border-slate-200/80 grid grid-cols-3 gap-1">
             {[
               { id: 'ticket', label: language === 'vi' ? '1. Ticket NCC' : '1. Provider ticket', icon: Ticket },
               { id: 'telegram', label: '2. Telegram', icon: Send },
@@ -1230,10 +1236,10 @@ export const DispatchConfigPage: React.FC = () => {
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveMethod(tab.id as DispatchMethod)}
-                  className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  className={`flex items-center justify-center gap-2 py-2 px-3 rounded-full text-xs font-semibold transition-all cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
                     isActive
                       ? 'bg-white text-blue-700 shadow-xs border border-slate-200'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-blue-600' : 'text-slate-500'}`} />
@@ -1245,27 +1251,28 @@ export const DispatchConfigPage: React.FC = () => {
 
           {/* KÊNH 1: TICKET NHÀ CUNG CẤP (MỖI LẦN THÊM LÀ DOMAIN KHÁC NHAU) */}
           {activeMethod === 'ticket' && (
-            <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/90 shadow-2xs space-y-4">
+            <Card className="p-5 sm:p-6 space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div className="flex items-center gap-2">
                   <Ticket className="w-4 h-4 text-blue-600" />
                   <h3 className="text-sm font-bold text-slate-900">
                     {language === 'vi' ? 'Tài khoản & cổng gửi ticket NCC' : 'Provider ticket portal credentials'}
                   </h3>
-                  <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold">
+                  <Badge variant="neutral" size="sm">
                     {providers.length} {language === 'vi' ? 'domain NCC' : 'domains'}
-                  </span>
+                  </Badge>
                 </div>
 
                 {!isAddingNewProvider && (
-                  <button
+                  <Button
                     type="button"
                     onClick={() => setIsAddingNewProvider(true)}
-                    className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer border border-blue-200"
+                    variant="brand"
+                    size="sm"
                   >
-                    <PlusCircle className="w-3.5 h-3.5" />
+                    <PlusCircle className="w-3.5 h-3.5 mr-1.5" />
                     <span>{language === 'vi' ? 'Thêm domain NCC' : 'Add domain'}</span>
-                  </button>
+                  </Button>
                 )}
               </div>
 
@@ -1752,12 +1759,12 @@ export const DispatchConfigPage: React.FC = () => {
                   </div>
                 </div>
               )}
-            </div>
+            </Card>
           )}
 
           {/* KÊNH 2: TELEGRAM (GỬI QUA TÀI KHOẢN TELETHON USER) */}
           {activeMethod === 'telegram' && (
-            <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/90 shadow-2xs space-y-5">
+            <Card className="p-5 sm:p-6 space-y-5">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div className="flex items-center gap-2">
                   <Send className="w-4 h-4 text-blue-600" />
@@ -1765,9 +1772,9 @@ export const DispatchConfigPage: React.FC = () => {
                     {language === 'vi' ? 'Cấu hình gửi Telegram (Tài khoản Telethon)' : 'Telegram Dispatch Configuration (Telethon)'}
                   </h3>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+                <Badge variant="brand" size="sm">
                   TELETHON USER
-                </span>
+                </Badge>
               </div>
 
               <div className="space-y-4 animate-in fade-in duration-150">
@@ -2188,12 +2195,12 @@ export const DispatchConfigPage: React.FC = () => {
                   </div>
                 )}
               </div>
-            </div>
+            </Card>
           )}
 
           {/* KÊNH 3: WHATSAPP (CẤU HÌNH SEND-WHATSAPP / WHATSAPP-WEB.JS) */}
           {activeMethod === 'whatsapp' && (
-            <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/90 shadow-2xs space-y-4.5">
+            <Card className="p-5 sm:p-6 space-y-5">
               {/* Header */}
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div className="flex items-center gap-2">
@@ -2202,9 +2209,9 @@ export const DispatchConfigPage: React.FC = () => {
                     {language === 'vi' ? 'Cấu hình gửi tin nhắn WhatsApp (Send-Whatsapp)' : 'WhatsApp Dispatch Configuration'}
                   </h3>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <Badge variant="emerald" size="sm">
                   Node.js + whatsapp-web.js (.wwebjs_auth)
-                </span>
+                </Badge>
               </div>
 
               {/* KHUNG TRẠNG THÁI PHIÊN ĐĂNG NHẬP WHATSAPP (.wwebjs_auth) */}
@@ -2595,11 +2602,11 @@ export const DispatchConfigPage: React.FC = () => {
                   </div>
                 )}
               </div>
-            </div>
+            </Card>
           )}
 
           {/* Tùy chọn Tự Động Bắn Đơn Cho Panel */}
-          <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs">
+          <Card className="p-4">
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -2619,7 +2626,7 @@ export const DispatchConfigPage: React.FC = () => {
                 ? 'Hệ thống tự động đồng bộ mã đơn, số lượng, link mục tiêu tới kênh đã cấu hình.'
                 : 'Automatically synchronizes order ID, quantity, and target link.'}
             </p>
-          </div>
+          </Card>
       </div>
 
       {/* MODAL QUÉT MÃ QR ĐĂNG NHẬP WHATSAPP */}

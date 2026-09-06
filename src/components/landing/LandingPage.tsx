@@ -186,7 +186,7 @@ export const LandingPage: React.FC = () => {
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
             <button
               onClick={() => setCurrentRoute('/packages')}
-              className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md hover:shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer group"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md hover:shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer group min-h-[44px]"
             >
               <span>{t('landing.ctaPrimary')}</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -196,7 +196,7 @@ export const LandingPage: React.FC = () => {
                 const el = document.getElementById('pricing-section');
                 el?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-semibold text-sm border border-slate-200 shadow-2xs hover:shadow-xs transition-all cursor-pointer"
+              className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-white hover:bg-slate-50 text-slate-800 font-semibold text-sm border border-slate-200 shadow-2xs hover:shadow-xs transition-all cursor-pointer min-h-[44px]"
             >
               {t('landing.ctaSecondary')}
             </button>
@@ -204,20 +204,20 @@ export const LandingPage: React.FC = () => {
 
           {/* Trust Metrics Bar */}
           <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto">
-            <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
-              <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">{t('landing.stats.activePanels')}</div>
+            <div className="p-4 rounded-2xl bg-white/90 backdrop-blur-sm border border-slate-200/80 shadow-xs">
+              <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-mono tabular-nums">{t('landing.stats.activePanels')}</div>
               <div className="text-xs text-slate-500 font-medium mt-0.5">{t('landing.stats.panelsLabel')}</div>
             </div>
-            <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
-              <div className="text-2xl sm:text-3xl font-extrabold text-blue-600">{t('landing.stats.ordersProcessed')}</div>
+            <div className="p-4 rounded-2xl bg-white/90 backdrop-blur-sm border border-slate-200/80 shadow-xs">
+              <div className="text-2xl sm:text-3xl font-extrabold text-blue-600 font-mono tabular-nums">{t('landing.stats.ordersProcessed')}</div>
               <div className="text-xs text-slate-500 font-medium mt-0.5">{t('landing.stats.ordersLabel')}</div>
             </div>
-            <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
-              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600">{t('landing.stats.uptime')}</div>
+            <div className="p-4 rounded-2xl bg-white/90 backdrop-blur-sm border border-slate-200/80 shadow-xs">
+              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600 font-mono tabular-nums">{t('landing.stats.uptime')}</div>
               <div className="text-xs text-slate-500 font-medium mt-0.5">{t('landing.stats.uptimeLabel')}</div>
             </div>
-            <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
-              <div className="text-2xl sm:text-3xl font-extrabold text-indigo-600">{t('landing.stats.aiResolution')}</div>
+            <div className="p-4 rounded-2xl bg-white/90 backdrop-blur-sm border border-slate-200/80 shadow-xs">
+              <div className="text-2xl sm:text-3xl font-extrabold text-indigo-600 font-mono tabular-nums">{t('landing.stats.aiResolution')}</div>
               <div className="text-xs text-slate-500 font-medium mt-0.5">{t('landing.stats.aiResolutionLabel')}</div>
             </div>
           </div>
@@ -241,45 +241,45 @@ export const LandingPage: React.FC = () => {
             {/* Mock Dashboard Preview Content */}
             <div className="p-5 sm:p-7 bg-slate-50/70 space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs">
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs">
                   <span className="text-xs text-slate-500 font-medium">
                     {language === 'vi' ? 'Doanh thu hệ thống' : 'Active Fleet Revenue'}
                   </span>
-                  <div className="text-xl font-bold text-slate-900 mt-1">$28,490.50 /mo</div>
-                  <span className="text-[11px] text-emerald-600 font-semibold">
+                  <div className="text-xl font-bold text-slate-900 mt-1 font-mono tabular-nums">$28,490.50 /mo</div>
+                  <span className="text-[11px] text-emerald-600 font-semibold font-mono tabular-nums">
                     {language === 'vi' ? '+18.4% so với tuần trước' : '+18.4% vs last week'}
                   </span>
                 </div>
-                <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs">
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs">
                   <span className="text-xs text-slate-500 font-medium">
                     {language === 'vi' ? 'Tốc độ xử lý đơn hàng' : 'Orders Processing Rate'}
                   </span>
-                  <div className="text-xl font-bold text-blue-600 mt-1">1,420 orders / min</div>
-                  <span className="text-[11px] text-slate-500">
+                  <div className="text-xl font-bold text-blue-600 mt-1 font-mono tabular-nums">1,420 orders / min</div>
+                  <span className="text-[11px] text-slate-500 font-mono tabular-nums">
                     {language === 'vi' ? '6 nhà cung cấp API đang kết nối' : '6 Connected API Providers'}
                   </span>
                 </div>
-                <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs">
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs">
                   <span className="text-xs text-slate-500 font-medium">
                     {language === 'vi' ? 'Chỉ số sức khỏe hệ thống' : 'Fleet Health Score'}
                   </span>
-                  <div className="text-xl font-bold text-emerald-600 mt-1">99.8 / 100</div>
-                  <span className="text-[11px] text-emerald-700 font-medium">
+                  <div className="text-xl font-bold text-emerald-600 mt-1 font-mono tabular-nums">99.8 / 100</div>
+                  <span className="text-[11px] text-emerald-700 font-medium font-mono tabular-nums">
                     {language === 'vi' ? '0 đơn hàng bị kẹt' : '0 stuck orders'}
                   </span>
                 </div>
               </div>
 
               {/* Interactive SMM Copilot Box */}
-              <div className="p-4 sm:p-5 rounded-xl bg-indigo-950 text-white border border-indigo-900 shadow-inner">
+              <div className="p-5 rounded-2xl bg-slate-950 text-white border border-slate-800 shadow-xl">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2 text-xs font-bold text-indigo-300">
-                    <Zap className="w-4 h-4 text-indigo-400" />
+                  <div className="flex items-center gap-2 text-xs font-semibold text-slate-300">
+                    <Zap className="w-4 h-4 text-blue-400" />
                     <span>
                       {language === 'vi' ? 'Chẩn đoán vận hành SMM tương tác' : 'Interactive SMM Operations Diagnostic'}
                     </span>
                   </div>
-                  <span className="text-[10px] bg-indigo-900 text-indigo-200 px-2 py-0.5 rounded font-mono">
+                  <span className="text-[10px] bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded-full font-mono tabular-nums">
                     v2.4 Core Engine
                   </span>
                 </div>
@@ -289,7 +289,7 @@ export const LandingPage: React.FC = () => {
                     type="text"
                     value={aiPromptInput}
                     onChange={(e) => setAiPromptInput(e.target.value)}
-                    className="flex-1 px-3.5 py-2 text-xs bg-indigo-900/60 border border-indigo-800 rounded-lg text-white placeholder-indigo-300 focus:outline-hidden focus:ring-2 focus:ring-indigo-400"
+                    className="flex-1 px-4 py-2.5 text-xs bg-slate-900 border border-slate-700 rounded-full text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                     placeholder={
                       language === 'vi'
                         ? 'Yêu cầu hệ thống chẩn đoán đơn hàng, DNS hoặc cài đặt tỷ suất lợi nhuận...'
@@ -299,7 +299,7 @@ export const LandingPage: React.FC = () => {
                   <button
                     onClick={handleRunAiDemo}
                     disabled={aiSimulatedLoading}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold transition-colors cursor-pointer shrink-0 disabled:opacity-50 flex items-center justify-center gap-1.5"
+                    className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-full text-xs font-semibold transition-colors cursor-pointer shrink-0 disabled:opacity-50 flex items-center justify-center gap-1.5 min-h-[40px]"
                   >
                     {aiSimulatedLoading
                       ? language === 'vi'
@@ -312,7 +312,7 @@ export const LandingPage: React.FC = () => {
                 </div>
 
                 {aiDemoReply && (
-                  <div className="mt-3 p-3 rounded-lg bg-indigo-900/80 border border-indigo-700/60 text-xs text-indigo-100 whitespace-pre-wrap leading-relaxed animate-in fade-in">
+                  <div className="mt-3.5 p-4 rounded-xl bg-slate-900/90 border border-slate-800 text-xs text-slate-200 whitespace-pre-wrap leading-relaxed animate-in fade-in">
                     {aiDemoReply}
                   </div>
                 )}
@@ -459,10 +459,10 @@ export const LandingPage: React.FC = () => {
             </p>
 
             {/* Period Switcher */}
-            <div className="mt-6 inline-flex items-center rounded-xl bg-slate-100 p-1 border border-slate-200 text-xs font-semibold">
+            <div className="mt-6 inline-flex items-center rounded-full bg-slate-100/90 p-1 border border-slate-200 text-xs font-semibold">
               <button
                 onClick={() => setBillingPeriod('weekly')}
-                className={`px-4 py-2 rounded-lg transition-all cursor-pointer ${
+                className={`px-4 py-2 rounded-full transition-all cursor-pointer ${
                   billingPeriod === 'weekly' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -470,7 +470,7 @@ export const LandingPage: React.FC = () => {
               </button>
               <button
                 onClick={() => setBillingPeriod('monthly')}
-                className={`px-4 py-2 rounded-lg transition-all cursor-pointer ${
+                className={`px-4 py-2 rounded-full transition-all cursor-pointer ${
                   billingPeriod === 'monthly' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -478,12 +478,12 @@ export const LandingPage: React.FC = () => {
               </button>
               <button
                 onClick={() => setBillingPeriod('yearly')}
-                className={`px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`px-4 py-2 rounded-full transition-all cursor-pointer flex items-center gap-1.5 ${
                   billingPeriod === 'yearly' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <span>{t('packages.billingYearly')}</span>
-                <span className="px-1.5 py-0.5 bg-emerald-500 text-white text-[10px] rounded-full font-bold">
+                <span className="px-2 py-0.5 bg-emerald-500 text-white text-[10px] rounded-full font-bold">
                   {t('common.savePercent')}
                 </span>
               </button>
@@ -507,7 +507,7 @@ export const LandingPage: React.FC = () => {
                   className={`relative p-6 rounded-2xl border transition-all flex flex-col justify-between ${
                     pkg.isPopular
                       ? 'bg-slate-900 text-white border-blue-600 shadow-xl ring-2 ring-blue-600/30'
-                      : 'bg-white text-slate-900 border-slate-200 hover:border-slate-300 shadow-xs'
+                      : 'bg-white text-slate-900 border-slate-200/80 hover:border-slate-300 shadow-xs'
                   }`}
                 >
                   {pkg.badge && (
@@ -524,7 +524,7 @@ export const LandingPage: React.FC = () => {
 
                     <div className="mt-5 pb-5 border-b border-slate-200/40">
                       <div className="flex items-baseline gap-1">
-                        <span className="text-3xl font-extrabold">{formatMoney(price)}</span>
+                        <span className="text-3xl font-extrabold font-mono tabular-nums">{formatMoney(price)}</span>
                         <span className={`text-xs ${pkg.isPopular ? 'text-slate-400' : 'text-slate-500'}`}>{periodLabel}</span>
                       </div>
                     </div>
@@ -536,7 +536,7 @@ export const LandingPage: React.FC = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span>Up to <strong>{typeof pkg.features.maxOrdersPerMonth === 'number' ? pkg.features.maxOrdersPerMonth.toLocaleString() : pkg.features.maxOrdersPerMonth}</strong> Orders/mo</span>
+                        <span>Up to <strong className="font-mono tabular-nums">{typeof pkg.features.maxOrdersPerMonth === 'number' ? pkg.features.maxOrdersPerMonth.toLocaleString() : pkg.features.maxOrdersPerMonth}</strong> Orders/mo</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
@@ -551,7 +551,7 @@ export const LandingPage: React.FC = () => {
 
                   <button
                     onClick={() => setCurrentRoute('/packages')}
-                    className={`mt-6 w-full py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+                    className={`mt-6 w-full py-3 rounded-full font-semibold text-xs transition-all cursor-pointer min-h-[42px] flex items-center justify-center ${
                       pkg.isPopular
                         ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-md'
                         : 'bg-slate-900 hover:bg-slate-800 text-white'
@@ -611,13 +611,13 @@ export const LandingPage: React.FC = () => {
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
               onClick={() => setCurrentRoute('/register')}
-              className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-white text-blue-700 font-bold text-sm shadow-lg hover:bg-blue-50 transition-all cursor-pointer"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white text-blue-700 font-bold text-sm shadow-lg hover:bg-blue-50 transition-all cursor-pointer min-h-[44px]"
             >
               {language === 'vi' ? 'Bắt đầu dùng thử miễn phí' : 'Start Free Trial Now'}
             </button>
             <button
               onClick={() => setCurrentRoute('/packages')}
-              className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-blue-800/60 hover:bg-blue-800 text-white font-semibold text-sm border border-blue-400/40 transition-all cursor-pointer"
+              className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-blue-800/60 hover:bg-blue-800 text-white font-semibold text-sm border border-blue-400/40 transition-all cursor-pointer min-h-[44px]"
             >
               {language === 'vi' ? 'Khám phá bảng giá gói' : 'Explore Plans'}
             </button>

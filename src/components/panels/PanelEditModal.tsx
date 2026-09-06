@@ -5,12 +5,13 @@ import {
   Globe,
   Key,
   FileText,
-  RefreshCw,
   Package as PackageIcon,
+  Save,
 } from 'lucide-react';
 import { SmmPanel } from '../../types';
 import { Modal } from '../ui/Modal';
 import { Select2 } from '../ui/Select2';
+import { Button } from '../ui/Button';
 
 interface PanelEditModalProps {
   panel: SmmPanel;
@@ -66,7 +67,7 @@ export const PanelEditModal: React.FC<PanelEditModalProps> = ({
     const ok = await updatePanel(panel.id, {
       name: name.trim(),
       domain: domain.trim().toLowerCase(),
-        apiKey: apiKey.trim(),
+      apiKey: apiKey.trim(),
       adminUsername: adminUsername.trim(),
       ...(adminPassword ? { adminPassword } : {}),
       ...(adminTwoFactorSecret ? { adminTwoFactorSecret: adminTwoFactorSecret.trim() } : {}),
@@ -108,13 +109,13 @@ export const PanelEditModal: React.FC<PanelEditModalProps> = ({
     <Modal
       isOpen={true}
       onClose={onClose}
-      title={language === 'vi' ? `Chỉnh sửa thông tin panel: ${panel.name}` : `Edit panel: ${panel.name}`}
+      title={language === 'vi' ? `Chỉnh sửa thông tin: ${panel.name}` : `Edit panel: ${panel.name}`}
       size="md"
     >
-      <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
+      <form onSubmit={handleSubmit} className="space-y-4 text-xs">
         {/* 1. Chọn Gói Dịch Vụ / Gói Cước */}
         <div className="space-y-1.5">
-          <label className="block font-bold text-slate-700 flex items-center gap-1.5">
+          <label className="block font-semibold text-slate-700 flex items-center gap-1.5">
             <PackageIcon className="w-3.5 h-3.5 text-blue-600" />
             <span>{language === 'vi' ? 'Gói cước dịch vụ của panel *' : 'Panel subscription plan *'}</span>
           </label>
@@ -125,16 +126,35 @@ export const PanelEditModal: React.FC<PanelEditModalProps> = ({
           />
         </div>
 
-        <div className="p-3 rounded-xl border border-amber-200 bg-amber-50/60 space-y-2">
-          <p className="font-bold text-amber-800">{language === 'vi' ? 'Thông tin tài khoản Admin Panel' : 'Panel Admin credentials'}</p>
-          <input value={adminUsername} onChange={e => setAdminUsername(e.target.value)} placeholder="Admin username" className="w-full px-3 py-2 rounded-xl border bg-white" />
-          <input type="password" value={adminPassword} onChange={e => setAdminPassword(e.target.value)} placeholder={language === 'vi' ? 'Mật khẩu mới (để trống nếu không đổi)' : 'New password (leave blank to keep)'} className="w-full px-3 py-2 rounded-xl border bg-white" />
-          <input value={adminTwoFactorSecret} onChange={e => setAdminTwoFactorSecret(e.target.value)} placeholder="2FA secret (TOTP)" className="w-full px-3 py-2 rounded-xl border bg-white font-mono" />
+        {/* Credentials Card */}
+        <div className="p-4 rounded-2xl border border-amber-200/80 bg-amber-50/50 space-y-2.5">
+          <p className="font-bold text-amber-900 text-xs flex items-center gap-1.5">
+            <span>{language === 'vi' ? 'Thông tin tài khoản Admin Panel' : 'Panel Admin credentials'}</span>
+          </p>
+          <input
+            value={adminUsername}
+            onChange={(e) => setAdminUsername(e.target.value)}
+            placeholder={language === 'vi' ? 'Tài khoản Admin' : 'Admin username'}
+            className="w-full px-3.5 py-2 rounded-xl border border-slate-200/90 bg-white text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all font-medium"
+          />
+          <input
+            type="password"
+            value={adminPassword}
+            onChange={(e) => setAdminPassword(e.target.value)}
+            placeholder={language === 'vi' ? 'Mật khẩu mới (để trống nếu không đổi)' : 'New password (leave blank to keep)'}
+            className="w-full px-3.5 py-2 rounded-xl border border-slate-200/90 bg-white text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all font-medium"
+          />
+          <input
+            value={adminTwoFactorSecret}
+            onChange={(e) => setAdminTwoFactorSecret(e.target.value)}
+            placeholder={language === 'vi' ? 'Secret 2FA (TOTP - Không bắt buộc)' : '2FA secret (TOTP - optional)'}
+            className="w-full px-3.5 py-2 rounded-xl border border-slate-200/90 bg-white font-mono tabular-nums text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
+          />
         </div>
 
         {/* 2. Tên SMM Panel */}
         <div className="space-y-1.5">
-          <label className="block font-bold text-slate-700 flex items-center gap-1.5">
+          <label className="block font-semibold text-slate-700 flex items-center gap-1.5">
             <Server className="w-3.5 h-3.5 text-blue-600" />
             <span>{language === 'vi' ? 'Tên SMM panel *' : 'SMM Panel name *'}</span>
           </label>
@@ -144,13 +164,13 @@ export const PanelEditModal: React.FC<PanelEditModalProps> = ({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Ví dụ: ApexBoost Global Hub"
-            className="w-full px-3.5 py-2 text-xs bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all font-medium"
+            className="w-full px-3.5 py-2 text-xs bg-white border border-slate-200/90 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all font-medium"
           />
         </div>
 
         {/* 3. Tên miền (Domain) */}
         <div className="space-y-1.5">
-          <label className="block font-bold text-slate-700 flex items-center gap-1.5">
+          <label className="block font-semibold text-slate-700 flex items-center gap-1.5">
             <Globe className="w-3.5 h-3.5 text-blue-600" />
             <span>{language === 'vi' ? 'Tên miền (domain) *' : 'Domain *'}</span>
           </label>
@@ -160,13 +180,13 @@ export const PanelEditModal: React.FC<PanelEditModalProps> = ({
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
             placeholder="domain.com hoặc panel.nexussmm.store"
-            className="w-full px-3.5 py-2 text-xs bg-white border border-slate-300 rounded-xl font-mono text-blue-600 font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
+            className="w-full px-3.5 py-2 text-xs bg-white border border-slate-200/90 rounded-xl font-mono tabular-nums text-blue-600 font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
           />
         </div>
 
         {/* 4. API Key */}
         <div className="space-y-1.5">
-          <label className="block font-bold text-slate-700 flex items-center gap-1.5">
+          <label className="block font-semibold text-slate-700 flex items-center gap-1.5">
             <Key className="w-3.5 h-3.5 text-amber-600" />
             <span>{language === 'vi' ? 'API Key (Key kết nối của panel)' : 'API Key'}</span>
           </label>
@@ -175,7 +195,7 @@ export const PanelEditModal: React.FC<PanelEditModalProps> = ({
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
             placeholder={language === 'vi' ? 'Nhập mã API Key kết nối SMM Panel của bạn...' : 'Enter your SMM Panel API Key...'}
-            className="w-full px-3.5 py-2 text-xs bg-white border border-slate-300 rounded-xl font-mono text-slate-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
+            className="w-full px-3.5 py-2 text-xs bg-white border border-slate-200/90 rounded-xl font-mono tabular-nums text-slate-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
           />
           <p className="text-[10px] text-slate-400">
             {language === 'vi'
@@ -186,7 +206,7 @@ export const PanelEditModal: React.FC<PanelEditModalProps> = ({
 
         {/* 5. Ghi chú */}
         <div className="space-y-1.5">
-          <label className="block font-bold text-slate-700 flex items-center gap-1.5">
+          <label className="block font-semibold text-slate-700 flex items-center gap-1.5">
             <FileText className="w-3.5 h-3.5 text-slate-500" />
             <span>{language === 'vi' ? 'Ghi chú quản trị' : 'Notes'}</span>
           </label>
@@ -195,27 +215,29 @@ export const PanelEditModal: React.FC<PanelEditModalProps> = ({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder={language === 'vi' ? 'Ghi chú phục vụ theo dõi và quản lý...' : 'Optional management notes...'}
-            className="w-full p-2.5 text-xs bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
+            className="w-full p-2.5 text-xs bg-white border border-slate-200/90 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
           />
         </div>
 
         {/* Modal Action Buttons */}
-        <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
-          <button
+        <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <Button
             type="button"
+            variant="secondary"
+            size="sm"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors"
           >
             {language === 'vi' ? 'Hủy' : 'Cancel'}
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
-            disabled={loading}
-            className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+            variant="primary"
+            size="sm"
+            loading={loading}
+            icon={<Save className="w-3.5 h-3.5" />}
           >
-            {loading && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
-            <span>{language === 'vi' ? 'Lưu thay đổi' : 'Save changes'}</span>
-          </button>
+            {language === 'vi' ? 'Lưu thay đổi' : 'Save changes'}
+          </Button>
         </div>
       </form>
     </Modal>

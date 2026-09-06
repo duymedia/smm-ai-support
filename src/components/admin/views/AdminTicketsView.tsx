@@ -8,7 +8,13 @@ import {
   User,
   ShieldCheck,
   Bot,
+  Clock,
+  Sparkles,
 } from 'lucide-react';
+import { Button } from '../../ui/Button';
+import { Badge } from '../../ui/Badge';
+import { Card } from '../../ui/Card';
+import { PageHeader } from '../../ui/PageHeader';
 
 export const AdminTicketsView: React.FC = () => {
   const { language, addToast } = useApp();
@@ -94,186 +100,209 @@ export const AdminTicketsView: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden h-[calc(100vh-140px)] min-h-[600px] flex flex-col animate-in fade-in duration-150">
-      {/* Top Header */}
-      <div className="px-5 py-3 border-b border-slate-200 bg-slate-900 text-white flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 font-bold">
-            <MessageSquare className="w-4 h-4" />
-          </div>
-          <div>
-            <h1 className="text-sm font-bold text-white">
-              {language === 'vi' ? 'Hỗ trợ & trả lời người dùng' : 'Customer support & replies'}
-            </h1>
-            <p className="text-[11px] text-slate-400">
-              {language === 'vi'
-                ? 'Xem tin nhắn và phản hồi trực tiếp cho người dùng'
-                : 'Directly view and reply to users'}
-            </p>
-          </div>
-        </div>
+    <div className="space-y-6">
+      {/* 1. Page Header with Open-Design Standards */}
+      <PageHeader
+        title={language === 'vi' ? 'Hỗ Trợ & Trả Lời Khách Hàng' : 'Support Desk & User Tickets'}
+        description={
+          language === 'vi'
+            ? 'Theo dõi luồng tin nhắn trực tiếp, phản hồi thắc mắc và kiểm soát can thiệp Nexus AI Copilot.'
+            : 'Supervise incoming support inquiries, real-time ticket escalation, and AI Copilot co-pilot intervention.'
+        }
+        badge={
+          <Badge variant="blue" pulse>
+            {tickets.length} {language === 'vi' ? 'Cuộc hội thoại' : 'Threads'}
+          </Badge>
+        }
+        actions={
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={loadTickets}
+            disabled={loading}
+            title={language === 'vi' ? 'Làm mới danh sách' : 'Refresh'}
+          >
+            <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${loading ? 'animate-spin text-blue-600' : ''}`} />
+            <span>{language === 'vi' ? 'Làm mới' : 'Sync'}</span>
+          </Button>
+        }
+      />
 
-        <button
-          onClick={loadTickets}
-          disabled={loading}
-          className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer disabled:opacity-50"
-          title={language === 'vi' ? 'Làm mới danh sách' : 'Refresh'}
-        >
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-blue-400' : ''}`} />
-        </button>
-      </div>
-
-      {/* Main Split Layout: Left User List / Right Chat & Reply */}
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-12 overflow-hidden">
-        {/* Cột trái: Danh sách hội thoại người dùng (4 Cols) */}
-        <div className="md:col-span-4 border-r border-slate-200 flex flex-col bg-slate-50/60 overflow-hidden">
-          {/* Ô tìm kiếm */}
-          <div className="p-3 border-b border-slate-200 bg-white">
-            <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={language === 'vi' ? 'Tìm theo tên, email...' : 'Search users...'}
-                className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
-              />
+      {/* 2. Main Ticket Console inside Mac Window Chrome Card */}
+      <Card
+        macChrome={true}
+        macTitle="DESK_OPERATIONS // LIVE_TICKETS"
+        macBadge={
+          <Badge variant="emerald" pulse>
+            AGENT CONNECTED
+          </Badge>
+        }
+        className="h-[calc(100vh-230px)] min-h-[640px] flex flex-col p-0"
+      >
+        <div className="flex-1 grid grid-cols-1 md:grid-cols-12 overflow-hidden h-full">
+          {/* Cột trái: Danh sách hội thoại người dùng (4 Cols) */}
+          <div className="md:col-span-4 border-r border-slate-200/80 flex flex-col bg-slate-50/50 overflow-hidden">
+            {/* Ô tìm kiếm */}
+            <div className="p-3.5 border-b border-slate-200/80 bg-white/80 backdrop-blur-xs">
+              <div className="relative">
+                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder={language === 'vi' ? 'Tìm theo tên, email, tiêu đề...' : 'Search threads...'}
+                  className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50/70 border border-slate-200 rounded-full focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 transition-all"
+                />
+              </div>
             </div>
-          </div>
 
-          {/* Danh sách người dùng */}
-          <div className="flex-1 overflow-y-auto divide-y divide-slate-100">
-            {filteredTickets.length === 0 ? (
-              <div className="p-8 text-center text-slate-400 text-xs">
-                {language === 'vi' ? 'Không có tin nhắn nào.' : 'No messages found.'}
-              </div>
-            ) : (
-              filteredTickets.map((ticket) => {
-                const isSelected = selectedTicket?.id === ticket.id;
-                const lastMsg = ticket.messages?.[ticket.messages.length - 1];
-
-                return (
-                  <div
-                    key={ticket.id}
-                    onClick={() => setSelectedTicket(ticket)}
-                    className={`p-3.5 transition-all cursor-pointer border-l-4 ${
-                      isSelected
-                        ? 'bg-blue-50/80 border-l-blue-600'
-                        : 'hover:bg-slate-100/70 border-l-transparent'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-2 mb-1">
-                      <span className="font-bold text-xs text-slate-900 truncate">
-                        {ticket.userName || `User #${ticket.userId}`}
-                      </span>
-                      <span className="text-[10px] text-slate-400 shrink-0 font-mono">
-                        {new Date(ticket.updatedAt).toLocaleTimeString()}
-                      </span>
-                    </div>
-
-                    <p className="text-[11px] text-slate-500 line-clamp-1">
-                      {lastMsg ? `${lastMsg.senderName}: ${lastMsg.content}` : ticket.subject}
-                    </p>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </div>
-
-        {/* Cột phải: Xem hội thoại & Khung Reply (8 Cols) */}
-        <div className="md:col-span-8 flex flex-col bg-white overflow-hidden">
-          {selectedTicket ? (
-            <>
-              {/* Header của cuộc hội thoại */}
-              <div className="px-5 py-3 border-b border-slate-200 bg-slate-50/80 flex items-center justify-between">
-                <div>
-                  <h3 className="text-xs font-bold text-slate-900">
-                    {selectedTicket.userName} <span className="text-slate-400 font-normal">({selectedTicket.userEmail || `#${selectedTicket.userId}`})</span>
-                  </h3>
-                  <p className="text-[11px] text-slate-500 truncate max-w-md">
-                    {selectedTicket.subject}
-                  </p>
+            {/* Danh sách người dùng */}
+            <div className="flex-1 overflow-y-auto divide-y divide-slate-100">
+              {filteredTickets.length === 0 ? (
+                <div className="p-8 text-center text-slate-400 text-xs">
+                  {language === 'vi' ? 'Không có tin nhắn nào.' : 'No messages found.'}
                 </div>
-              </div>
-
-              {/* Lịch sử tin nhắn */}
-              <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 bg-slate-50/30">
-                {selectedTicket.messages?.map((msg: any, idx: number) => {
-                  const isAdmin = msg.senderRole === 'admin';
-                  const isAi = msg.senderRole === 'ai' || msg.isAiGenerated;
+              ) : (
+                filteredTickets.map((ticket) => {
+                  const isSelected = selectedTicket?.id === ticket.id;
+                  const lastMsg = ticket.messages?.[ticket.messages.length - 1];
 
                   return (
                     <div
-                      key={msg.id || idx}
-                      className={`flex flex-col ${isAdmin ? 'items-end' : 'items-start'}`}
+                      key={ticket.id}
+                      onClick={() => setSelectedTicket(ticket)}
+                      className={`p-4 transition-all cursor-pointer border-l-4 ${
+                        isSelected
+                          ? 'bg-blue-50/70 border-l-blue-600'
+                          : 'hover:bg-slate-100/60 border-l-transparent'
+                      }`}
                     >
-                      <div className="flex items-center gap-1.5 text-[10px] text-slate-400 mb-1 px-1">
-                        {isAi ? (
-                          <span className="font-bold text-purple-600 flex items-center gap-1">
-                            <Bot className="w-3 h-3" /> Nexus AI Copilot
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <div className="flex items-center gap-2 truncate">
+                          <div className="w-6 h-6 rounded-full bg-slate-900 text-white font-bold text-[10px] flex items-center justify-center shrink-0">
+                            {ticket.userName ? ticket.userName.slice(0, 1).toUpperCase() : 'U'}
+                          </div>
+                          <span className="font-bold text-xs text-slate-900 truncate">
+                            {ticket.userName || `User #${ticket.userId}`}
                           </span>
-                        ) : isAdmin ? (
-                          <span className="font-bold text-emerald-600 flex items-center gap-1">
-                            <ShieldCheck className="w-3 h-3" /> {msg.senderName} (Admin)
-                          </span>
-                        ) : (
-                          <span className="font-bold text-slate-700 flex items-center gap-1">
-                            <User className="w-3 h-3" /> {msg.senderName}
-                          </span>
-                        )}
-                        <span>•</span>
-                        <span>{new Date(msg.createdAt).toLocaleTimeString()}</span>
+                        </div>
+                        <span className="text-[10px] text-slate-400 shrink-0 font-mono tabular-nums">
+                          {new Date(ticket.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
                       </div>
 
-                      <div
-                        className={`max-w-[80%] rounded-2xl p-3 text-xs leading-relaxed shadow-2xs ${
-                          isAi
-                            ? 'bg-purple-50/80 border border-purple-200 text-purple-950 rounded-tl-xs'
-                            : isAdmin
-                            ? 'bg-blue-600 text-white rounded-tr-xs'
-                            : 'bg-white border border-slate-200 text-slate-800 rounded-tl-xs'
-                        }`}
-                      >
-                        {msg.content}
-                      </div>
+                      <p className="text-[11px] text-slate-500 line-clamp-1 pl-8">
+                        {lastMsg ? `${lastMsg.senderName}: ${lastMsg.content}` : ticket.subject}
+                      </p>
                     </div>
                   );
-                })}
-                <div ref={messagesEndRef} />
-              </div>
-
-              {/* Khung Reply người dùng */}
-              <form onSubmit={handleSendReply} className="p-3 border-t border-slate-200 bg-white">
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
-                    placeholder={language === 'vi' ? 'Nhập câu trả lời gửi cho người dùng...' : 'Reply to user...'}
-                    className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
-                  />
-                  <button
-                    type="submit"
-                    disabled={sendingReply || !replyText.trim()}
-                    className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer disabled:opacity-50"
-                  >
-                    <Send className="w-3.5 h-3.5" />
-                    <span>{sendingReply ? (language === 'vi' ? 'Đang gửi...' : 'Sending...') : (language === 'vi' ? 'Gửi' : 'Send')}</span>
-                  </button>
-                </div>
-              </form>
-            </>
-          ) : (
-            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-slate-400">
-              <MessageSquare className="w-10 h-10 text-slate-300 mb-2" />
-              <p className="text-xs font-semibold text-slate-600">
-                {language === 'vi' ? 'Chọn một người dùng bên trái để trả lời' : 'Select a user to reply'}
-              </p>
+                })
+              )}
             </div>
-          )}
+          </div>
+
+          {/* Cột phải: Xem hội thoại & Khung Reply (8 Cols) */}
+          <div className="md:col-span-8 flex flex-col bg-white overflow-hidden">
+            {selectedTicket ? (
+              <>
+                {/* Header của cuộc hội thoại */}
+                <div className="px-5 py-3.5 border-b border-slate-200/80 bg-slate-50/60 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                      <span>{selectedTicket.userName}</span>
+                      <span className="text-slate-400 font-mono text-[11px]">({selectedTicket.userEmail || `#${selectedTicket.userId}`})</span>
+                    </h3>
+                    <p className="text-[11px] text-slate-500 truncate max-w-md mt-0.5">
+                      {selectedTicket.subject}
+                    </p>
+                  </div>
+                  <Badge variant="blue" size="sm">
+                    Ticket #{selectedTicket.id.slice(-6)}
+                  </Badge>
+                </div>
+
+                {/* Lịch sử tin nhắn */}
+                <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 bg-slate-50/20">
+                  {selectedTicket.messages?.map((msg: any, idx: number) => {
+                    const isAdmin = msg.senderRole === 'admin';
+                    const isAi = msg.senderRole === 'ai' || msg.isAiGenerated;
+
+                    return (
+                      <div
+                        key={msg.id || idx}
+                        className={`flex flex-col ${isAdmin ? 'items-end' : 'items-start'}`}
+                      >
+                        <div className="flex items-center gap-1.5 text-[10px] text-slate-400 mb-1 px-1">
+                          {isAi ? (
+                            <Badge variant="purple" size="sm">
+                              <Bot className="w-3 h-3 mr-1" />
+                              Nexus AI Copilot
+                            </Badge>
+                          ) : isAdmin ? (
+                            <Badge variant="emerald" size="sm">
+                              <ShieldCheck className="w-3 h-3 mr-1" />
+                              {msg.senderName} (Admin)
+                            </Badge>
+                          ) : (
+                            <Badge variant="slate" size="sm">
+                              <User className="w-3 h-3 mr-1" />
+                              {msg.senderName}
+                            </Badge>
+                          )}
+                          <span>&bull;</span>
+                          <span className="font-mono tabular-nums">{new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+
+                        <div
+                          className={`max-w-[80%] rounded-2xl p-3.5 text-xs leading-relaxed shadow-2xs ${
+                            isAi
+                              ? 'bg-purple-50/90 border border-purple-200/80 text-purple-950 rounded-tl-xs'
+                              : isAdmin
+                              ? 'bg-slate-950 text-white rounded-tr-xs'
+                              : 'bg-white border border-slate-200/80 text-slate-800 rounded-tl-xs'
+                          }`}
+                        >
+                          {msg.content}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* Khung Reply người dùng */}
+                <form onSubmit={handleSendReply} className="p-3.5 border-t border-slate-200/80 bg-white">
+                  <div className="flex items-center gap-2.5">
+                    <input
+                      type="text"
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                      placeholder={language === 'vi' ? 'Nhập câu trả lời gửi cho khách hàng...' : 'Reply to customer...'}
+                      className="flex-1 px-4 py-2.5 bg-slate-50/70 border border-slate-200 rounded-full text-xs focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 transition-all"
+                    />
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      disabled={sendingReply || !replyText.trim()}
+                      loading={sendingReply}
+                    >
+                      <Send className="w-3.5 h-3.5 mr-1" />
+                      <span>{language === 'vi' ? 'Gửi' : 'Send'}</span>
+                    </Button>
+                  </div>
+                </form>
+              </>
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-slate-400">
+                <MessageSquare className="w-10 h-10 text-slate-300 mb-2" />
+                <p className="text-xs font-semibold text-slate-600">
+                  {language === 'vi' ? 'Chọn một người dùng bên trái để trả lời' : 'Select a user to reply'}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

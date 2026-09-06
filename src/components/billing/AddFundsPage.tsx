@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { PaymentGatewayItem } from '../../types';
 import { Select2, Select2Option } from '../ui/Select2';
+import { Button } from '../ui/Button';
+import { Badge } from '../ui/Badge';
+import { Card } from '../ui/Card';
 import {
   CreditCard,
   Building2,
@@ -219,24 +222,23 @@ export const AddFundsPage: React.FC = () => {
       `}</style>
 
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 p-6 sm:p-8 text-white shadow-xl">
-        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-80 h-80 rounded-full bg-blue-500/15 blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-3xl bg-slate-900 border border-slate-800 p-6 sm:p-8 text-white shadow-xl">
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-80 h-80 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="px-2.5 py-1 rounded-lg bg-blue-500/20 border border-blue-400/30 text-blue-300 text-xs font-bold tracking-tight flex items-center gap-1.5">
-                <Zap className="w-3.5 h-3.5 text-blue-400" />
+              <Badge variant="brand" size="sm" pulse>
+                <Zap className="w-3.5 h-3.5 mr-1" />
                 <span>Nạp tiền tự động 24/7</span>
-              </span>
-              <span className="px-2.5 py-1 rounded-lg bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              </Badge>
+              <Badge variant="emerald" size="sm" pulse>
                 <span>VietQR Live Scanner + Binance Pay</span>
-              </span>
+              </Badge>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
               {language === 'vi' ? 'Nạp tiền vào tài khoản' : 'Add funds to balance'}
             </h1>
-            <p className="text-sm text-slate-300 max-w-2xl">
+            <p className="text-sm text-slate-400 max-w-2xl leading-relaxed">
               {language === 'vi'
                 ? 'Hệ thống quét mã QR tự động cộng tiền sau 5-30 giây. Hỗ trợ toàn bộ ngân hàng Việt Nam và Binance Pay / Crypto không mất phí.'
                 : 'Automated top-up with real-time QR scanning. Balance credited within seconds via Vietnamese Banks and Binance Pay.'}
@@ -250,13 +252,13 @@ export const AddFundsPage: React.FC = () => {
         {/* Left Side: 7 Columns - Input & Gateway Selector */}
         <div className="lg:col-span-7 space-y-5">
           {/* STEP 1: Select Currency */}
-          <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-3">
+          <Card className="p-5 space-y-3.5">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[11px]">1</span>
+                <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[11px] font-mono">1</span>
                 <span>{language === 'vi' ? 'Chọn Loại Tiền Tệ Nạp (Currency)' : '1. Select Deposit Currency'}</span>
               </label>
-              <span className="text-[11px] font-semibold text-slate-500">
+              <span className="text-[11px] font-mono text-slate-500">
                 {selectedCurrency === 'VND' ? 'Việt Nam Đồng (₫)' : 'United States Dollar ($)'}
               </span>
             </div>
@@ -267,22 +269,22 @@ export const AddFundsPage: React.FC = () => {
                 onClick={() => handleCurrencyChange('VND')}
                 className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between ${
                   selectedCurrency === 'VND'
-                    ? 'border-emerald-600 bg-emerald-50/60 ring-2 ring-emerald-500/20 text-emerald-950'
-                    : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700'
+                    ? 'border-emerald-600 bg-emerald-50/60 ring-2 ring-emerald-500/20 text-emerald-950 shadow-xs'
+                    : 'border-slate-200/80 bg-slate-50/70 hover:bg-slate-100/70 text-slate-700'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm ${
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm font-mono ${
                     selectedCurrency === 'VND' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-slate-200 text-slate-700'
                   }`}>
                     ₫
                   </div>
                   <div>
-                    <p className="font-bold text-xs">VND (Việt Nam Đồng)</p>
+                    <p className="font-semibold text-xs text-slate-900">VND (Việt Nam Đồng)</p>
                     <p className="text-[11px] text-slate-500">VietQR, MB, VCB, ACB, BIDV</p>
                   </div>
                 </div>
-                {selectedCurrency === 'VND' && <Check className="w-5 h-5 text-emerald-600" />}
+                {selectedCurrency === 'VND' && <Check className="w-5 h-5 text-emerald-600 shrink-0" />}
               </button>
 
               <button
@@ -290,29 +292,29 @@ export const AddFundsPage: React.FC = () => {
                 onClick={() => handleCurrencyChange('USD')}
                 className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between ${
                   selectedCurrency === 'USD'
-                    ? 'border-blue-600 bg-blue-50/60 ring-2 ring-blue-500/20 text-blue-950'
-                    : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700'
+                    ? 'border-blue-600 bg-blue-50/60 ring-2 ring-blue-500/20 text-blue-950 shadow-xs'
+                    : 'border-slate-200/80 bg-slate-50/70 hover:bg-slate-100/70 text-slate-700'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm ${
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm font-mono ${
                     selectedCurrency === 'USD' ? 'bg-blue-600 text-white shadow-xs' : 'bg-slate-200 text-slate-700'
                   }`}>
                     $
                   </div>
                   <div>
-                    <p className="font-bold text-xs">USD (Crypto / Binance)</p>
+                    <p className="font-semibold text-xs text-slate-900">USD (Crypto / Binance)</p>
                     <p className="text-[11px] text-slate-500">Binance Pay, USDT TRC20</p>
                   </div>
                 </div>
-                {selectedCurrency === 'USD' && <Check className="w-5 h-5 text-blue-600" />}
+                {selectedCurrency === 'USD' && <Check className="w-5 h-5 text-blue-600 shrink-0" />}
               </button>
             </div>
-          </div>
+          </Card>
 
-          {/* PERMANENT TRANSFER MEMO SETTING CARD (Họ và Tên Ngân Hàng / Cú Pháp Chuyển Khoản Vĩnh Viễn) */}
+          {/* PERMANENT TRANSFER MEMO SETTING CARD */}
           {selectedCurrency === 'VND' && (
-            <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-50/80 via-white to-blue-50/60 border border-indigo-200/80 shadow-2xs space-y-3">
+            <div className="p-5 rounded-2xl bg-indigo-50/40 border border-indigo-200/80 shadow-2xs space-y-3.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center">
@@ -323,14 +325,13 @@ export const AddFundsPage: React.FC = () => {
                   </h3>
                 </div>
                 {user?.transferCode ? (
-                  <span className="px-2 py-0.5 rounded-md bg-emerald-100 border border-emerald-300 text-emerald-800 text-[10px] font-bold flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                    <span>{language === 'vi' ? 'Đã kích hoạt' : 'Active'}</span>
-                  </span>
+                  <Badge variant="emerald" size="sm" pulse>
+                    {language === 'vi' ? 'Đã kích hoạt' : 'Active'}
+                  </Badge>
                 ) : (
-                  <span className="px-2 py-0.5 rounded-md bg-amber-100 border border-amber-300 text-amber-800 text-[10px] font-bold">
+                  <Badge variant="warning" size="sm">
                     {language === 'vi' ? 'Chưa thiết lập' : 'Not set'}
-                  </span>
+                  </Badge>
                 )}
               </div>
 
@@ -346,22 +347,24 @@ export const AddFundsPage: React.FC = () => {
                   value={customTransferCode}
                   onChange={(e) => setCustomTransferCode(e.target.value)}
                   placeholder={language === 'vi' ? 'VD: NGUYEN VAN A hoặc NAP12345' : 'e.g. NGUYEN VAN A or NAP12345'}
-                  className="flex-1 px-3.5 py-2 rounded-xl bg-white border border-indigo-200 text-xs font-mono font-bold text-indigo-950 uppercase focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  className="flex-1 px-3.5 py-2 rounded-xl bg-white border border-indigo-200 text-xs font-mono font-bold text-indigo-950 uppercase focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
                 />
-                <button
+                <Button
                   type="button"
+                  variant="brand"
+                  size="sm"
                   onClick={handleSaveTransferCode}
-                  disabled={savingTransferCode}
-                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1.5 shrink-0 disabled:opacity-50"
+                  loading={savingTransferCode}
+                  className="shrink-0"
                 >
-                  <RefreshCw className={`w-3.5 h-3.5 ${savingTransferCode ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${savingTransferCode ? 'animate-spin' : ''}`} />
                   <span>{savingTransferCode ? (language === 'vi' ? 'Đang lưu...' : 'Saving...') : (language === 'vi' ? 'Lưu Cú Pháp' : 'Save Memo')}</span>
-                </button>
+                </Button>
               </div>
 
-              <div className="text-[10px] text-indigo-700/80 flex items-center gap-1.5 bg-indigo-100/50 p-2 rounded-lg border border-indigo-200/50">
+              <div className="text-[11px] text-indigo-800/90 flex items-center gap-2 bg-indigo-100/60 p-2.5 rounded-xl border border-indigo-200/60">
                 <Info className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                <span>
+                <span className="font-mono tabular-nums">
                   {language === 'vi'
                     ? `Nội dung chuyển khoản hiện tại trên VietQR: "${memoCode}"`
                     : `Current VietQR Memo: "${memoCode}"`}
@@ -371,15 +374,15 @@ export const AddFundsPage: React.FC = () => {
           )}
 
           {/* STEP 2: Choose Payment Gateway via Select2 */}
-          <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-3">
+          <Card className="p-5 space-y-3.5">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[11px]">2</span>
+                <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[11px] font-mono">2</span>
                 <span>{language === 'vi' ? 'Chọn Phương Thức / Ngân Hàng Thanh Toán' : '2. Select Payment Method'}</span>
               </label>
               <button
                 onClick={loadGateways}
-                className="text-[11px] text-blue-600 hover:underline flex items-center gap-1 cursor-pointer font-semibold"
+                className="text-[11px] text-blue-600 hover:text-blue-700 flex items-center gap-1 cursor-pointer font-semibold transition-colors"
               >
                 <RefreshCw className={`w-3 h-3 ${loadingGateways ? 'animate-spin' : ''}`} />
                 <span>{language === 'vi' ? 'Làm mới cổng' : 'Refresh'}</span>
@@ -407,7 +410,7 @@ export const AddFundsPage: React.FC = () => {
 
             {/* Gateway Highlights Banner */}
             {selectedGateway && (
-              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3 text-xs">
+              <div className="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/80 flex items-center justify-between gap-3 text-xs">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-lg bg-white border border-slate-200 p-1 flex items-center justify-center shrink-0">
                     {selectedGateway.logoUrl ? (
@@ -419,7 +422,7 @@ export const AddFundsPage: React.FC = () => {
                     )}
                   </div>
                   <div>
-                    <p className="font-bold text-slate-900">{selectedGateway.name}</p>
+                    <p className="font-semibold text-slate-900">{selectedGateway.name}</p>
                     <p className="text-[11px] text-slate-500">
                       {selectedGateway.notes || selectedGateway.instructions || (language === 'vi' ? 'Tự động kiểm tra & cộng tiền 24/7' : 'Auto 24/7 processing')}
                     </p>
@@ -427,33 +430,33 @@ export const AddFundsPage: React.FC = () => {
                 </div>
 
                 {bonusPercentage > 0 && (
-                  <div className="px-2.5 py-1 rounded-lg bg-amber-100 border border-amber-300 text-amber-900 font-bold text-[11px] flex items-center gap-1 shrink-0">
-                    <Flame className="w-3.5 h-3.5 text-amber-600" />
+                  <Badge variant="amber" size="sm" pulse>
+                    <Flame className="w-3 h-3 mr-1" />
                     <span>+{bonusPercentage}% Khuyến Mãi</span>
-                  </div>
+                  </Badge>
                 )}
               </div>
             )}
-          </div>
+          </Card>
 
           {/* STEP 3: Enter Deposit Amount */}
-          <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-4">
+          <Card className="p-5 space-y-4">
             <label className="text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[11px]">3</span>
+              <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[11px] font-mono">3</span>
               <span>{language === 'vi' ? 'Nhập Số Tiền Cần Nạp' : '3. Enter Deposit Amount'}</span>
             </label>
 
-            {/* Quick Amount Presets */}
+            {/* Quick Amount Presets (Pill Buttons) */}
             <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
               {presets.map((p) => (
                 <button
                   key={p}
                   type="button"
                   onClick={() => setAmount(p)}
-                  className={`py-2 rounded-xl text-xs font-bold transition-all cursor-pointer text-center ${
+                  className={`py-2 px-3 rounded-full text-xs font-mono font-bold transition-all cursor-pointer text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
                     amount === p
                       ? 'bg-blue-600 text-white shadow-xs'
-                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200'
+                      : 'bg-slate-100/80 hover:bg-slate-200/70 text-slate-700 border border-slate-200/80'
                   }`}
                 >
                   {selectedCurrency === 'VND' ? `${(p / 1000).toLocaleString('vi-VN')}K` : `$${p}`}
@@ -463,7 +466,7 @@ export const AddFundsPage: React.FC = () => {
 
             {/* Amount Input */}
             <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-base font-extrabold text-slate-400">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-base font-bold text-slate-400 font-mono">
                 {selectedCurrency === 'VND' ? '₫' : '$'}
               </span>
               <input
@@ -473,54 +476,51 @@ export const AddFundsPage: React.FC = () => {
                 value={amount}
                 onChange={(e) => setAmount(Math.max(0, Number(e.target.value)))}
                 placeholder={selectedCurrency === 'VND' ? 'Nhập số tiền VND (VD: 100000)' : 'Enter amount in USD (e.g. 50)'}
-                className="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-base font-extrabold text-slate-900 font-mono focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
+                className="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-base font-bold text-slate-900 font-mono tabular-nums focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-colors"
               />
             </div>
 
             {/* Conversion & Bonus Preview */}
-            <div className="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200/80 text-xs space-y-1.5">
+            <div className="p-4 rounded-xl bg-blue-50/60 border border-blue-200/80 text-xs space-y-2">
               <div className="flex items-center justify-between text-slate-600">
                 <span>{language === 'vi' ? 'Số tiền quy đổi sang USD:' : 'Equivalent in USD:'}</span>
-                <span className="font-mono font-bold text-slate-900">${amountUsd.toFixed(2)} USD</span>
+                <span className="font-mono tabular-nums font-bold text-slate-900">${amountUsd.toFixed(2)} USD</span>
               </div>
 
               {bonusPercentage > 0 && (
-                <div className="flex items-center justify-between text-amber-800 font-semibold">
-                  <span className="flex items-center gap-1">
+                <div className="flex items-center justify-between text-amber-800 font-medium">
+                  <span className="flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5 text-amber-600" />
                     <span>Thưởng nạp thêm (+{bonusPercentage}%):</span>
                   </span>
-                  <span className="font-mono font-bold">
+                  <span className="font-mono tabular-nums font-bold">
                     +{selectedCurrency === 'VND' ? `${bonusAmountVnd.toLocaleString('vi-VN')} ₫` : `$${bonusAmountUsd} USD`}
                   </span>
                 </div>
               )}
 
-              <div className="pt-1.5 border-t border-blue-200 flex items-center justify-between text-blue-900 font-bold">
+              <div className="pt-2 border-t border-blue-200/80 flex items-center justify-between text-blue-950 font-bold">
                 <span>{language === 'vi' ? 'Tổng số dư sẽ nhận:' : 'Total Balance Credited:'}</span>
-                <span className="font-mono text-sm text-blue-700">
+                <span className="font-mono tabular-nums text-sm text-blue-700">
                   {formatMoney(totalReceivedUsd)} ({totalReceivedVnd.toLocaleString('vi-VN')} ₫)
                 </span>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
 
         {/* Right Side: 5 Columns - Live Laser Scan QR Screen & Payment Info */}
         <div className="lg:col-span-5 space-y-5">
-          <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-lg space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <QrCode className="w-4 h-4 text-blue-600" />
-                <span className="text-xs font-bold text-slate-900 uppercase tracking-wide">
-                  {language === 'vi' ? 'Quét Mã QR Thanh Toán' : 'QR Payment Screen'}
-                </span>
-              </div>
-              <span className="text-xs font-mono font-extrabold text-emerald-600">
+          <Card
+            macChrome
+            macTitle={language === 'vi' ? 'Cổng Quét QR Thanh Toán' : 'QR Payment Gateway'}
+            macBadge={
+              <Badge variant="emerald" size="sm" pulse>
                 {selectedCurrency === 'VND' ? `${amountVnd.toLocaleString('vi-VN')} ₫` : `$${amountUsd} USD`}
-              </span>
-            </div>
-
+              </Badge>
+            }
+            className="p-5 space-y-4"
+          >
             {/* LASER SCANNER QR CONTAINER */}
             <div className="flex flex-col items-center">
               <div className="relative p-4 rounded-2xl bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 shadow-xl overflow-hidden group max-w-[280px] w-full">
@@ -550,7 +550,7 @@ export const AddFundsPage: React.FC = () => {
                 </div>
 
                 {/* Scanning Live Indicator */}
-                <div className="mt-3 flex items-center justify-center gap-1.5 text-[10px] font-bold text-cyan-300 uppercase tracking-wider">
+                <div className="mt-3 flex items-center justify-center gap-1.5 text-[10px] font-mono font-semibold text-cyan-300 uppercase tracking-wider">
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
                   <span>{language === 'vi' ? 'Hệ thống tự động quét giao dịch 24/7' : 'Auto Scanning 24/7'}</span>
                 </div>
@@ -561,25 +561,25 @@ export const AddFundsPage: React.FC = () => {
             {selectedGateway && (
               <div className="space-y-2 text-xs pt-2">
                 {/* Bank / Gateway Name */}
-                <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                  <span className="text-slate-500 font-semibold">{language === 'vi' ? 'Ngân hàng / Cổng:' : 'Bank / Method:'}</span>
-                  <span className="font-bold text-slate-900 text-right truncate max-w-[180px]">
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50/80 border border-slate-100">
+                  <span className="text-slate-500 font-medium">{language === 'vi' ? 'Ngân hàng / Cổng:' : 'Bank / Method:'}</span>
+                  <span className="font-semibold text-slate-900 text-right truncate max-w-[180px]">
                     {selectedGateway.name}
                   </span>
                 </div>
 
                 {/* Account Number / Binance ID */}
-                <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                  <span className="text-slate-500 font-semibold">
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50/80 border border-slate-100">
+                  <span className="text-slate-500 font-medium">
                     {selectedGateway.cryptoType === 'BINANCE_PAY' ? 'Binance ID:' : selectedGateway.type === 'crypto' ? 'Địa chỉ ví:' : 'Số tài khoản:'}
                   </span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-mono font-extrabold text-blue-700 text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono tabular-nums font-bold text-blue-700 text-xs">
                       {selectedGateway.merchantId || selectedGateway.accountNumber || selectedGateway.walletAddress || '—'}
                     </span>
                     <button
                       onClick={() => handleCopy('acc', selectedGateway.merchantId || selectedGateway.accountNumber || selectedGateway.walletAddress || '')}
-                      className="p-1 rounded-md bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors cursor-pointer"
+                      className="p-1.5 rounded-full bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors cursor-pointer"
                       title="Sao chép"
                     >
                       {copiedKey === 'acc' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
@@ -589,22 +589,22 @@ export const AddFundsPage: React.FC = () => {
 
                 {/* Account Holder Name */}
                 {selectedGateway.accountHolder && (
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                    <span className="text-slate-500 font-semibold">{language === 'vi' ? 'Chủ tài khoản:' : 'Account Holder:'}</span>
-                    <span className="font-bold text-slate-900 uppercase">{selectedGateway.accountHolder}</span>
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50/80 border border-slate-100">
+                    <span className="text-slate-500 font-medium">{language === 'vi' ? 'Chủ tài khoản:' : 'Account Holder:'}</span>
+                    <span className="font-semibold text-slate-900 uppercase font-mono">{selectedGateway.accountHolder}</span>
                   </div>
                 )}
 
                 {/* Exact Amount */}
                 <div className="flex items-center justify-between p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200">
-                  <span className="text-emerald-900 font-semibold">{language === 'vi' ? 'Số tiền chuyển:' : 'Exact Amount:'}</span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-mono font-black text-emerald-700 text-sm">
+                  <span className="text-emerald-900 font-medium">{language === 'vi' ? 'Số tiền chuyển:' : 'Exact Amount:'}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono tabular-nums font-bold text-emerald-700 text-sm">
                       {selectedCurrency === 'VND' ? `${amountVnd.toLocaleString('vi-VN')} ₫` : `$${amountUsd} USD`}
                     </span>
                     <button
                       onClick={() => handleCopy('amount', selectedCurrency === 'VND' ? String(amountVnd) : String(amountUsd))}
-                      className="p-1 rounded-md bg-white border border-emerald-300 hover:bg-emerald-100 text-emerald-700 transition-colors cursor-pointer"
+                      className="p-1.5 rounded-full bg-white border border-emerald-300 hover:bg-emerald-100 text-emerald-700 transition-colors cursor-pointer"
                       title="Sao chép số tiền"
                     >
                       {copiedKey === 'amount' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
@@ -618,13 +618,13 @@ export const AddFundsPage: React.FC = () => {
                     <span className="text-amber-900 font-bold block">{language === 'vi' ? 'Nội dung CK:' : 'Transfer Memo:'}</span>
                     <span className="text-[10px] text-amber-700 font-semibold">{language === 'vi' ? '(Bắt buộc ghi đúng)' : '(Required)'}</span>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-mono font-black text-amber-900 text-xs px-2 py-0.5 rounded bg-white border border-amber-300">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono tabular-nums font-bold text-amber-900 text-xs px-2.5 py-1 rounded-full bg-white border border-amber-300">
                       {memoCode}
                     </span>
                     <button
                       onClick={() => handleCopy('memo', memoCode)}
-                      className="p-1 rounded-md bg-white border border-amber-300 hover:bg-amber-100 text-amber-700 transition-colors cursor-pointer"
+                      className="p-1.5 rounded-full bg-white border border-amber-300 hover:bg-amber-100 text-amber-700 transition-colors cursor-pointer"
                       title="Sao chép nội dung"
                     >
                       {copiedKey === 'memo' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
@@ -649,8 +649,8 @@ export const AddFundsPage: React.FC = () => {
             )}
 
             {/* Note & Security Guarantee */}
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-500 space-y-1">
-              <div className="flex items-center gap-1.5 text-slate-700 font-bold">
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-[11px] text-slate-500 space-y-1">
+              <div className="flex items-center gap-1.5 text-slate-700 font-semibold">
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
                 <span>{language === 'vi' ? 'Cam kết tự động & an toàn 100%' : '100% Automated & Secure'}</span>
               </div>
@@ -660,7 +660,7 @@ export const AddFundsPage: React.FC = () => {
                   : 'Please input the exact transfer memo so the automated webhook can credit your balance immediately.'}
               </p>
             </div>
-          </div>
+          </Card>
         </div>
       </div>
     </div>

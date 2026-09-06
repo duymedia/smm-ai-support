@@ -18,6 +18,9 @@ import {
   Repeat,
   Radio,
 } from 'lucide-react';
+import { Button } from '../ui/Button';
+import { Badge } from '../ui/Badge';
+import { Card } from '../ui/Card';
 
 export const AiSupportPage: React.FC = () => {
   const { aiChatMessages, sendAiChatMessage, refreshData, user, language } = useApp();
@@ -62,62 +65,55 @@ export const AiSupportPage: React.FC = () => {
   return (
     <div className="space-y-4 animate-in fade-in duration-200">
       {/* Khung Chat Hỗ Trợ Khách Hàng Cao Cấp */}
-      <div className="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col h-[calc(100vh-130px)] min-h-[600px]">
-        {/* Chat Header */}
-        <div className="px-5 py-4 bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white flex items-center justify-between border-b border-slate-800 shadow-xs">
-          <div className="flex items-center gap-3.5">
-            <div className="relative">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/25 font-bold">
-                <Headphones className="w-5 h-5" />
-              </div>
-              <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-slate-900 flex items-center justify-center">
-                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-              </span>
+      <Card
+        macChrome
+        macTitle="Live Incident & Support Hub"
+        macBadge={
+          <Badge variant="emerald" size="sm" pulse>
+            {language === 'vi' ? 'Trực tuyến 24/7' : 'Online 24/7'}
+          </Badge>
+        }
+        className="flex flex-col h-[calc(100vh-130px)] min-h-[600px]"
+      >
+        {/* Chat Header Subtitle */}
+        <div className="px-5 py-3.5 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-md font-bold">
+              <Headphones className="w-4 h-4" />
             </div>
 
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-sm font-bold text-white tracking-tight">
-                  {language === 'vi' ? 'Trung tâm hỗ trợ khách hàng' : 'Customer support center'}
-                </h1>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 text-[10px] font-semibold border border-emerald-500/30 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  {language === 'vi' ? 'Trực tuyến 24/7' : 'Online 24/7'}
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-300 mt-0.5 flex items-center gap-2">
-                <span>{language === 'vi' ? 'Kênh giải đáp kỹ thuật & hỗ trợ dịch vụ trực tiếp' : 'Direct technical assistance and customer service'}</span>
-                <span className="text-slate-500">•</span>
-                <span className="text-emerald-400 font-medium flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  {language === 'vi' ? 'Phản hồi nhanh' : 'Fast response'}
-                </span>
+              <h1 className="text-sm font-semibold text-white tracking-tight">
+                {language === 'vi' ? 'Trung tâm hỗ trợ khách hàng' : 'Customer Support Center'}
+              </h1>
+              <p className="text-[11px] text-slate-400">
+                {language === 'vi' ? 'Kênh giải đáp kỹ thuật & hỗ trợ dịch vụ trực tiếp' : 'Direct technical assistance and customer service'}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => refreshData()}
-              className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer border border-white/10"
-              title={language === 'vi' ? 'Làm mới tin nhắn' : 'Refresh messages'}
-            >
-              <RefreshCw className="w-4 h-4" />
-            </button>
-          </div>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => refreshData()}
+            className="border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800"
+            title={language === 'vi' ? 'Làm mới tin nhắn' : 'Refresh messages'}
+          >
+            <RefreshCw className="w-4 h-4" />
+          </Button>
         </div>
 
         {/* Khung Hiển Thị Tin Nhắn */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-slate-50/60">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-slate-50/50">
           {/* Welcome Banner */}
-          <div className="max-w-xl mx-auto p-4 rounded-2xl bg-gradient-to-r from-blue-50/80 to-indigo-50/80 border border-blue-100 text-center space-y-1.5 shadow-2xs">
-            <div className="w-9 h-9 mx-auto rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-500/20">
+          <div className="max-w-xl mx-auto p-4 rounded-2xl bg-white/90 border border-slate-200/80 text-center space-y-2 shadow-sm">
+            <div className="w-9 h-9 mx-auto rounded-full bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center shadow-xs">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <h3 className="text-xs font-bold text-slate-900">
+            <h3 className="text-xs font-semibold text-slate-900">
               {language === 'vi' ? `Xin chào ${user?.name || ''}, bạn cần hỗ trợ gì hôm nay?` : `Welcome ${user?.name || ''}, how can we help?`}
             </h3>
-            <p className="text-[11px] text-slate-600 leading-relaxed">
+            <p className="text-[11px] text-slate-500 leading-relaxed max-w-md mx-auto">
               {language === 'vi'
                 ? 'Đội ngũ chuyên viên kỹ thuật luôn sẵn sàng tiếp nhận và giải quyết mọi yêu cầu về vận hành panel, nạp tiền và cấu hình hệ thống.'
                 : 'Our technical support team is ready 24/7 to resolve inquiries regarding panels, billing, and DNS setup.'}
@@ -136,10 +132,10 @@ export const AiSupportPage: React.FC = () => {
               >
                 {/* Avatar */}
                 <div
-                  className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs shrink-0 font-bold shadow-xs ${
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs shrink-0 font-bold shadow-xs ${
                     isUser
-                      ? 'bg-gradient-to-tr from-blue-600 to-indigo-600 text-white'
-                      : 'bg-gradient-to-tr from-emerald-600 to-teal-700 text-white'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-emerald-600 text-white'
                   }`}
                 >
                   {isUser ? <User className="w-4 h-4" /> : <ShieldCheck className="w-4 h-4" />}
@@ -147,30 +143,30 @@ export const AiSupportPage: React.FC = () => {
 
                 {/* Nội Dung Tin Nhắn */}
                 <div className="space-y-1 max-w-full">
-                  <div className={`flex items-center gap-1.5 text-[10px] text-slate-400 px-1 ${isUser ? 'justify-end' : ''}`}>
+                  <div className={`flex items-center gap-1.5 text-[10px] text-slate-400 px-1 font-mono ${isUser ? 'justify-end' : ''}`}>
                     {isAdmin ? (
-                      <span className="font-bold text-emerald-700 flex items-center gap-1 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                        <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                      <Badge variant="emerald" size="sm">
+                        <ShieldCheck className="w-3 h-3 mr-1 text-emerald-600" />
                         {msg.senderName || (language === 'vi' ? 'Hỗ trợ viên chính thức' : 'Official support agent')}
-                      </span>
+                      </Badge>
                     ) : (
                       <span className="font-semibold text-slate-600">{language === 'vi' ? 'Bạn' : 'You'}</span>
                     )}
                     <span>•</span>
-                    <span>{new Date(msg.timestamp).toLocaleTimeString()}</span>
+                    <span className="tabular-nums">{new Date(msg.timestamp).toLocaleTimeString()}</span>
                   </div>
 
                   <div
                     className={`p-4 rounded-2xl text-xs leading-relaxed ${
                       isUser
-                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-tr-xs shadow-md shadow-blue-500/10 font-normal'
-                        : 'bg-white border border-slate-200 text-slate-800 rounded-tl-xs shadow-xs font-normal'
+                        ? 'bg-blue-600 text-white rounded-tr-xs shadow-md shadow-blue-500/10 font-normal'
+                        : 'bg-white border border-slate-200/80 text-slate-800 rounded-tl-xs shadow-xs font-normal'
                     }`}
                   >
                     <div className="whitespace-pre-wrap">{msg.text}</div>
 
                     {isUser && (
-                      <div className="flex items-center justify-end gap-1 text-[9px] text-blue-100 mt-1 opacity-80">
+                      <div className="flex items-center justify-end gap-1 text-[9px] text-blue-100 mt-1.5 opacity-80">
                         <CheckCheck className="w-3 h-3" />
                         <span>{language === 'vi' ? 'Đã gửi' : 'Sent'}</span>
                       </div>
@@ -184,7 +180,7 @@ export const AiSupportPage: React.FC = () => {
         </div>
 
         {/* Gợi Ý Chủ Đề Nhanh */}
-        <div className="px-4 py-2 bg-slate-50/90 border-t border-slate-100 flex items-center gap-2 overflow-x-auto">
+        <div className="px-4 py-2.5 bg-slate-50/90 border-t border-slate-100 flex items-center gap-2 overflow-x-auto">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight shrink-0">
             {language === 'vi' ? 'Chủ đề nhanh:' : 'Quick topics:'}
           </span>
@@ -194,7 +190,7 @@ export const AiSupportPage: React.FC = () => {
               <button
                 key={idx}
                 onClick={() => handleSendMessage(topic.query)}
-                className="px-3 py-1 bg-white hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 border border-slate-200 rounded-xl text-[11px] font-medium text-slate-600 whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                className="px-3.5 py-1.5 bg-white hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 border border-slate-200/80 rounded-full text-[11px] font-semibold text-slate-600 whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               >
                 <Icon className="w-3 h-3 text-blue-600" />
                 <span>{topic.label}</span>
@@ -205,25 +201,27 @@ export const AiSupportPage: React.FC = () => {
 
         {/* Khung Nhập Tin Nhắn */}
         <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="p-3.5 bg-white border-t border-slate-200">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <input
               type="text"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               placeholder={language === 'vi' ? 'Nhập nội dung cần hỗ trợ (nhấn Enter để gửi)...' : 'Type your inquiry here (press Enter to send)...'}
-              className="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all placeholder:text-slate-400"
+              className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-full text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all placeholder:text-slate-400"
             />
-            <button
+            <Button
               type="submit"
               disabled={isSending || !inputMessage.trim()}
-              className="px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl text-xs font-bold flex items-center gap-2 shadow-md shadow-blue-500/20 transition-all cursor-pointer disabled:opacity-50 shrink-0"
+              loading={isSending}
+              variant="brand"
+              size="md"
             >
-              <Send className="w-3.5 h-3.5" />
+              {!isSending && <Send className="w-3.5 h-3.5 mr-1.5" />}
               <span>{isSending ? (language === 'vi' ? 'Đang gửi...' : 'Sending...') : (language === 'vi' ? 'Gửi tin nhắn' : 'Send message')}</span>
-            </button>
+            </Button>
           </div>
         </form>
-      </div>
+      </Card>
     </div>
   );
 };

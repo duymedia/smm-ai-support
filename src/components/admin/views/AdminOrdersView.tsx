@@ -26,6 +26,11 @@ import {
 } from 'lucide-react';
 import { Modal } from '../../ui/Modal';
 import { Select2 } from '../../ui/Select2';
+import { Button } from '../../ui/Button';
+import { Badge } from '../../ui/Badge';
+import { Card } from '../../ui/Card';
+import { StatCard } from '../../ui/StatCard';
+import { PageHeader } from '../../ui/PageHeader';
 
 export interface RentalOrder {
   id: number | string;
@@ -275,119 +280,93 @@ export const AdminOrdersView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4 animate-in fade-in duration-200">
+    <div className="space-y-6 animate-in fade-in duration-200 pb-12">
       {/* 1. Top Header Banner */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200/80 text-blue-600 flex items-center justify-center font-bold shadow-2xs shrink-0">
-            <ShoppingBag className="w-5 h-5" />
-          </div>
-          <div>
-            <h1 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
-              <span>{language === 'vi' ? 'Quản lý gói khách hàng đã thuê & hạn dùng' : 'Customer rented packages & expiration'}</span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">
-                {orders.length} {language === 'vi' ? 'gói đã thuê' : 'rented'}
-              </span>
-            </h1>
-            <p className="text-xs text-slate-500">
-              {language === 'vi'
-                ? 'Theo dõi khách hàng đã thuê gói nào, thời điểm kích hoạt, ngày hết hạn và khóa tự động khi hết hạn.'
-                : 'Manage customer rented plans, activation dates, exact expiration countdowns, and auto-blocking.'}
-            </p>
-          </div>
-        </div>
+      <PageHeader
+        title={language === 'vi' ? 'Quản Lý Gói Khách Hàng Đã Thuê' : 'Customer Rented Packages & Expiration'}
+        description={
+          language === 'vi'
+            ? 'Theo dõi khách hàng đã thuê gói nào, thời điểm kích hoạt, ngày hết hạn và khóa tự động khi hết hạn.'
+            : 'Manage customer rented plans, activation dates, exact expiration countdowns, and auto-blocking.'
+        }
+        badge={
+          <Badge variant="brand" size="sm">
+            <span className="font-mono tabular-nums">{orders.length}</span> {language === 'vi' ? 'gói đã thuê' : 'rented'}
+          </Badge>
+        }
+        actions={
+          <div className="flex items-center gap-2">
+            <div className="px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 flex items-center gap-2 text-xs">
+              <span className="text-slate-500 font-medium">{language === 'vi' ? 'Doanh số:' : 'Revenue:'}</span>
+              <span className="font-bold text-emerald-600 font-mono tabular-nums">{formatMoney(totalRevenue)}</span>
+            </div>
 
-        {/* Actions & Refresh */}
-        <div className="flex items-center flex-wrap gap-2.5">
-          <div className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-2 text-xs">
-            <span className="text-slate-500 font-medium">{language === 'vi' ? 'Tổng doanh số:' : 'Revenue:'}</span>
-            <span className="font-bold text-emerald-600 font-mono">{formatMoney(totalRevenue)}</span>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setIsCreateModalOpen(true)}
+              icon={<Plus className="w-4 h-4" />}
+            >
+              {language === 'vi' ? 'Tạo đơn mới' : 'Assign package'}
+            </Button>
+
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={loadOrders}
+              disabled={loading}
+              className="w-9 h-9 min-h-[36px]"
+              title={language === 'vi' ? 'Làm mới danh sách' : 'Refresh list'}
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+            </Button>
           </div>
-
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            <span>{language === 'vi' ? 'Tạo đơn thuê mới' : 'Assign package'}</span>
-          </button>
-
-          <button
-            onClick={loadOrders}
-            disabled={loading}
-            className="p-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs transition-colors cursor-pointer"
-            title={language === 'vi' ? 'Làm mới danh sách' : 'Refresh list'}
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-          </button>
-        </div>
-      </div>
+        }
+      />
 
       {/* 2. Status Counter KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-3.5 shadow-2xs flex items-center justify-between">
-          <div>
-            <div className="text-[10px] font-bold text-slate-400">
-              {language === 'vi' ? 'Tổng gói đã thuê' : 'Total rented'}
-            </div>
-            <div className="text-xl font-black text-slate-900 mt-0.5 font-mono">{orders.length}</div>
-            <div className="text-[10px] text-slate-500">{language === 'vi' ? 'Toàn hệ thống' : 'All time'}</div>
-          </div>
-          <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
-            <Package className="w-4 h-4" />
-          </div>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <StatCard
+          title={language === 'vi' ? 'Tổng gói đã thuê' : 'Total rented'}
+          value={orders.length}
+          subtitle={language === 'vi' ? 'Toàn hệ thống' : 'All time'}
+          icon={<Package className="w-5 h-5 text-blue-600" />}
+        />
 
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-3.5 shadow-2xs flex items-center justify-between">
-          <div>
-            <div className="text-[10px] font-bold text-slate-400">
-              {language === 'vi' ? 'Đang hoạt động' : 'Active plans'}
-            </div>
-            <div className="text-xl font-black text-emerald-600 mt-0.5 font-mono">{activeCount}</div>
-            <div className="text-[10px] text-emerald-700 font-medium">{language === 'vi' ? 'Còn hạn sử dụng' : 'Healthy'}</div>
-          </div>
-          <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-            <CheckCircle2 className="w-4 h-4" />
-          </div>
-        </div>
+        <StatCard
+          title={language === 'vi' ? 'Đang hoạt động' : 'Active plans'}
+          value={activeCount}
+          subtitle={language === 'vi' ? 'Còn hạn sử dụng' : 'Healthy'}
+          icon={<CheckCircle2 className="w-5 h-5 text-emerald-600" />}
+          trend={{ value: 'ACTIVE', positive: true }}
+          highlight
+        />
 
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-3.5 shadow-2xs flex items-center justify-between">
-          <div>
-            <div className="text-[10px] font-bold text-slate-400">
-              {language === 'vi' ? 'Sắp hết hạn (≤ 3 ngày)' : 'Expiring soon'}
-            </div>
-            <div className="text-xl font-black text-amber-600 mt-0.5 font-mono">{expiringCount}</div>
-            <div className="text-[10px] text-amber-700 font-medium">{language === 'vi' ? 'Cần gia hạn sớm' : 'Near expiration'}</div>
-          </div>
-          <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
-            <AlertTriangle className="w-4 h-4" />
-          </div>
-        </div>
+        <StatCard
+          title={language === 'vi' ? 'Sắp hết hạn (≤ 3 ngày)' : 'Expiring soon'}
+          value={expiringCount}
+          subtitle={language === 'vi' ? 'Cần gia hạn sớm' : 'Near expiration'}
+          icon={<AlertTriangle className="w-5 h-5 text-amber-600" />}
+        />
 
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-3.5 shadow-2xs flex items-center justify-between">
-          <div>
-            <div className="text-[10px] font-bold text-slate-400">
-              {language === 'vi' ? 'Đã khóa / Hết hạn' : 'Blocked / Expired'}
-            </div>
-            <div className="text-xl font-black text-rose-600 mt-0.5 font-mono">{blockedCount}</div>
-            <div className="text-[10px] text-rose-700 font-medium">{language === 'vi' ? 'Đã bị khóa gói' : 'Locked'}</div>
-          </div>
-          <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold">
-            <Lock className="w-4 h-4" />
-          </div>
-        </div>
+        <StatCard
+          title={language === 'vi' ? 'Đã khóa / Hết hạn' : 'Blocked / Expired'}
+          value={blockedCount}
+          subtitle={language === 'vi' ? 'Đã bị khóa gói' : 'Locked'}
+          icon={<Lock className="w-5 h-5 text-rose-600" />}
+        />
       </div>
 
       {/* 3. Search & Multi-Filter Toolbar */}
-      <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 bg-white border border-slate-200/90 p-3 rounded-2xl shadow-2xs text-xs">
+      <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 bg-white border border-slate-200/90 p-4 rounded-2xl shadow-xs text-xs">
         <div className="sm:col-span-4 relative">
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder={language === 'vi' ? 'Tìm theo #ID, khách hàng, email, ghi chú...' : 'Search by #ID, user, email, notes...'}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-8.5 pr-3 py-1.5 rounded-xl bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-hidden focus:border-blue-500 transition-colors"
+            className="w-full pl-9 pr-3 py-2 rounded-full bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all"
           />
         </div>
 
@@ -433,8 +412,16 @@ export const AdminOrdersView: React.FC = () => {
       </div>
 
       {/* 4. Structured Rented Packages & Expiration Table */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl shadow-2xs overflow-hidden">
-        <div className="overflow-x-auto">
+      <Card
+        macChrome
+        macTitle={language === 'vi' ? 'Danh sách gói thuê & thời hạn' : 'Rented Packages & Expiration Ledger'}
+        macBadge={
+          <Badge variant="neutral" size="sm">
+            <span className="font-mono tabular-nums">{filteredOrders.length}</span> {language === 'vi' ? 'đơn' : 'records'}
+          </Badge>
+        }
+      >
+        <div className="overflow-x-auto -mx-6 -my-4">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50/90 border-b border-slate-200 text-slate-500 font-bold text-[11px]">
               <tr>
@@ -626,7 +613,7 @@ export const AdminOrdersView: React.FC = () => {
             </tbody>
           </table>
         </div>
-      </div>
+      </Card>
 
       {/* 5. Modal Quick Extend Rental Duration */}
       {orderToExtend && (
@@ -638,7 +625,7 @@ export const AdminOrdersView: React.FC = () => {
           maxWidth="md"
         >
           <form onSubmit={handleConfirmExtend} className="space-y-4 text-xs">
-            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
               <div className="flex justify-between">
                 <span className="text-slate-500">{language === 'vi' ? 'Khách hàng:' : 'Customer:'}</span>
                 <span className="font-bold text-slate-900">{orderToExtend.userName} ({orderToExtend.userEmail})</span>
@@ -649,29 +636,30 @@ export const AdminOrdersView: React.FC = () => {
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">{language === 'vi' ? 'Hạn dùng hiện tại:' : 'Current Expiration:'}</span>
-                <span className="font-bold font-mono text-slate-800">
+                <span className="font-bold font-mono text-slate-800 tabular-nums">
                   {getRentalPeriod(orderToExtend.createdAt, orderToExtend.billingCycle).endDate.toLocaleDateString()}
                 </span>
               </div>
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1.5">
-                {language === 'vi' ? 'Chọn thời gian gia hạn thêm:' : 'Select Extension Duration:'}
+              <label className="block font-bold text-slate-700 mb-2">
+                {language === 'vi' ? 'Chọn thời gian gia hạn thêm:' : 'Select extension period:'}
               </label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 {[
-                  { days: 7, label: language === 'vi' ? '+7 Ngày (1 Tuần)' : '+7 Days' },
-                  { days: 30, label: language === 'vi' ? '+30 Ngày (1 Tháng)' : '+30 Days' },
-                  { days: 365, label: language === 'vi' ? '+365 Ngày (1 Năm)' : '+1 Year' },
+                  { days: 7, label: language === 'vi' ? '+7 ngày (Tuần)' : '+7 days (Week)' },
+                  { days: 30, label: language === 'vi' ? '+30 ngày (Tháng)' : '+30 days (Month)' },
+                  { days: 90, label: language === 'vi' ? '+90 ngày (Quý)' : '+90 days (Quarter)' },
+                  { days: 365, label: language === 'vi' ? '+365 ngày (Năm)' : '+365 days (Year)' },
                 ].map((opt) => (
                   <button
                     key={opt.days}
                     type="button"
                     onClick={() => setExtendDays(opt.days)}
-                    className={`p-2.5 rounded-xl font-bold border text-center transition-all cursor-pointer ${
+                    className={`py-2 px-3 rounded-full border text-xs font-bold transition-all cursor-pointer ${
                       extendDays === opt.days
-                        ? 'bg-blue-50 border-blue-500 text-blue-700 ring-2 ring-blue-500/20'
+                        ? 'bg-slate-900 border-slate-900 text-white shadow-xs'
                         : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
                     }`}
                   >
@@ -682,27 +670,25 @@ export const AdminOrdersView: React.FC = () => {
             </div>
 
             <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2.5">
-              <button
+              <Button
                 type="button"
+                variant="secondary"
                 disabled={isExtending}
                 onClick={() => setOrderToExtend(null)}
-                className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl font-bold transition-colors cursor-pointer"
               >
                 {language === 'vi' ? 'Hủy Bỏ' : 'Cancel'}
-              </button>
+              </Button>
 
-              <button
+              <Button
                 type="submit"
+                variant="primary"
                 disabled={isExtending}
-                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-md shadow-blue-600/20 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                icon={<Zap className="w-4 h-4 text-amber-300" />}
               >
-                <Zap className="w-4 h-4 text-amber-300" />
-                <span>
-                  {isExtending
-                    ? (language === 'vi' ? 'Đang gia hạn...' : 'Extending...')
-                    : (language === 'vi' ? 'Xác Nhận Gia Hạn' : 'Apply Extension')}
-                </span>
-              </button>
+                {isExtending
+                  ? (language === 'vi' ? 'Đang gia hạn...' : 'Extending...')
+                  : (language === 'vi' ? 'Xác Nhận Gia Hạn' : 'Apply Extension')}
+              </Button>
             </div>
           </form>
         </Modal>
@@ -728,7 +714,7 @@ export const AdminOrdersView: React.FC = () => {
                 value={newOrderForm.userId}
                 onChange={(e) => setNewOrderForm({ ...newOrderForm, userId: e.target.value })}
                 placeholder="Ví dụ: 1 hoặc 2"
-                className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold focus:bg-white focus:outline-hidden focus:border-blue-500"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold focus:bg-white focus:outline-hidden focus:border-slate-900 tabular-nums"
               />
             </div>
 
@@ -769,7 +755,7 @@ export const AdminOrdersView: React.FC = () => {
                 required
                 value={newOrderForm.total}
                 onChange={(e) => setNewOrderForm({ ...newOrderForm, total: parseFloat(e.target.value) || 0 })}
-                className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold focus:bg-white focus:outline-hidden focus:border-blue-500"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold focus:bg-white focus:outline-hidden focus:border-slate-900 tabular-nums"
               />
             </div>
 
@@ -782,32 +768,30 @@ export const AdminOrdersView: React.FC = () => {
                 value={newOrderForm.notes}
                 onChange={(e) => setNewOrderForm({ ...newOrderForm, notes: e.target.value })}
                 placeholder="Ví dụ: Kích hoạt gói khuyến mãi"
-                className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:outline-hidden focus:border-blue-500"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:outline-hidden focus:border-slate-900"
               />
             </div>
 
             <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2.5">
-              <button
+              <Button
                 type="button"
+                variant="secondary"
                 disabled={isCreating}
                 onClick={() => setIsCreateModalOpen(false)}
-                className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl font-bold transition-colors cursor-pointer"
               >
                 {language === 'vi' ? 'Hủy' : 'Cancel'}
-              </button>
+              </Button>
 
-              <button
+              <Button
                 type="submit"
+                variant="primary"
                 disabled={isCreating}
-                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-md shadow-blue-600/20 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                icon={<CheckCircle2 className="w-4 h-4" />}
               >
-                <CheckCircle2 className="w-4 h-4" />
-                <span>
-                  {isCreating
-                    ? (language === 'vi' ? 'Đang tạo...' : 'Creating...')
-                    : (language === 'vi' ? 'Tạo Đơn Thuê' : 'Create Order')}
-                </span>
-              </button>
+                {isCreating
+                  ? (language === 'vi' ? 'Đang tạo...' : 'Creating...')
+                  : (language === 'vi' ? 'Tạo Đơn Thuê' : 'Create Order')}
+              </Button>
             </div>
           </form>
         </Modal>
@@ -830,7 +814,7 @@ export const AdminOrdersView: React.FC = () => {
                 <h4 className="font-bold text-slate-900 text-sm">
                   {language === 'vi' ? `Bạn có chắc muốn xóa đơn thuê #${orderToDelete.id}?` : `Delete rental order #${orderToDelete.id}?`}
                 </h4>
-                <p className="text-slate-600">
+                <p className="text-slate-600 leading-relaxed">
                   {language === 'vi'
                     ? `Hành động này sẽ xóa vĩnh viễn đơn thuê gói "${orderToDelete.packageName}" của khách hàng "${orderToDelete.userName}" khỏi hệ thống.`
                     : `This will permanently delete the rental order for "${orderToDelete.userName}" from the database.`}
@@ -838,7 +822,7 @@ export const AdminOrdersView: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
               <div className="flex justify-between items-center">
                 <span className="text-slate-500 font-medium">{language === 'vi' ? 'Khách hàng:' : 'Customer:'}</span>
                 <span className="font-bold text-slate-900">{orderToDelete.userName}</span>
@@ -849,33 +833,31 @@ export const AdminOrdersView: React.FC = () => {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-slate-500 font-medium">{language === 'vi' ? 'Tổng tiền:' : 'Total Amount:'}</span>
-                <span className="font-extrabold text-emerald-600 font-mono">{formatMoney(orderToDelete.total)}</span>
+                <span className="font-extrabold text-emerald-600 font-mono tabular-nums">{formatMoney(orderToDelete.total)}</span>
               </div>
             </div>
 
             <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2.5">
-              <button
+              <Button
                 type="button"
+                variant="secondary"
                 disabled={isDeleting}
                 onClick={() => setOrderToDelete(null)}
-                className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl font-bold transition-colors cursor-pointer disabled:opacity-50"
               >
                 {language === 'vi' ? 'Hủy Bỏ' : 'Cancel'}
-              </button>
+              </Button>
 
-              <button
+              <Button
                 type="button"
+                variant="danger"
                 disabled={isDeleting}
                 onClick={handleConfirmDelete}
-                className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold shadow-md shadow-rose-600/20 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                icon={<Trash2 className="w-4 h-4" />}
               >
-                <Trash2 className="w-4 h-4" />
-                <span>
-                  {isDeleting
-                    ? (language === 'vi' ? 'Đang xóa...' : 'Deleting...')
-                    : (language === 'vi' ? 'Xác Nhận Xóa' : 'Delete Order')}
-                </span>
-              </button>
+                {isDeleting
+                  ? (language === 'vi' ? 'Đang xóa...' : 'Deleting...')
+                  : (language === 'vi' ? 'Xác Nhận Xóa' : 'Delete Order')}
+              </Button>
             </div>
           </div>
         </Modal>

@@ -18,6 +18,11 @@ import {
   LineChart as LineChartIcon,
   ShieldCheck,
 } from 'lucide-react';
+import { StatCard } from '../../ui/StatCard';
+import { Card } from '../../ui/Card';
+import { Badge } from '../../ui/Badge';
+import { Button } from '../../ui/Button';
+import { PageHeader } from '../../ui/PageHeader';
 
 export const AdminOverviewView: React.FC = () => {
   const { language, formatMoney, setCurrentRoute } = useApp();
@@ -108,305 +113,249 @@ export const AdminOverviewView: React.FC = () => {
   const suspendedRate = 100 - activeRate;
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-200">
+    <div className="space-y-6 animate-in fade-in duration-200 pb-12">
       {/* 1. Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 p-6 sm:p-8 text-white shadow-xl">
-        <div className="absolute top-0 right-0 -mt-12 -mr-12 w-96 h-96 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
-        <div className="relative z-10 space-y-2">
-          <div className="flex flex-wrap items-center gap-2.5">
-            <div className="px-2.5 py-1 rounded-lg bg-blue-500/20 border border-blue-400/30 text-blue-300 text-xs font-bold flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-blue-400" />
-              <span>{language === 'vi' ? 'Trung tâm điều khiển quản trị' : 'Command center'}</span>
-            </div>
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>{language === 'vi' ? 'Hệ thống hoạt động 99.99%' : 'System uptime 99.99%'}</span>
-            </div>
+      <PageHeader
+        title={language === 'vi' ? 'Trung Tâm Quản Trị & Vận Hành Toàn Sàn' : 'Operations & Management Command Center'}
+        description={
+          language === 'vi'
+            ? 'Tổng hợp toàn bộ chỉ số doanh thu, người dùng, panel và đơn thuê gói trên toàn hệ thống.'
+            : 'Aggregate telemetry of all users, revenue, panel rentals, and platform system health.'
+        }
+        badge={
+          <div className="flex items-center gap-2">
+            <Badge variant="brand" size="sm">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>COMMAND CENTER</span>
+            </Badge>
+            <Badge variant="emerald" pulse size="sm">
+              SLA 99.99%
+            </Badge>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            {language === 'vi' ? 'Trung tâm quản trị & vận hành toàn sàn' : 'Operations & management'}
-          </h1>
-          <p className="text-sm text-slate-300 max-w-2xl">
-            {language === 'vi'
-              ? 'Tổng hợp toàn bộ chỉ số doanh thu, người dùng, panel và đơn thuê gói trên toàn hệ thống.'
-              : 'Aggregate metrics of all users, revenue, panel rentals, and platform system health.'}
-          </p>
-        </div>
-      </div>
+        }
+      />
 
       {/* 2. 4 Primary Stat KPI Cards (All Users Aggregate) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* KPI 1: Total Revenue */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">
-              {language === 'vi' ? 'Doanh thu toàn sàn' : 'Total volume'}
-            </span>
-            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-              <DollarSign className="w-5 h-5" />
-            </div>
-          </div>
-          <p className="text-2xl font-black text-slate-900 font-mono">
-            {formatMoney(stats.totalTransactionsVolume || 0)}
-          </p>
-          <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-bold pt-1">
-            <TrendingUp className="w-3.5 h-3.5" />
-            <span>+24.8% {language === 'vi' ? 'so với tháng trước' : 'vs last month'}</span>
-          </div>
-        </div>
+        <StatCard
+          title={language === 'vi' ? 'Doanh thu toàn sàn' : 'Total volume'}
+          value={formatMoney(stats.totalTransactionsVolume || 0)}
+          trend={{ value: '+24.8%', positive: true, label: language === 'vi' ? 'so với tháng trước' : 'vs last month' }}
+          icon={<DollarSign className="w-5 h-5 text-emerald-600" />}
+          highlight
+        />
 
         {/* KPI 2: Total Panels */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">
-              {language === 'vi' ? 'Tổng số panel' : 'Total panels'}
-            </span>
-            <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
-              <Server className="w-5 h-5" />
-            </div>
-          </div>
-          <p className="text-2xl font-black text-slate-900 font-mono">
-            {stats.totalPanels.toLocaleString()}
-          </p>
-          <div className="flex items-center gap-1 text-xs text-blue-600 font-semibold pt-1">
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>{stats.activePanels} {language === 'vi' ? 'đang hoạt động' : 'active'}</span>
-            {stats.suspendedPanels > 0 && (
-              <span className="text-rose-600">({stats.suspendedPanels} tạm khóa)</span>
-            )}
-          </div>
-        </div>
+        <StatCard
+          title={language === 'vi' ? 'Tổng số panel' : 'Total panels'}
+          value={stats.totalPanels}
+          subtitle={`${stats.activePanels} ${language === 'vi' ? 'hoạt động' : 'active'}`}
+          icon={<Server className="w-5 h-5 text-blue-600" />}
+        />
 
         {/* KPI 3: Total Users */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">
-              {language === 'vi' ? 'Khách hàng & người dùng' : 'Registered users'}
-            </span>
-            <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
-              <Users className="w-5 h-5" />
-            </div>
-          </div>
-          <p className="text-2xl font-black text-slate-900 font-mono">
-            {stats.totalUsers.toLocaleString()}
-          </p>
-          <p className="text-xs text-slate-500 font-medium pt-1">
-            {language === 'vi' ? 'Tài khoản đăng ký trên MySQL' : 'Registered customer accounts'}
-          </p>
-        </div>
+        <StatCard
+          title={language === 'vi' ? 'Khách hàng & người dùng' : 'Registered users'}
+          value={stats.totalUsers}
+          subtitle={language === 'vi' ? 'Tài khoản MySQL' : 'Active database users'}
+          icon={<Users className="w-5 h-5 text-purple-600" />}
+        />
 
         {/* KPI 4: Total Orders */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">
-              {language === 'vi' ? 'Tổng số đơn thuê gói' : 'Rental orders'}
-            </span>
-            <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
-              <Package className="w-5 h-5" />
-            </div>
-          </div>
-          <p className="text-2xl font-black text-slate-900 font-mono">
-            {stats.totalOrders.toLocaleString()}
-          </p>
-          <div className="flex items-center gap-1 text-xs text-emerald-600 font-bold pt-1">
-            <Activity className="w-3.5 h-3.5" />
-            <span>{language === 'vi' ? 'Độ trễ hệ thống: 38ms' : 'System latency: 38ms'}</span>
-          </div>
-        </div>
+        <StatCard
+          title={language === 'vi' ? 'Tổng số đơn thuê gói' : 'Rental orders'}
+          value={stats.totalOrders}
+          subtitle={language === 'vi' ? 'Độ trễ: 38ms' : 'Latency: 38ms'}
+          icon={<Package className="w-5 h-5 text-amber-600" />}
+        />
       </div>
 
       {/* 3. Charts Section: Bar Chart & Donut Chart */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* 3.1 Bar Chart: Doanh thu & Đơn hàng toàn sàn */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs flex flex-col justify-between">
-          <div>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
-              <div>
-                <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-blue-600" />
-                  <span>{language === 'vi' ? 'Biểu đồ tăng trưởng toàn sàn' : 'Platform growth & volume'}</span>
-                </h2>
+        <div className="lg:col-span-2">
+          <Card
+            macChrome
+            macTitle={language === 'vi' ? 'Biểu đồ tăng trưởng toàn sàn' : 'Platform growth & volume'}
+            macBadge={<Badge variant="brand" size="sm">TELEMETRY</Badge>}
+          >
+            <div>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
                 <p className="text-xs text-slate-500">
                   {language === 'vi'
                     ? 'Thống kê tổng doanh thu và số lượng đơn thuê của toàn bộ người dùng'
                     : 'Aggregated revenue and rental orders across all customers'}
                 </p>
-              </div>
 
-              {/* Controls */}
-              <div className="flex items-center gap-2">
-                <div className="flex items-center bg-slate-100 p-0.5 rounded-xl text-xs">
-                  <button
-                    onClick={() => setChartMetric('revenue')}
-                    className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
-                      chartMetric === 'revenue'
-                        ? 'bg-white text-blue-600 shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
-                  >
-                    {language === 'vi' ? 'Doanh thu' : 'Revenue'}
-                  </button>
-                  <button
-                    onClick={() => setChartMetric('orders')}
-                    className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
-                      chartMetric === 'orders'
-                        ? 'bg-white text-blue-600 shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
-                  >
-                    {language === 'vi' ? 'Đơn thuê' : 'Orders'}
-                  </button>
-                </div>
-
-                <div className="flex items-center bg-slate-100 p-0.5 rounded-xl text-xs">
-                  {(['7d', '30d', '90d'] as const).map((tf) => (
+                {/* Controls */}
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center bg-slate-100 p-0.5 rounded-full text-xs">
                     <button
-                      key={tf}
-                      onClick={() => setTimeframe(tf)}
-                      className={`px-2 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
-                        timeframe === tf
-                          ? 'bg-white text-slate-900 shadow-xs font-bold'
-                          : 'text-slate-500 hover:text-slate-900'
+                      onClick={() => setChartMetric('revenue')}
+                      className={`px-3 py-1 rounded-full font-bold transition-all cursor-pointer ${
+                        chartMetric === 'revenue'
+                          ? 'bg-white text-slate-900 shadow-2xs'
+                          : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
-                      {tf}
+                      {language === 'vi' ? 'Doanh thu' : 'Revenue'}
                     </button>
-                  ))}
+                    <button
+                      onClick={() => setChartMetric('orders')}
+                      className={`px-3 py-1 rounded-full font-bold transition-all cursor-pointer ${
+                        chartMetric === 'orders'
+                          ? 'bg-white text-slate-900 shadow-2xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      {language === 'vi' ? 'Đơn thuê' : 'Orders'}
+                    </button>
+                  </div>
+
+                  <div className="flex items-center bg-slate-100 p-0.5 rounded-full text-xs">
+                    {(['7d', '30d', '90d'] as const).map((tf) => (
+                      <button
+                        key={tf}
+                        onClick={() => setTimeframe(tf)}
+                        className={`px-2.5 py-1 rounded-full font-semibold transition-all cursor-pointer ${
+                          timeframe === tf
+                            ? 'bg-white text-slate-900 shadow-2xs font-bold'
+                            : 'text-slate-500 hover:text-slate-900'
+                        }`}
+                      >
+                        {tf}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Interactive Bar Chart Visualization */}
+              <div className="pt-6">
+                <div className="h-56 flex items-end justify-between gap-2 sm:gap-4 px-2">
+                  {currentBarData.map((item, idx) => {
+                    const val = chartMetric === 'revenue' ? item.revenue : item.orders;
+                    const maxVal = chartMetric === 'revenue' ? maxBarRevenue : maxBarOrders;
+                    const heightPercent = Math.max(12, Math.round((val / maxVal) * 100));
+                    const isHovered = hoveredBarIndex === idx;
+
+                    return (
+                      <div
+                        key={idx}
+                        className="flex-1 flex flex-col items-center gap-2 group relative cursor-pointer"
+                        onMouseEnter={() => setHoveredBarIndex(idx)}
+                        onMouseLeave={() => setHoveredBarIndex(null)}
+                      >
+                        {/* Tooltip */}
+                        {isHovered && (
+                          <div className="absolute -top-12 z-20 bg-slate-900 text-white text-[11px] font-mono tabular-nums py-1 px-2.5 rounded-xl shadow-lg whitespace-nowrap animate-in fade-in zoom-in-95">
+                            <div className="font-bold">{item.label}</div>
+                            <div>
+                              {chartMetric === 'revenue' ? formatMoney(item.revenue) : `${item.orders} đơn thuê`}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Bar Column */}
+                        <div className="w-full max-w-[40px] bg-slate-100 rounded-t-xl overflow-hidden h-44 flex items-end">
+                          <div
+                            className={`w-full rounded-t-xl transition-all duration-300 ${
+                              chartMetric === 'revenue'
+                                ? isHovered
+                                  ? 'bg-slate-900'
+                                  : 'bg-blue-600'
+                                : isHovered
+                                ? 'bg-slate-900'
+                                : 'bg-indigo-600'
+                            }`}
+                            style={{ height: `${heightPercent}%` }}
+                          />
+                        </div>
+
+                        {/* Label */}
+                        <span className="text-[11px] font-semibold text-slate-500 truncate">{item.label}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
 
-            {/* Interactive Bar Chart Visualization */}
-            <div className="pt-6">
-              <div className="h-56 flex items-end justify-between gap-2 sm:gap-4 px-2">
-                {currentBarData.map((item, idx) => {
-                  const val = chartMetric === 'revenue' ? item.revenue : item.orders;
-                  const maxVal = chartMetric === 'revenue' ? maxBarRevenue : maxBarOrders;
-                  const heightPercent = Math.max(12, Math.round((val / maxVal) * 100));
-                  const isHovered = hoveredBarIndex === idx;
-
-                  return (
-                    <div
-                      key={idx}
-                      className="flex-1 flex flex-col items-center gap-2 group relative cursor-pointer"
-                      onMouseEnter={() => setHoveredBarIndex(idx)}
-                      onMouseLeave={() => setHoveredBarIndex(null)}
-                    >
-                      {/* Tooltip */}
-                      {isHovered && (
-                        <div className="absolute -top-12 z-20 bg-slate-900 text-white text-[11px] font-mono py-1 px-2.5 rounded-lg shadow-lg whitespace-nowrap animate-in fade-in zoom-in-95">
-                          <div className="font-bold">{item.label}</div>
-                          <div>
-                            {chartMetric === 'revenue' ? formatMoney(item.revenue) : `${item.orders} đơn thuê`}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Bar Column */}
-                      <div className="w-full max-w-[40px] bg-slate-100 rounded-t-xl overflow-hidden h-44 flex items-end">
-                        <div
-                          className={`w-full rounded-t-xl transition-all duration-300 ${
-                            chartMetric === 'revenue'
-                              ? isHovered
-                                ? 'bg-blue-600'
-                                : 'bg-blue-500'
-                              : isHovered
-                              ? 'bg-indigo-600'
-                              : 'bg-indigo-500'
-                          }`}
-                          style={{ height: `${heightPercent}%` }}
-                        />
-                      </div>
-
-                      {/* Label */}
-                      <span className="text-[11px] font-semibold text-slate-500 truncate">{item.label}</span>
-                    </div>
-                  );
-                })}
-              </div>
+            <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+              <span>
+                {language === 'vi' ? 'Tổng số liệu cập nhật tự động từ database' : 'Real-time aggregated platform data'}
+              </span>
+              <span className="font-bold text-emerald-600 flex items-center gap-1 font-mono tabular-nums">
+                <TrendingUp className="w-3.5 h-3.5" />
+                <span>SLA 99.99%</span>
+              </span>
             </div>
-          </div>
-
-          <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-            <span>
-              {language === 'vi' ? 'Tổng số liệu cập nhật tự động từ database' : 'Real-time aggregated platform data'}
-            </span>
-            <span className="font-bold text-blue-600 flex items-center gap-1">
-              <TrendingUp className="w-3.5 h-3.5" />
-              <span>SLA 99.99%</span>
-            </span>
-          </div>
+          </Card>
         </div>
 
         {/* 3.2 Donut Chart: Phân bố gói cước & trạng thái */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs flex flex-col justify-between space-y-4">
-          <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <PieChartIcon className="w-4 h-4 text-purple-600" />
-                <span>{language === 'vi' ? 'Phân bố gói cước thuê' : 'Plan distribution'}</span>
-              </h2>
-              <span className="text-xs font-bold text-slate-400 font-mono">
-                {stats.totalPanels} {language === 'vi' ? 'panels' : 'panels'}
-              </span>
-            </div>
+        <div>
+          <Card
+            macChrome
+            macTitle={language === 'vi' ? 'Phân bố gói cước thuê' : 'Plan distribution'}
+            macBadge={
+              <Badge variant="neutral" size="sm">
+                <span className="font-mono tabular-nums">{stats.totalPanels}</span> panels
+              </Badge>
+            }
+          >
+            <div className="space-y-4">
+              <div className="space-y-3 pt-2">
+                {packageDistribution.map((pkg, i) => (
+                  <div key={i} className="space-y-1.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-slate-800 flex items-center gap-2">
+                        <span className={`w-2.5 h-2.5 rounded-full ${pkg.bgClass}`} />
+                        {pkg.name}
+                      </span>
+                      <span className="font-mono font-bold text-slate-600 tabular-nums">{pkg.count} ({pkg.percent}%)</span>
+                    </div>
+                    <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full ${pkg.bgClass} rounded-full transition-all duration-500`}
+                        style={{ width: `${pkg.percent}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
 
-            <div className="mt-4 space-y-3">
-              {packageDistribution.map((pkg, i) => (
-                <div key={i} className="space-y-1.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-slate-800 flex items-center gap-2">
-                      <span className={`w-2.5 h-2.5 rounded-full ${pkg.bgClass}`} />
-                      {pkg.name}
-                    </span>
-                    <span className="font-mono font-bold text-slate-600">{pkg.count} ({pkg.percent}%)</span>
-                  </div>
-                  <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full ${pkg.bgClass} rounded-full transition-all duration-500`}
-                      style={{ width: `${pkg.percent}%` }}
-                    />
-                  </div>
+              <div className="pt-3 border-t border-slate-100 bg-slate-50/60 p-3 rounded-2xl">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-slate-600">
+                    {language === 'vi' ? 'Tỷ lệ panel hoạt động:' : 'Active rate:'}
+                  </span>
+                  <span className="font-bold text-emerald-600 font-mono tabular-nums">{activeRate}% {language === 'vi' ? 'hoạt động' : 'active'}</span>
                 </div>
-              ))}
+              </div>
             </div>
-          </div>
-
-          <div className="pt-4 border-t border-slate-100 bg-slate-50/60 p-3 rounded-xl">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-slate-600">
-                {language === 'vi' ? 'Tỷ lệ panel hoạt động:' : 'Active rate:'}
-              </span>
-              <span className="font-bold text-emerald-600">{activeRate}% {language === 'vi' ? 'hoạt động' : 'active'}</span>
-            </div>
-          </div>
+          </Card>
         </div>
       </div>
 
       {/* 4. Recent Orders Table Across Entire Platform */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
-        <div className="p-4 border-b border-slate-200 flex items-center justify-between">
-          <div>
-            <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-blue-600" />
-              <span>{language === 'vi' ? 'Đơn thuê gói mới nhất toàn sàn' : 'Recent platform rental orders'}</span>
-            </h2>
-            <p className="text-xs text-slate-500">
-              {language === 'vi'
-                ? 'Các giao dịch và đơn kích hoạt gói của khách hàng gần đây'
-                : 'Latest rental activations and renewals across all users'}
-            </p>
-          </div>
-          <button
+      <Card
+        macChrome
+        macTitle={language === 'vi' ? 'Đơn thuê gói mới nhất toàn sàn' : 'Recent platform rental orders'}
+        macBadge={
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setCurrentRoute('/admin/orders')}
-            className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 cursor-pointer"
+            icon={<ArrowUpRight className="w-3.5 h-3.5" />}
+            className="h-7 text-xs"
           >
-            <span>{language === 'vi' ? 'Xem tất cả' : 'View all'}</span>
-            <ArrowUpRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        <div className="overflow-x-auto">
+            {language === 'vi' ? 'Xem tất cả' : 'View all'}
+          </Button>
+        }
+      >
+        <div className="overflow-x-auto -mx-6 -my-4">
           <table className="w-full text-left text-xs border-collapse">
             <thead className="bg-slate-50/90 border-b border-slate-200 text-slate-500 font-bold whitespace-nowrap">
               <tr>
@@ -429,12 +378,12 @@ export const AdminOverviewView: React.FC = () => {
               ) : (
                 recentOrders.map((ord: any) => (
                   <tr key={ord.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-3 px-4 text-center font-mono font-bold text-blue-600">
+                    <td className="py-3 px-4 text-center font-mono font-bold text-slate-900 tabular-nums">
                       #{ord.id}
                     </td>
                     <td className="py-3 px-4">
                       <div className="font-bold text-slate-900">{ord.userName}</div>
-                      <div className="text-[11px] text-slate-500 font-mono">{ord.userEmail}</div>
+                      <div className="text-[11px] text-slate-500 font-mono tabular-nums">{ord.userEmail}</div>
                     </td>
                     <td className="py-3 px-4 font-semibold text-slate-800">
                       {ord.packageName}
@@ -442,22 +391,20 @@ export const AdminOverviewView: React.FC = () => {
                     <td className="py-3 px-4 font-mono text-slate-600">
                       {ord.billingCycle}
                     </td>
-                    <td className="py-3 px-4 font-mono font-bold text-emerald-600">
+                    <td className="py-3 px-4 font-mono font-bold text-emerald-600 tabular-nums">
                       {formatMoney(ord.total)}
                     </td>
-                    <td className="py-3 px-4 font-mono text-slate-500 text-[11px]">
+                    <td className="py-3 px-4 font-mono text-slate-500 text-[11px] tabular-nums">
                       {new Date(ord.createdAt).toLocaleDateString()} {new Date(ord.createdAt).toLocaleTimeString()}
                     </td>
                     <td className="py-3 px-4 text-center">
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                          ord.status === 'active'
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            : 'bg-rose-50 text-rose-700 border border-rose-200'
-                        }`}
+                      <Badge
+                        variant={ord.status === 'active' ? 'emerald' : 'rose'}
+                        pulse={ord.status === 'active'}
+                        size="sm"
                       >
                         {ord.status === 'active' ? 'Active' : 'Blocked'}
-                      </span>
+                      </Badge>
                     </td>
                   </tr>
                 ))
@@ -465,32 +412,31 @@ export const AdminOverviewView: React.FC = () => {
             </tbody>
           </table>
         </div>
-      </div>
+      </Card>
 
       {/* 5. Infrastructure Cluster Monitor */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs p-6">
-        <div className="mb-4">
-          <h2 className="text-base font-bold text-slate-900">
-            {language === 'vi' ? 'Trạng thái hạ tầng máy chủ & gateway' : 'Server infrastructure & gateway status'}
-          </h2>
-          <p className="text-xs text-slate-500">
-            {language === 'vi'
-              ? 'Giám sát tải CPU, RAM và độ trễ ping thực tế tới các cụm máy chủ'
-              : 'Real-time telemetry and resource usage from server clusters'}
-          </p>
-        </div>
+      <Card
+        macChrome
+        macTitle={language === 'vi' ? 'Trạng thái hạ tầng máy chủ & gateway' : 'Server infrastructure & gateway status'}
+        macBadge={<Badge variant="emerald" pulse size="sm">ANYCAST CLUSTER</Badge>}
+      >
+        <p className="text-xs text-slate-500 mb-4">
+          {language === 'vi'
+            ? 'Giám sát tải CPU, RAM và độ trễ ping thực tế tới các cụm máy chủ'
+            : 'Real-time telemetry and resource usage from server clusters'}
+        </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {clusterNodes.map((node: any) => (
-            <div key={node.id} className="p-4 rounded-xl border border-slate-100 bg-slate-50/60 hover:bg-white hover:border-slate-300 transition-all">
+            <div key={node.id} className="p-4 rounded-2xl border border-slate-200/80 bg-slate-50/60 hover:bg-white hover:border-slate-300 transition-all">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
                   <Globe className="w-3.5 h-3.5 text-blue-600" />
                   {node.name}
                 </span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">
-                  {node.pingMs}ms
-                </span>
+                <Badge variant="emerald" pulse size="sm">
+                  <span className="font-mono tabular-nums">{node.pingMs}ms</span>
+                </Badge>
               </div>
 
               <div className="mt-3 space-y-2 text-xs text-slate-600">
@@ -504,7 +450,7 @@ export const AdminOverviewView: React.FC = () => {
                     <div className="w-16 h-1.5 rounded-full bg-slate-200 overflow-hidden">
                       <div className="h-full bg-blue-600 rounded-full" style={{ width: `${node.cpuLoad}%` }} />
                     </div>
-                    <span className="font-semibold">{node.cpuLoad}%</span>
+                    <span className="font-semibold font-mono tabular-nums">{node.cpuLoad}%</span>
                   </div>
                 </div>
                 <div className="flex justify-between">
@@ -513,18 +459,18 @@ export const AdminOverviewView: React.FC = () => {
                     <div className="w-16 h-1.5 rounded-full bg-slate-200 overflow-hidden">
                       <div className="h-full bg-indigo-600 rounded-full" style={{ width: `${node.ramUsage}%` }} />
                     </div>
-                    <span className="font-semibold">{node.ramUsage}%</span>
+                    <span className="font-semibold font-mono tabular-nums">{node.ramUsage}%</span>
                   </div>
                 </div>
                 <div className="flex justify-between pt-1 border-t border-slate-200/60">
                   <span className="text-slate-400">{language === 'vi' ? 'Kết nối đang mở:' : 'Active connections:'}</span>
-                  <span className="font-bold text-slate-800">{node.activeConnections.toLocaleString()}</span>
+                  <span className="font-bold text-slate-800 font-mono tabular-nums">{node.activeConnections.toLocaleString()}</span>
                 </div>
               </div>
             </div>
           ))}
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

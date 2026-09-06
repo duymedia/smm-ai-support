@@ -23,11 +23,18 @@ import {
   Lock,
   DollarSign,
   ToggleLeft,
-  ToggleRight
-  ,AlertTriangle
+  ToggleRight,
+  AlertTriangle,
+  ArrowRight,
+  Calendar,
 } from 'lucide-react';
 import { Modal } from '../../ui/Modal';
 import { Select2 } from '../../ui/Select2';
+import { Button } from '../../ui/Button';
+import { Badge } from '../../ui/Badge';
+import { Card } from '../../ui/Card';
+import { StatCard } from '../../ui/StatCard';
+import { PageHeader } from '../../ui/PageHeader';
 
 export interface AdminUserData {
   id: number | string;
@@ -271,201 +278,255 @@ export const AdminUsersView: React.FC = () => {
   });
 
   const totalBalance = users.reduce((acc, u) => acc + (Number(u.balance) || 0), 0);
+  const activeCount = users.filter((u) => u.status === 'active' || !u.status).length;
+  const staffCount = users.filter((u) => u.role === 'admin' || u.role === 'super_admin' || u.role === 'support').length;
 
-  const getRoleBadge = (role: AdminUserData['role']) => {
+  const renderRoleBadge = (role: AdminUserData['role']) => {
     switch (role) {
       case 'super_admin':
         return (
-          <span className="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-900 text-amber-400 border border-amber-500/30 inline-flex items-center gap-1">
-            <Crown className="w-3 h-3 text-amber-400" />
-            <span>Super Admin</span>
-          </span>
+          <Badge variant="amber">
+            <Crown className="w-3 h-3 mr-1" />
+            Super Admin
+          </Badge>
         );
       case 'admin':
         return (
-          <span className="px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200 inline-flex items-center gap-1">
-            <ShieldCheck className="w-3 h-3 text-purple-600" />
-            <span>Admin</span>
-          </span>
+          <Badge variant="purple">
+            <ShieldCheck className="w-3 h-3 mr-1" />
+            Admin
+          </Badge>
         );
       case 'support':
         return (
-          <span className="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 inline-flex items-center gap-1">
-            <Headphones className="w-3 h-3 text-blue-600" />
-            <span>Support</span>
-          </span>
+          <Badge variant="blue">
+            <Headphones className="w-3 h-3 mr-1" />
+            Support
+          </Badge>
         );
       default:
         return (
-          <span className="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200 inline-flex items-center gap-1">
-            <User className="w-3 h-3 text-slate-500" />
-            <span>Customer</span>
-          </span>
+          <Badge variant="slate">
+            <User className="w-3 h-3 mr-1" />
+            Customer
+          </Badge>
         );
     }
   };
 
-  const getStatusBadge = (status?: AdminUserData['status']) => {
+  const renderStatusBadge = (status?: AdminUserData['status']) => {
     switch (status) {
-      case 'active':
-        return (
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide bg-emerald-50 text-emerald-700 border border-emerald-200 inline-flex items-center gap-1">
-            <CheckCircle2 className="w-2.5 h-2.5" />
-            <span>Active</span>
-          </span>
-        );
       case 'suspended':
         return (
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide bg-amber-50 text-amber-700 border border-amber-200 inline-flex items-center gap-1">
-            <AlertCircle className="w-2.5 h-2.5" />
-            <span>Suspended</span>
-          </span>
+          <Badge variant="warning">
+            Suspended
+          </Badge>
         );
       case 'banned':
         return (
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide bg-rose-50 text-rose-700 border border-rose-200 inline-flex items-center gap-1">
-            <XCircle className="w-2.5 h-2.5" />
-            <span>Banned</span>
-          </span>
+          <Badge variant="danger">
+            Banned
+          </Badge>
         );
       default:
         return (
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide bg-emerald-50 text-emerald-700 border border-emerald-200 inline-flex items-center gap-1">
-            <CheckCircle2 className="w-2.5 h-2.5" />
-            <span>Active</span>
-          </span>
+          <Badge variant="emerald" pulse>
+            Active
+          </Badge>
         );
     }
   };
 
   return (
-    <div className="space-y-4 animate-in fade-in duration-200">
-      {/* 1. Header & Summary Stats */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200/80 text-blue-600 flex items-center justify-center font-bold shadow-2xs shrink-0">
-            <Users className="w-5 h-5" />
+    <div className="space-y-6">
+      {/* 1. Page Header with Open-Design Standards */}
+      <PageHeader
+        title={language === 'vi' ? 'Quản Lý Thành Viên & Phân Quyền' : 'Users & Access Control'}
+        description={
+          language === 'vi'
+            ? 'Quản trị danh sách khách hàng, cấu hình vai trò RBAC, điều chỉnh hạn mức ví và giám sát hoạt động.'
+            : 'Manage customer accounts, configure fine-grained RBAC roles, adjust balances, and oversee identity security.'
+        }
+        badge={
+          <Badge variant="blue" pulse>
+            {users.length} {language === 'vi' ? 'Thành viên' : 'Identities'}
+          </Badge>
+        }
+        actions={
+          <div className="flex items-center gap-2.5">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={loadUsers}
+              disabled={loading}
+              title={language === 'vi' ? 'Làm mới danh sách' : 'Refresh list'}
+            >
+              <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${loading ? 'animate-spin text-blue-600' : ''}`} />
+              <span>{language === 'vi' ? 'Làm mới' : 'Sync'}</span>
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleOpenCreate}
+            >
+              <Plus className="w-4 h-4 mr-1.5" />
+              <span>{language === 'vi' ? 'Thêm thành viên' : 'Add User'}</span>
+            </Button>
           </div>
-          <div>
-            <h1 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
-              <span>{language === 'vi' ? 'Quản Lý Người Dùng' : 'Users'}</span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">
-                {users.length} {language === 'vi' ? 'thành viên' : 'users'}
-              </span>
-            </h1>
-            <p className="text-xs text-slate-500">
-              {language === 'vi'
-                ? 'Thêm, sửa, phân quyền, quản lý số dư ví và trạng thái hoạt động của khách hàng.'
-                : 'Add, update, grant roles, manage wallet balances, and track user activity.'}
-            </p>
+        }
+      />
+
+      {/* 2. KPI StatCards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          title={language === 'vi' ? 'Tổng thành viên' : 'Total Users'}
+          value={users.length}
+          subtitle={language === 'vi' ? 'Đã lưu trên hệ thống' : 'Registered identities'}
+          icon={<Users className="w-5 h-5 text-blue-600" />}
+        />
+
+        <StatCard
+          title={language === 'vi' ? 'Tổng quỹ số dư ví' : 'Total Capital Balance'}
+          value={formatMoney(totalBalance)}
+          subtitle={language === 'vi' ? 'Quỹ ký gửi toàn hệ thống' : 'Custodial ledger sum'}
+          icon={<Wallet className="w-5 h-5 text-emerald-600" />}
+          highlight={true}
+        />
+
+        <StatCard
+          title={language === 'vi' ? 'Đang hoạt động' : 'Active Accounts'}
+          value={activeCount}
+          subtitle={`${users.length > 0 ? Math.round((activeCount / users.length) * 100) : 100}% ${language === 'vi' ? 'tài khoản hợp lệ' : 'retention rate'}`}
+          icon={<CheckCircle2 className="w-5 h-5 text-emerald-600" />}
+          trend={{
+            value: `${users.length > 0 ? Math.round((activeCount / users.length) * 100) : 100}%`,
+            positive: true,
+            label: language === 'vi' ? 'Hợp lệ' : 'Active',
+          }}
+        />
+
+        <StatCard
+          title={language === 'vi' ? 'Quản trị viên & CSKH' : 'Staff & Admins'}
+          value={staffCount}
+          subtitle={language === 'vi' ? 'Được cấp quyền quản trị' : 'Elevated privileges'}
+          icon={<ShieldCheck className="w-5 h-5 text-purple-600" />}
+        />
+      </div>
+
+      {/* 3. Search & Filter Bar */}
+      <div className="rounded-2xl border border-slate-200/80 bg-white/90 backdrop-blur-sm p-4 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.10)] flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3 flex-1">
+          <div className="relative flex-1 min-w-[240px] max-w-md">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder={language === 'vi' ? 'Tìm theo #ID, họ tên, username, email, điện thoại...' : 'Search by #ID, name, username, email, phone...'}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 rounded-full border border-slate-200 bg-slate-50/70 text-xs focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 transition-all"
+            />
+          </div>
+
+          <div className="w-40">
+            <Select2
+              value={roleFilter}
+              onChange={(val) => setRoleFilter(val)}
+              options={[
+                { value: 'all', label: language === 'vi' ? 'Tất cả vai trò' : 'All Roles' },
+                { value: 'customer', label: 'Customer' },
+                { value: 'support', label: 'Support' },
+                { value: 'admin', label: 'Admin' },
+                { value: 'super_admin', label: 'Super Admin' },
+              ]}
+              className="text-xs"
+            />
+          </div>
+
+          <div className="w-40">
+            <Select2
+              value={statusFilter}
+              onChange={(val) => setStatusFilter(val)}
+              options={[
+                { value: 'all', label: language === 'vi' ? 'Tất cả trạng thái' : 'All Statuses' },
+                { value: 'active', label: 'Active' },
+                { value: 'suspended', label: 'Suspended' },
+                { value: 'banned', label: 'Banned' },
+              ]}
+              className="text-xs"
+            />
           </div>
         </div>
 
-        {/* Stats & Actions */}
-        <div className="flex items-center flex-wrap gap-2.5">
-          <div className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-2 text-xs">
-            <span className="text-slate-500 font-medium">{language === 'vi' ? 'Tổng số dư ví:' : 'Total Balance:'}</span>
-            <span className="font-bold text-emerald-600 font-mono">{formatMoney(totalBalance)}</span>
-          </div>
-
-          <button
-            onClick={handleOpenCreate}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            <span>{language === 'vi' ? 'Thêm Thành Viên' : 'Add User'}</span>
-          </button>
-
-          <button
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
             onClick={loadUsers}
             disabled={loading}
-            className="p-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs transition-colors cursor-pointer"
-            title={language === 'vi' ? 'Làm mới danh sách' : 'Refresh list'}
+            title={language === 'vi' ? 'Làm mới' : 'Refresh'}
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-          </button>
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-blue-600' : ''}`} />
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={handleOpenCreate}
+          >
+            <Plus className="w-4 h-4 mr-1.5" />
+            <span>{language === 'vi' ? 'Thêm người dùng' : 'New User'}</span>
+          </Button>
         </div>
       </div>
 
-      {/* 2. Compact Search & Filter Toolbar */}
-      <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 bg-white border border-slate-200/90 p-3 rounded-2xl shadow-2xs text-xs">
-        <div className="sm:col-span-6 relative">
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder={language === 'vi' ? 'Tìm theo #ID, họ tên, username, email, số điện thoại...' : 'Search by #ID, name, username, email, phone...'}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-8.5 pr-3 py-1.5 rounded-xl bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-hidden focus:border-blue-500 transition-colors"
-          />
-        </div>
-
-        <div className="sm:col-span-3">
-          <Select2
-            value={roleFilter}
-            onChange={(val) => setRoleFilter(val)}
-            options={[
-              { value: 'all', label: language === 'vi' ? 'Tất cả vai trò' : 'All Roles' },
-              { value: 'customer', label: 'Customer' },
-              { value: 'support', label: 'Support' },
-              { value: 'admin', label: 'Admin' },
-              { value: 'super_admin', label: 'Super Admin' },
-            ]}
-          />
-        </div>
-
-        <div className="sm:col-span-3">
-          <Select2
-            value={statusFilter}
-            onChange={(val) => setStatusFilter(val)}
-            options={[
-              { value: 'all', label: language === 'vi' ? 'Tất cả trạng thái' : 'All Status' },
-              { value: 'active', label: 'Active' },
-              { value: 'suspended', label: 'Suspended' },
-              { value: 'banned', label: 'Banned' },
-            ]}
-          />
-        </div>
-      </div>
-
-      {/* 3. Structured Users Table */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl shadow-2xs overflow-hidden">
+      {/* 4. Structured Users Table inside Mac Window Chrome Card */}
+      <Card
+        macChrome={true}
+        macTitle="DIRECTORY // IAM_REGISTRY"
+        macBadge={
+          <Badge variant="emerald" pulse>
+            {activeCount} ACTIVE
+          </Badge>
+        }
+      >
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50/90 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead className="bg-slate-50/90 border-b border-slate-200/80 text-slate-500 font-bold text-[11px] whitespace-nowrap">
               <tr>
-                <th className="py-3 px-4 w-16">{language === 'vi' ? '#ID' : '#ID'}</th>
-                <th className="py-3 px-4">{language === 'vi' ? 'Thành Viên' : 'User Profile'}</th>
-                <th className="py-3 px-4">{language === 'vi' ? 'Email & Liên Hệ' : 'Contact Info'}</th>
-                <th className="py-3 px-4">{language === 'vi' ? 'Vai trò' : 'Role'}</th>
-                <th className="py-3 px-4">{language === 'vi' ? 'Số dư ví' : 'Wallet Balance'}</th>
-                <th className="py-3 px-4">{language === 'vi' ? 'Đơn hàng' : 'Orders'}</th>
-                <th className="py-3 px-4 text-center">{language === 'vi' ? 'Trạng thái' : 'Status'}</th>
-                <th className="py-3 px-4">{language === 'vi' ? 'Ngày tham gia' : 'Joined Date'}</th>
-                <th className="py-3 px-4 text-right">{language === 'vi' ? 'Thao tác' : 'Actions'}</th>
+                <th className="py-3.5 px-4 w-16 text-center">{language === 'vi' ? '#ID' : '#ID'}</th>
+                <th className="py-3.5 px-4">{language === 'vi' ? 'Thành Viên' : 'User Profile'}</th>
+                <th className="py-3.5 px-4">{language === 'vi' ? 'Email & Liên Hệ' : 'Contact Info'}</th>
+                <th className="py-3.5 px-4">{language === 'vi' ? 'Vai trò' : 'Role'}</th>
+                <th className="py-3.5 px-4">{language === 'vi' ? 'Số dư ví' : 'Wallet Balance'}</th>
+                <th className="py-3.5 px-4">{language === 'vi' ? 'Đơn hàng' : 'Orders'}</th>
+                <th className="py-3.5 px-4 text-center">{language === 'vi' ? 'Trạng thái' : 'Status'}</th>
+                <th className="py-3.5 px-4">{language === 'vi' ? 'Ngày tham gia' : 'Joined Date'}</th>
+                <th className="py-3.5 px-4 text-right">{language === 'vi' ? 'Thao tác' : 'Actions'}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-700">
+            <tbody className="divide-y divide-slate-100 text-slate-700 whitespace-nowrap">
               {filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="py-10 text-center text-slate-500 font-medium">
-                    {language === 'vi' ? 'Không có thành viên nào phù hợp.' : 'No matching users found.'}
+                  <td colSpan={9} className="py-14 text-center text-slate-400">
+                    <Users className="w-8 h-8 mx-auto text-slate-300 mb-2" />
+                    <p className="font-semibold text-slate-600">
+                      {language === 'vi' ? 'Không có thành viên nào phù hợp.' : 'No matching users found.'}
+                    </p>
                   </td>
                 </tr>
               ) : (
                 filteredUsers.map((u) => (
-                  <tr key={u.id} className="hover:bg-slate-50/80 transition-colors">
+                  <tr key={u.id} className="hover:bg-slate-50/70 transition-colors group">
                     {/* #ID Column */}
-                    <td className="py-3 px-4">
-                      <span className="font-mono font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg border border-blue-100 text-xs">
+                    <td className="py-3.5 px-4 text-center">
+                      <span className="font-mono font-bold text-blue-600 bg-blue-50/80 px-2.5 py-1 rounded-full border border-blue-200/60 text-xs inline-block tabular-nums">
                         #{u.id}
                       </span>
                     </td>
 
                     {/* Profile Column */}
-                    <td className="py-3 px-4">
+                    <td className="py-3.5 px-4">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-xl bg-slate-900 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs">
+                        <div className="w-8 h-8 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs">
                           {u.name ? u.name.slice(0, 2).toUpperCase() : 'US'}
                         </div>
                         <div>
@@ -476,34 +537,34 @@ export const AdminUsersView: React.FC = () => {
                     </td>
 
                     {/* Contact Info Column */}
-                    <td className="py-3 px-4">
+                    <td className="py-3.5 px-4">
                       <div className="font-medium text-slate-800 flex items-center gap-1.5">
-                        <Mail className="w-3 h-3 text-slate-400 shrink-0" />
+                        <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                         <span>{u.email}</span>
                       </div>
                       {u.phone && (
                         <div className="text-[11px] text-slate-500 font-mono flex items-center gap-1.5 mt-0.5">
-                          <Phone className="w-2.5 h-2.5 text-slate-400 shrink-0" />
+                          <Phone className="w-3 h-3 text-slate-400 shrink-0" />
                           <span>{u.phone}</span>
                         </div>
                       )}
                     </td>
 
                     {/* Role Column */}
-                    <td className="py-3 px-4">
-                      {getRoleBadge(u.role)}
+                    <td className="py-3.5 px-4">
+                      {renderRoleBadge(u.role)}
                     </td>
 
                     {/* Wallet Balance Column */}
-                    <td className="py-3 px-4">
+                    <td className="py-3.5 px-4">
                       <div className="flex items-center gap-2">
-                        <span className="font-extrabold text-emerald-600 font-mono text-sm">
+                        <span className="font-extrabold text-emerald-600 font-mono tabular-nums text-xs">
                           {formatMoney(u.balance)}
                         </span>
                         <button
                           type="button"
                           onClick={() => handleOpenBalanceModal(u)}
-                          className="p-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 transition-colors cursor-pointer"
+                          className="p-1 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 transition-colors cursor-pointer"
                           title={language === 'vi' ? 'Cộng/Trừ tiền ví' : 'Adjust wallet balance'}
                         >
                           <Wallet className="w-3.5 h-3.5" />
@@ -512,52 +573,43 @@ export const AdminUsersView: React.FC = () => {
                     </td>
 
                     {/* Orders Count Column */}
-                    <td className="py-3 px-4">
-                      <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-bold text-xs inline-flex items-center gap-1 border border-slate-200">
+                    <td className="py-3.5 px-4">
+                      <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-bold text-xs inline-flex items-center gap-1 border border-slate-200 font-mono tabular-nums">
                         <Package className="w-3 h-3 text-slate-400" />
                         <span>{u.ordersCount || 0}</span>
                       </span>
                     </td>
 
                     {/* Status Column */}
-                    <td className="py-3 px-4 text-center">
+                    <td className="py-3.5 px-4 text-center">
                       <button
                         onClick={() => handleToggleUserStatus(u)}
                         className="inline-flex items-center gap-1 cursor-pointer focus:outline-hidden"
                         title={language === 'vi' ? 'Bấm để Bật/Tắt tài khoản' : 'Click to toggle user status'}
                       >
-                        {u.status === 'active' || !u.status ? (
-                          <div className="flex items-center gap-1 text-emerald-600 font-bold">
-                            <ToggleRight className="w-6 h-6 text-emerald-600" />
-                            <span className="text-[10px] uppercase">Active</span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-1 text-slate-400 font-bold">
-                            <ToggleLeft className="w-6 h-6 text-slate-300" />
-                            <span className="text-[10px] uppercase">Off</span>
-                          </div>
-                        )}
+                        {renderStatusBadge(u.status)}
                       </button>
                     </td>
 
                     {/* Joined Date Column */}
-                    <td className="py-3 px-4">
-                      <div className="text-slate-900 font-medium text-xs">
-                        {new Date(u.createdAt).toLocaleDateString()}
+                    <td className="py-3.5 px-4">
+                      <div className="text-slate-900 font-medium text-xs font-mono tabular-nums flex items-center gap-1">
+                        <Calendar className="w-3 h-3 text-slate-400" />
+                        <span>{new Date(u.createdAt).toLocaleDateString()}</span>
                       </div>
-                      <div className="text-[10px] text-slate-400 font-mono">
+                      <div className="text-[10px] text-slate-400 font-mono tabular-nums">
                         {new Date(u.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </div>
                     </td>
 
                     {/* Actions Column */}
-                    <td className="py-3 px-4 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
+                    <td className="py-3.5 px-4 text-right">
+                      <div className="flex items-center justify-end gap-1">
                         {/* Edit User Button */}
                         <button
                           type="button"
                           onClick={() => handleOpenEdit(u)}
-                          className="p-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/80 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-full hover:bg-blue-50/80 text-blue-600 transition-colors cursor-pointer"
                           title={language === 'vi' ? 'Chỉnh sửa thông tin' : 'Edit User'}
                         >
                           <Edit3 className="w-3.5 h-3.5" />
@@ -567,7 +619,7 @@ export const AdminUsersView: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleOpenBalanceModal(u)}
-                          className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200/80 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-full hover:bg-emerald-50/80 text-emerald-600 transition-colors cursor-pointer"
                           title={language === 'vi' ? 'Điều chỉnh số dư' : 'Adjust Balance'}
                         >
                           <DollarSign className="w-3.5 h-3.5" />
@@ -577,7 +629,7 @@ export const AdminUsersView: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => setUserToDelete(u)}
-                          className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200/80 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-full hover:bg-rose-50/80 text-rose-600 transition-colors cursor-pointer"
                           title={language === 'vi' ? 'Xóa tài khoản' : 'Delete User'}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -590,16 +642,16 @@ export const AdminUsersView: React.FC = () => {
             </tbody>
           </table>
         </div>
-      </div>
+      </Card>
 
-      {/* 4. Modal Create / Edit User */}
+      {/* ========================================================================= */}
+      {/* MODAL 1: CREATE / EDIT USER */}
+      {/* ========================================================================= */}
       {isUserModalOpen && (
         <Modal
           isOpen={true}
           onClose={() => !isSavingUser && setIsUserModalOpen(false)}
           title={editingUser ? (language === 'vi' ? `Chỉnh Sửa: ${editingUser.name}` : `Edit User: ${editingUser.name}`) : (language === 'vi' ? 'Thêm Thành Viên Mới' : 'Create New User')}
-          subtitle={language === 'vi' ? 'Cấu hình thông tin tài khoản, quyền hạn và số dư ví' : 'Configure user credentials, role, and wallet balance'}
-          maxWidth="lg"
         >
           <form onSubmit={handleSaveUser} className="space-y-4 text-xs">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -613,7 +665,7 @@ export const AdminUsersView: React.FC = () => {
                   value={userForm.name}
                   onChange={(e) => setUserForm({ ...userForm, name: e.target.value })}
                   placeholder="Ví dụ: Nguyễn Văn A"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:outline-hidden focus:border-blue-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
                 />
               </div>
 
@@ -627,7 +679,7 @@ export const AdminUsersView: React.FC = () => {
                   value={userForm.username}
                   onChange={(e) => setUserForm({ ...userForm, username: e.target.value })}
                   placeholder="Ví dụ: alexsmm"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:outline-hidden focus:border-blue-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
                 />
               </div>
 
@@ -641,7 +693,7 @@ export const AdminUsersView: React.FC = () => {
                   value={userForm.email}
                   onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
                   placeholder="user@example.com"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:outline-hidden focus:border-blue-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
                 />
               </div>
 
@@ -654,7 +706,7 @@ export const AdminUsersView: React.FC = () => {
                   value={userForm.phone}
                   onChange={(e) => setUserForm({ ...userForm, phone: e.target.value })}
                   placeholder="+84 988 888 888"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:outline-hidden focus:border-blue-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 font-mono"
                 />
               </div>
 
@@ -665,13 +717,13 @@ export const AdminUsersView: React.FC = () => {
                     : (language === 'vi' ? 'Mật Khẩu Đăng Nhập' : 'Password')}
                 </label>
                 <div className="relative">
-                  <Lock className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Lock className="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="password"
                     value={userForm.password}
                     onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
                     placeholder={editingUser ? '••••••••' : 'Nhập mật khẩu...'}
-                    className="w-full pl-8.5 pr-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:outline-hidden focus:border-blue-500"
+                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
                   />
                 </div>
               </div>
@@ -681,20 +733,22 @@ export const AdminUsersView: React.FC = () => {
                   {language === 'vi' ? 'Số Dư Ban Đầu (USD)' : 'Initial Balance (USD)'}
                 </label>
                 <div className="relative">
-                  <DollarSign className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <DollarSign className="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="number"
                     step="0.01"
                     value={userForm.balance}
                     onChange={(e) => setUserForm({ ...userForm, balance: parseFloat(e.target.value) || 0 })}
-                    className="w-full pl-8.5 pr-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold focus:bg-white focus:outline-hidden focus:border-blue-500"
+                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 tabular-nums"
                   />
                 </div>
               </div>
 
               <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  {language === 'vi' ? 'Vai Trò / Quyền Hạn' : 'User Role'}
+                </label>
                 <Select2
-                  label={language === 'vi' ? 'Vai Trò / Quyền Hạn' : 'User Role'}
                   value={userForm.role}
                   onChange={(val) => setUserForm({ ...userForm, role: val as AdminUserData['role'] })}
                   options={[
@@ -707,8 +761,10 @@ export const AdminUsersView: React.FC = () => {
               </div>
 
               <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  {language === 'vi' ? 'Trạng Thái Hoạt Động' : 'Account Status'}
+                </label>
                 <Select2
-                  label={language === 'vi' ? 'Trạng Thái Hoạt Động' : 'Account Status'}
                   value={userForm.status}
                   onChange={(val) => setUserForm({ ...userForm, status: val as AdminUserData['status'] })}
                   options={[
@@ -720,49 +776,45 @@ export const AdminUsersView: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-2.5">
-              <button
+            <div className="pt-4 border-t border-slate-200 flex items-center justify-end gap-2.5">
+              <Button
                 type="button"
+                variant="outline"
                 disabled={isSavingUser}
                 onClick={() => setIsUserModalOpen(false)}
-                className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl font-bold transition-colors cursor-pointer"
               >
                 {language === 'vi' ? 'Hủy Bỏ' : 'Cancel'}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
+                variant="primary"
                 disabled={isSavingUser}
-                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-md shadow-blue-600/20 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                loading={isSavingUser}
               >
-                <CheckCircle2 className="w-4 h-4" />
-                <span>
-                  {isSavingUser
-                    ? (language === 'vi' ? 'Đang lưu...' : 'Saving...')
-                    : editingUser
-                    ? (language === 'vi' ? 'Cập Nhật' : 'Save Changes')
-                    : (language === 'vi' ? 'Tạo Thành Viên' : 'Create User')}
-                </span>
-              </button>
+                {editingUser
+                  ? (language === 'vi' ? 'Lưu Thay Đổi' : 'Save Changes')
+                  : (language === 'vi' ? 'Tạo Thành Viên' : 'Create User')}
+              </Button>
             </div>
           </form>
         </Modal>
       )}
 
-      {/* 5. Modal Adjust Wallet Balance */}
+      {/* ========================================================================= */}
+      {/* MODAL 2: ADJUST BALANCE */}
+      {/* ========================================================================= */}
       {isBalanceModalOpen && balanceUser && (
         <Modal
           isOpen={true}
           onClose={() => !isSavingBalance && setIsBalanceModalOpen(false)}
           title={language === 'vi' ? 'Điều Chỉnh Số Dư Ví' : 'Adjust Wallet Balance'}
-          subtitle={`${balanceUser.name} (${balanceUser.email}) — Hiện tại: ${formatMoney(balanceUser.balance)}`}
-          maxWidth="md"
         >
           <form onSubmit={handleSaveBalance} className="space-y-4 text-xs">
             <div className="grid grid-cols-2 gap-2.5">
               <button
                 type="button"
                 onClick={() => setBalanceData({ ...balanceData, type: 'credit' })}
-                className={`flex items-center justify-center gap-2 p-3 rounded-xl border font-bold transition-all cursor-pointer ${
+                className={`flex items-center justify-center gap-2 p-3 rounded-2xl border font-bold transition-all cursor-pointer ${
                   balanceData.type === 'credit'
                     ? 'bg-emerald-50 border-emerald-500 text-emerald-700 ring-2 ring-emerald-500/20'
                     : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
@@ -775,7 +827,7 @@ export const AdminUsersView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setBalanceData({ ...balanceData, type: 'debit' })}
-                className={`flex items-center justify-center gap-2 p-3 rounded-xl border font-bold transition-all cursor-pointer ${
+                className={`flex items-center justify-center gap-2 p-3 rounded-2xl border font-bold transition-all cursor-pointer ${
                   balanceData.type === 'debit'
                     ? 'bg-rose-50 border-rose-500 text-rose-700 ring-2 ring-rose-500/20'
                     : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
@@ -791,7 +843,7 @@ export const AdminUsersView: React.FC = () => {
                 {language === 'vi' ? 'Số Tiền Điều Chỉnh (USD)' : 'Amount (USD)'} <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
-                <DollarSign className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <DollarSign className="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="number"
                   step="0.01"
@@ -799,7 +851,7 @@ export const AdminUsersView: React.FC = () => {
                   required
                   value={balanceData.amount}
                   onChange={(e) => setBalanceData({ ...balanceData, amount: parseFloat(e.target.value) || 0 })}
-                  className="w-full pl-8.5 pr-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold focus:bg-white focus:outline-hidden focus:border-blue-500"
+                  className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 tabular-nums"
                 />
               </div>
             </div>
@@ -813,18 +865,18 @@ export const AdminUsersView: React.FC = () => {
                 value={balanceData.reason}
                 onChange={(e) => setBalanceData({ ...balanceData, reason: e.target.value })}
                 placeholder="Ví dụ: Hoàn tiền đơn lỗi / Thưởng nạp ví..."
-                className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:outline-hidden focus:border-blue-500"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
               />
             </div>
 
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
               <div className="flex justify-between text-slate-600">
                 <span>{language === 'vi' ? 'Số dư hiện tại:' : 'Current Balance:'}</span>
-                <span className="font-bold font-mono">{formatMoney(balanceUser.balance)}</span>
+                <span className="font-bold font-mono tabular-nums">{formatMoney(balanceUser.balance)}</span>
               </div>
-              <div className="flex justify-between text-slate-900 font-bold border-t border-slate-200 pt-1">
+              <div className="flex justify-between text-slate-900 font-bold border-t border-slate-200 pt-1.5">
                 <span>{language === 'vi' ? 'Số dư sau điều chỉnh:' : 'New Balance:'}</span>
-                <span className="font-extrabold font-mono text-emerald-600">
+                <span className="font-extrabold font-mono tabular-nums text-emerald-600">
                   {formatMoney(
                     balanceData.type === 'credit'
                       ? Number(balanceUser.balance) + (Number(balanceData.amount) || 0)
@@ -834,50 +886,45 @@ export const AdminUsersView: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2.5">
-              <button
+            <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2.5">
+              <Button
                 type="button"
+                variant="outline"
                 disabled={isSavingBalance}
                 onClick={() => setIsBalanceModalOpen(false)}
-                className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl font-bold transition-colors cursor-pointer"
               >
                 {language === 'vi' ? 'Hủy' : 'Cancel'}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
+                variant="success"
                 disabled={isSavingBalance}
-                className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-md shadow-emerald-600/20 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                loading={isSavingBalance}
               >
-                <CheckCircle2 className="w-4 h-4" />
-                <span>
-                  {isSavingBalance
-                    ? (language === 'vi' ? 'Đang xử lý...' : 'Processing...')
-                    : (language === 'vi' ? 'Xác Nhận Điều Chỉnh' : 'Apply Adjustment')}
-                </span>
-              </button>
+                {language === 'vi' ? 'Xác Nhận Điều Chỉnh' : 'Apply Adjustment'}
+              </Button>
             </div>
           </form>
         </Modal>
       )}
 
-      {/* 6. Modal Delete User Confirmation */}
+      {/* ========================================================================= */}
+      {/* MODAL 3: DELETE USER */}
+      {/* ========================================================================= */}
       {userToDelete && (
         <Modal
           isOpen={true}
           onClose={() => !isDeleting && setUserToDelete(null)}
           title={language === 'vi' ? 'Xác Nhận Xóa Tài Khoản' : 'Confirm User Deletion'}
-          maxWidth="md"
         >
           <div className="space-y-4 text-xs">
             <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-rose-50/80 border border-rose-200/80">
-              <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
-                <AlertTriangle className="w-5 h-5" />
-              </div>
+              <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
               <div className="space-y-1">
                 <h4 className="font-bold text-slate-900 text-sm">
                   {language === 'vi' ? `Bạn có chắc chắn muốn xóa thành viên #${userToDelete.id}?` : `Delete user account #${userToDelete.id}?`}
                 </h4>
-                <p className="text-slate-600">
+                <p className="text-slate-600 leading-relaxed">
                   {language === 'vi'
                     ? `Tài khoản "${userToDelete.name}" (${userToDelete.email}) và toàn bộ dữ liệu liên quan sẽ bị xóa khỏi cơ sở dữ liệu.`
                     : `Account "${userToDelete.name}" (${userToDelete.email}) will be permanently deleted.`}
@@ -885,7 +932,7 @@ export const AdminUsersView: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
               <div className="flex justify-between items-center">
                 <span className="text-slate-500 font-medium">{language === 'vi' ? 'Thành viên:' : 'Name:'}</span>
                 <span className="font-bold text-slate-900">{userToDelete.name}</span>
@@ -896,37 +943,32 @@ export const AdminUsersView: React.FC = () => {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-slate-500 font-medium">{language === 'vi' ? 'Vai trò:' : 'Role:'}</span>
-                <span className="font-bold uppercase text-blue-700">{userToDelete.role}</span>
+                <span>{renderRoleBadge(userToDelete.role)}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-slate-500 font-medium">{language === 'vi' ? 'Số dư hiện tại:' : 'Balance:'}</span>
-                <span className="font-extrabold text-emerald-600 font-mono">{formatMoney(userToDelete.balance)}</span>
+                <span className="font-extrabold text-emerald-600 font-mono tabular-nums">{formatMoney(userToDelete.balance)}</span>
               </div>
             </div>
 
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2.5">
-              <button
+            <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2.5">
+              <Button
                 type="button"
+                variant="outline"
                 disabled={isDeleting}
                 onClick={() => setUserToDelete(null)}
-                className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl font-bold transition-colors cursor-pointer disabled:opacity-50"
               >
                 {language === 'vi' ? 'Hủy Bỏ' : 'Cancel'}
-              </button>
-
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="danger"
                 disabled={isDeleting}
+                loading={isDeleting}
                 onClick={handleConfirmDelete}
-                className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold shadow-md shadow-rose-600/20 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
               >
-                <Trash2 className="w-4 h-4" />
-                <span>
-                  {isDeleting
-                    ? (language === 'vi' ? 'Đang xóa...' : 'Deleting...')
-                    : (language === 'vi' ? 'Xác Nhận Xóa' : 'Delete User')}
-                </span>
-              </button>
+                {language === 'vi' ? 'Xóa Vĩnh Viễn' : 'Delete User'}
+              </Button>
             </div>
           </div>
         </Modal>

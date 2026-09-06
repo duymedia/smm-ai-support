@@ -32,6 +32,10 @@ import {
 import { SmmPanel } from '../../types';
 import { Modal } from '../ui/Modal';
 import { Select2 } from '../ui/Select2';
+import { Button } from '../ui/Button';
+import { Badge } from '../ui/Badge';
+import { Card } from '../ui/Card';
+import { StatCard } from '../ui/StatCard';
 import { PanelEditModal } from './PanelEditModal';
 import { PanelDeleteModal } from './PanelDeleteModal';
 
@@ -201,21 +205,23 @@ export const PanelsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-5 animate-in fade-in duration-200 w-full min-w-0">
+    <div className="space-y-5 animate-in fade-in duration-200 w-full min-w-0">
       {/* 1. Active Package Requirement Notice Banner */}
       {!ordersLoading && !hasActivePackage && (
-        <div className="p-4 sm:p-5 rounded-2xl bg-amber-50/90 border border-amber-200/90 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <Card className="p-4 sm:p-5 border-amber-200/80 bg-amber-50/60 backdrop-blur-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold shrink-0 shadow-2xs">
+            <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold shrink-0 shadow-2xs">
               <Lock className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                <span>{language === 'vi' ? 'Yêu cầu thuê gói dịch vụ' : 'Active plan required'}</span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-200/70 text-amber-900">
+              <div className="flex items-center gap-2">
+                <h4 className="font-bold text-slate-900 text-sm">
+                  {language === 'vi' ? 'Yêu cầu thuê gói dịch vụ' : 'Active plan required'}
+                </h4>
+                <Badge variant="warning" pulse>
                   {language === 'vi' ? 'Chưa kích hoạt' : 'Inactive'}
-                </span>
-              </h4>
+                </Badge>
+              </div>
               <p className="text-xs text-slate-600 mt-0.5">
                 {language === 'vi'
                   ? 'Bạn chưa thuê gói dịch vụ nào hoặc gói đã hết hạn. Vui lòng chọn gói thuê để khởi chạy panel.'
@@ -224,30 +230,30 @@ export const PanelsPage: React.FC = () => {
             </div>
           </div>
 
-          <button
+          <Button
+            variant="primary"
+            size="sm"
             onClick={() => setCurrentRoute('/packages')}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs flex items-center gap-1.5 shrink-0 transition-all cursor-pointer"
+            icon={<Sparkles className="w-4 h-4 text-blue-200" />}
           >
-            <Sparkles className="w-4 h-4 text-blue-200" />
-            <span>{language === 'vi' ? 'Xem bảng giá & thuê gói' : 'Browse packages'}</span>
-          </button>
-        </div>
+            {language === 'vi' ? 'Xem bảng giá & thuê gói' : 'Browse packages'}
+          </Button>
+        </Card>
       )}
 
       {/* 2. Top Header & Primary Action Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white/90 backdrop-blur-sm p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.10)]">
+      <Card className="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 mb-1.5">
-            <span className="inline-flex size-4 items-center justify-center rounded-full bg-blue-500/10">
-              <span className="size-2 rounded-full bg-blue-600 animate-pulse" />
-            </span>
-            <span className="tracking-wider uppercase font-mono text-[11px]">Fleet Infrastructure</span>
+          <div className="inline-flex items-center gap-2 text-xs font-semibold text-blue-600 mb-1.5">
+            <Badge variant="info" pulse size="sm">
+              FLEET INFRASTRUCTURE
+            </Badge>
           </div>
-          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900 flex items-center gap-2.5">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2.5">
             <span>{language === 'vi' ? 'Quản Lý Danh Sách SMM Panels' : 'SMM Panels Management'}</span>
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200/70 font-mono">
-              {panels.length} {language === 'vi' ? 'panel' : 'panels'}
-            </span>
+            <Badge variant="neutral" size="sm">
+              <span className="font-mono tabular-nums">{panels.length}</span> {language === 'vi' ? 'panel' : 'panels'}
+            </Badge>
           </h1>
           <p className="text-xs text-slate-500 mt-1 max-w-xl leading-relaxed">
             {language === 'vi'
@@ -257,148 +263,131 @@ export const PanelsPage: React.FC = () => {
         </div>
 
         <div className="flex items-center flex-wrap gap-2.5 shrink-0">
-          <button
+          <Button
+            variant="secondary"
+            size="md"
             onClick={() => setShowDnsModal(true)}
-            className="h-10 px-4 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80 rounded-full text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer"
+            icon={<Globe className="w-3.5 h-3.5 text-slate-500" />}
           >
-            <Globe className="w-3.5 h-3.5 text-slate-500" />
-            <span>{language === 'vi' ? 'Cấu hình DNS' : 'DNS Guide'}</span>
-          </button>
+            {language === 'vi' ? 'Cấu hình DNS' : 'DNS Guide'}
+          </Button>
 
-          <button
+          <Button
+            variant={hasActivePackage ? 'primary' : 'secondary'}
+            size="md"
             onClick={handleRentOrAddPanel}
-            className={`h-10 px-5 rounded-full text-xs font-bold shadow-xs flex items-center gap-2 transition-all cursor-pointer ${
-              hasActivePackage
-                ? 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-md shadow-blue-500/20'
-                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
-            }`}
-            title={!hasActivePackage ? (language === 'vi' ? 'Cần thuê gói dịch vụ trước' : 'Package required') : undefined}
+            icon={hasActivePackage ? <PlusCircle className="w-4 h-4" /> : <Lock className="w-3.5 h-3.5 text-amber-600" />}
           >
-            {hasActivePackage ? <PlusCircle className="w-4 h-4" /> : <Lock className="w-3.5 h-3.5 text-amber-600" />}
-            <span>{language === 'vi' ? 'Thêm Panel Mới' : 'Add New Panel'}</span>
-          </button>
+            {language === 'vi' ? 'Thêm Panel Mới' : 'Add New Panel'}
+          </Button>
         </div>
-      </div>
+      </Card>
 
       {/* 3. Aggregate KPI Metric Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-        <div className="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-slate-500">{language === 'vi' ? 'Tổng số panel' : 'Total panels'}</span>
-            <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
-              <Server className="w-3.5 h-3.5" />
-            </div>
-          </div>
-          <p className="text-xl font-extrabold text-slate-900 font-mono">{panels.length}</p>
-          <span className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
-            <CheckCircle2 className="w-3 h-3" />
-            {totalActivePanels} {language === 'vi' ? 'đang hoạt động' : 'online'}
-          </span>
-        </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+        <StatCard
+          title={language === 'vi' ? 'Tổng số panel' : 'Total panels'}
+          value={panels.length}
+          icon={<Server className="w-4 h-4 text-blue-600" />}
+          trend={{
+            value: `${totalActivePanels} ${language === 'vi' ? 'hoạt động' : 'online'}`,
+            positive: true,
+          }}
+        />
 
-        <div className="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-slate-500">{language === 'vi' ? 'Tổng ví panel' : 'Panel balances'}</span>
-            <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-              <Wallet className="w-3.5 h-3.5" />
-            </div>
-          </div>
-          <p className="text-xl font-extrabold text-emerald-600 font-mono">{formatMoney(totalPanelBalances)}</p>
-          <span className="text-[10px] text-slate-400 font-mono">{language === 'vi' ? 'Tổng số dư các panel' : 'Combined balance'}</span>
-        </div>
+        <StatCard
+          title={language === 'vi' ? 'Tổng ví panel' : 'Panel balances'}
+          value={formatMoney(totalPanelBalances)}
+          icon={<Wallet className="w-4 h-4 text-emerald-600" />}
+          subtitle={language === 'vi' ? 'Tổng số dư đồng bộ tất cả panel' : 'Combined wallet balance'}
+        />
 
-        <div className="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-slate-500">{language === 'vi' ? 'Đơn đã xử lý' : 'Total orders'}</span>
-            <div className="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
-              <TrendingUp className="w-3.5 h-3.5" />
-            </div>
-          </div>
-          <p className="text-xl font-extrabold text-purple-700 font-mono">{totalAllOrders.toLocaleString()}</p>
-          <span className="text-[10px] text-slate-400">{(totalAllMessages || 0).toLocaleString()} webhook & API</span>
-        </div>
+        <StatCard
+          title={language === 'vi' ? 'Đơn đã xử lý' : 'Total orders'}
+          value={totalAllOrders.toLocaleString()}
+          icon={<TrendingUp className="w-4 h-4 text-purple-600" />}
+          subtitle={`${(totalAllMessages || 0).toLocaleString()} webhook & API`}
+        />
 
-        <div className="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-slate-500">{language === 'vi' ? 'Hạ tầng SLA' : 'Uptime SLA'}</span>
-            <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
-              <ShieldCheck className="w-3.5 h-3.5" />
-            </div>
-          </div>
-          <p className="text-xl font-extrabold text-slate-900 font-mono">99.98%</p>
-          <span className="text-[10px] text-emerald-600 font-medium">Cloudflare TLS 1.3 edge</span>
-        </div>
+        <StatCard
+          title={language === 'vi' ? 'Hạ tầng SLA' : 'Uptime SLA'}
+          value="99.98%"
+          icon={<ShieldCheck className="w-4 h-4 text-amber-600" />}
+          subtitle="Cloudflare TLS 1.3 edge"
+        />
       </div>
 
       {/* 4. DNS INSTRUCTIONS ACCORDION / BANNER */}
       {showDnsModal && (
-        <div className="p-4 sm:p-5 rounded-2xl bg-slate-900 text-white border border-slate-800 shadow-md space-y-3 animate-in fade-in">
+        <Card macChrome title={language === 'vi' ? 'Hướng dẫn trỏ DNS tên miền riêng' : 'Custom Domain DNS Guide'} className="bg-slate-950 text-slate-100 border-slate-800 p-5 space-y-3.5 animate-in fade-in">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-blue-300 flex items-center gap-1.5">
-              <Globe className="w-4 h-4 text-blue-400" />
-              {language === 'vi' ? 'Hướng dẫn trỏ DNS tên miền riêng' : 'Custom Domain DNS Guide'}
-            </span>
-            <button
+            <p className="text-xs text-slate-300 leading-relaxed max-w-3xl">
+              {language === 'vi'
+                ? 'Trỏ bản ghi A hoặc Nameservers từ nhà cung cấp tên miền của bạn về hệ thống để kích hoạt SSL miễn phí và kết nối SMM panel:'
+                : 'Point your domain A-Record or Nameservers to our edge servers to activate automatic SSL and connect your storefront:'}
+            </p>
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => setShowDnsModal(false)}
-              className="text-xs text-slate-400 hover:text-white cursor-pointer"
+              className="text-slate-400 hover:text-white"
             >
               {language === 'vi' ? 'Đóng' : 'Close'}
-            </button>
+            </Button>
           </div>
-          <p className="text-xs text-slate-300 leading-relaxed max-w-3xl">
-            {language === 'vi'
-              ? 'Trỏ bản ghi A hoặc Nameservers từ nhà cung cấp tên miền của bạn về hệ thống để kích hoạt SSL miễn phí và kết nối SMM panel:'
-              : 'Point your domain A-Record or Nameservers to our edge servers to activate automatic SSL and connect your storefront:'}
-          </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-            <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/80 flex items-center justify-between">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
               <div>
-                <span className="text-slate-400 block text-[10px] font-semibold">Bản ghi A (IPv4):</span>
-                <code className="text-blue-300 font-mono text-xs font-bold">104.21.48.112</code>
+                <span className="text-slate-400 block text-[10px] font-semibold tracking-wider uppercase">Bản ghi A (IPv4):</span>
+                <code className="text-blue-400 font-mono tabular-nums text-xs font-bold mt-0.5 block">104.21.48.112</code>
               </div>
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => handleCopyText('104.21.48.112', 'Đã sao chép IP')}
-                className="p-1.5 hover:bg-slate-700 rounded-lg text-slate-300 hover:text-white transition-colors cursor-pointer"
+                className="text-slate-400 hover:text-white"
                 title="Sao chép"
               >
                 <Copy className="w-3.5 h-3.5" />
-              </button>
+              </Button>
             </div>
 
-            <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/80 flex items-center justify-between">
+            <div className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
               <div>
-                <span className="text-slate-400 block text-[10px] font-semibold">Nameservers:</span>
-                <code className="text-blue-300 font-mono text-xs font-bold">ns1.nexussmm.io & ns2.nexussmm.io</code>
+                <span className="text-slate-400 block text-[10px] font-semibold tracking-wider uppercase">Nameservers:</span>
+                <code className="text-blue-400 font-mono tabular-nums text-xs font-bold mt-0.5 block">ns1.nexussmm.io & ns2.nexussmm.io</code>
               </div>
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => handleCopyText('ns1.nexussmm.io\nns2.nexussmm.io', 'Đã sao chép Nameservers')}
-                className="p-1.5 hover:bg-slate-700 rounded-lg text-slate-300 hover:text-white transition-colors cursor-pointer"
+                className="text-slate-400 hover:text-white"
                 title="Sao chép"
               >
                 <Copy className="w-3.5 h-3.5" />
-              </button>
+              </Button>
             </div>
           </div>
-        </div>
+        </Card>
       )}
 
       {/* 5. Filter, Search & View Switcher Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-slate-200/90 shadow-2xs">
+      <Card className="p-3 flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="relative w-full sm:w-80">
-          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search className="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={language === 'vi' ? 'Tìm theo tên panel, domain, API key...' : 'Search panel, domain, API key...'}
-            className="w-full pl-8.5 pr-3 py-1.5 text-xs bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 transition-all"
+            className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50/80 hover:bg-white focus:bg-white border border-slate-200/90 rounded-full focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 transition-all font-medium"
           />
         </div>
 
-        <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
+        <div className="flex items-center justify-between sm:justify-end gap-2.5 w-full sm:w-auto">
           {/* Status Pills */}
-          <div className="flex items-center gap-1 overflow-x-auto">
+          <div className="flex items-center gap-1.5 overflow-x-auto">
             {[
               { id: 'all', label: language === 'vi' ? 'Tất cả' : 'All' },
               { id: 'active', label: language === 'vi' ? 'Hoạt động' : 'Active' },
@@ -407,10 +396,10 @@ export const PanelsPage: React.FC = () => {
               <button
                 key={st.id}
                 onClick={() => setFilterStatus(st.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer shrink-0 ${
                   filterStatus === st.id
                     ? 'bg-slate-900 text-white shadow-2xs'
-                    : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/80'
+                    : 'bg-slate-100/80 text-slate-600 hover:bg-slate-200/80'
                 }`}
               >
                 {st.label}
@@ -418,11 +407,11 @@ export const PanelsPage: React.FC = () => {
             ))}
           </div>
 
-          {/* View Mode Toggle: Table (Default) vs Grid */}
-          <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200 shrink-0">
+          {/* View Mode Toggle */}
+          <div className="flex items-center bg-slate-100 p-1 rounded-full border border-slate-200/80 shrink-0">
             <button
               onClick={() => setViewMode('table')}
-              className={`p-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1 text-xs font-semibold ${
+              className={`px-2.5 py-1 rounded-full transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold ${
                 viewMode === 'table' ? 'bg-white text-blue-600 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
               }`}
               title={language === 'vi' ? 'Dạng bảng chi tiết' : 'Table view'}
@@ -432,7 +421,7 @@ export const PanelsPage: React.FC = () => {
             </button>
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1 text-xs font-semibold ${
+              className={`px-2.5 py-1 rounded-full transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold ${
                 viewMode === 'grid' ? 'bg-white text-blue-600 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
               }`}
               title={language === 'vi' ? 'Dạng thẻ lưới' : 'Grid view'}
@@ -442,36 +431,39 @@ export const PanelsPage: React.FC = () => {
             </button>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* 6. Panels Content: Table View (Default) vs Grid Cards */}
       {filteredPanels.length === 0 ? (
-        <div className="p-10 text-center bg-white rounded-2xl border border-slate-200/90 space-y-3 shadow-2xs">
+        <Card className="p-12 text-center space-y-4">
           {!hasActivePackage ? (
             <>
-              <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto">
-                <Lock className="w-6 h-6" />
+              <div className="w-14 h-14 rounded-3xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto shadow-2xs">
+                <Lock className="w-7 h-7" />
               </div>
-              <h3 className="text-sm font-bold text-slate-900">
+              <h3 className="text-base font-bold text-slate-900">
                 {language === 'vi' ? 'Chưa có gói dịch vụ kích hoạt' : 'Package rental required'}
               </h3>
-              <p className="text-xs text-slate-500 max-w-md mx-auto">
+              <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
                 {language === 'vi'
                   ? 'Bạn chưa thể khởi tạo hoặc kết nối SMM panel vì chưa thuê gói dịch vụ nào. Hãy chọn gói thuê phù hợp để bắt đầu sử dụng.'
                   : 'You cannot create or manage SMM panels without an active rental plan. Choose a package to unlock full panel access.'}
               </p>
-              <button
+              <Button
+                variant="primary"
+                size="md"
                 onClick={() => setCurrentRoute('/packages')}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition-all cursor-pointer inline-flex items-center gap-1.5"
+                icon={<Sparkles className="w-4 h-4 text-blue-200" />}
               >
-                <Sparkles className="w-4 h-4 text-blue-200" />
-                <span>{language === 'vi' ? 'Xem bảng giá & thuê gói ngay' : 'Browse packages & rent'}</span>
-              </button>
+                {language === 'vi' ? 'Xem bảng giá & thuê gói ngay' : 'Browse packages & rent'}
+              </Button>
             </>
           ) : (
             <>
-              <Server className="w-10 h-10 text-slate-300 mx-auto" />
-              <h3 className="text-sm font-bold text-slate-900">
+              <div className="w-14 h-14 rounded-3xl bg-slate-50 border border-slate-200 text-slate-400 flex items-center justify-center mx-auto shadow-2xs">
+                <Server className="w-7 h-7" />
+              </div>
+              <h3 className="text-base font-bold text-slate-900">
                 {language === 'vi' ? 'Không tìm thấy panel nào' : 'No panels found'}
               </h3>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
@@ -479,24 +471,25 @@ export const PanelsPage: React.FC = () => {
                   ? 'Không tìm thấy panel nào phù hợp với bộ lọc hiện tại của bạn.'
                   : "You don't have any panels matching your current filter."}
               </p>
-              <button
+              <Button
+                variant="primary"
+                size="md"
                 onClick={handleRentOrAddPanel}
-                className="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold shadow-xs hover:bg-blue-700 cursor-pointer inline-flex items-center gap-1.5"
+                icon={<PlusCircle className="w-4 h-4" />}
               >
-                <PlusCircle className="w-4 h-4" />
-                <span>{language === 'vi' ? 'Thêm panel mới' : 'Add new panel'}</span>
-              </button>
+                {language === 'vi' ? 'Thêm panel mới' : 'Add new panel'}
+              </Button>
             </>
           )}
-        </div>
+        </Card>
       ) : viewMode === 'table' ? (
         /* PREMIUM TABLE VIEW MODE */
-        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden w-full min-w-0 max-w-full">
+        <Card className="overflow-hidden p-0">
           <div className="overflow-x-auto w-full overscroll-x-contain touch-pan-x" style={{ WebkitOverflowScrolling: 'touch' }}>
             <table className="w-full text-left text-xs border-collapse min-w-[680px]">
-              <thead className="bg-slate-50/90 border-b border-slate-200 text-slate-500 font-bold text-[11px] whitespace-nowrap">
+              <thead className="bg-slate-50/80 border-b border-slate-200/80 text-slate-500 font-semibold text-[11px] whitespace-nowrap">
                 <tr>
-                  <th className="py-3 px-4 w-14 text-center">#ID</th>
+                  <th className="py-3 px-4 w-16 text-center font-mono">#ID</th>
                   <th className="py-3 px-4">{language === 'vi' ? 'Tên panel' : 'Panel name'}</th>
                   <th className="py-3 px-4">{language === 'vi' ? 'Tên miền (Domain)' : 'Domain'}</th>
                   <th className="py-3 px-4">{language === 'vi' ? 'API Key' : 'API Key'}</th>
@@ -515,30 +508,33 @@ export const PanelsPage: React.FC = () => {
                     : `${displayKey.slice(0, 8)}••••••••${displayKey.slice(-4)}`;
 
                   return (
-                    <tr key={panel.id} className="hover:bg-slate-50/90 transition-colors">
+                    <tr key={panel.id} className="hover:bg-slate-50/80 transition-colors">
                       {/* #ID */}
                       <td className="py-3 px-4 text-center">
-                        <span className="font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100 text-xs">
+                        <span className="font-mono tabular-nums font-bold text-blue-600 bg-blue-50/80 px-2 py-0.5 rounded-full border border-blue-100 text-xs">
                           #{panel.id}
                         </span>
                       </td>
 
-                      {/* Tên panel (Chỉ hiển thị name tinh gọn) */}
+                      {/* Tên panel */}
                       <td className="py-3 px-4">
-                        <span className="font-bold text-slate-900 text-xs">
+                        <button
+                          onClick={() => setCurrentRoute(`/panels/${panel.id}`)}
+                          className="font-bold text-slate-900 hover:text-blue-600 transition-colors text-xs text-left cursor-pointer"
+                        >
                           {panel.name}
-                        </span>
+                        </button>
                       </td>
 
                       {/* Tên miền */}
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-1.5">
-                          <code className="font-mono text-blue-600 font-bold text-xs bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200">
+                          <code className="font-mono tabular-nums text-blue-600 font-semibold text-xs bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200">
                             {panel.domain}
                           </code>
                           <button
                             onClick={() => handleCopyText(`https://${panel.domain}`, language === 'vi' ? 'Đã sao chép tên miền' : 'Domain copied')}
-                            className="p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-700 rounded transition-colors cursor-pointer"
+                            className="p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-700 rounded-md transition-colors cursor-pointer"
                             title={language === 'vi' ? 'Sao chép link' : 'Copy'}
                           >
                             <Copy className="w-3.5 h-3.5" />
@@ -547,7 +543,7 @@ export const PanelsPage: React.FC = () => {
                             href={`https://${panel.domain}`}
                             target="_blank"
                             rel="noreferrer"
-                            className="p-1 hover:bg-blue-50 text-slate-400 hover:text-blue-600 rounded transition-colors cursor-pointer"
+                            className="p-1 hover:bg-blue-50 text-slate-400 hover:text-blue-600 rounded-md transition-colors cursor-pointer"
                             title={language === 'vi' ? 'Mở trang web' : 'Open'}
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
@@ -559,19 +555,19 @@ export const PanelsPage: React.FC = () => {
                       <td className="py-3 px-4">
                         {panel.apiKey ? (
                           <div className="flex items-center gap-1.5">
-                            <code className="font-mono text-[11px] text-slate-700 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200 font-medium">
+                            <code className="font-mono tabular-nums text-[11px] text-slate-700 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200 font-medium">
                               {maskedKey}
                             </code>
                             <button
                               onClick={() => setVisibleKeyPanelId(isKeyVisible ? null : panel.id)}
-                              className="p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-700 rounded transition-colors cursor-pointer"
+                              className="p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-700 rounded-md transition-colors cursor-pointer"
                               title={isKeyVisible ? 'Ẩn khóa' : 'Hiện khóa'}
                             >
                               {isKeyVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                             </button>
                             <button
                               onClick={() => handleCopyText(displayKey, language === 'vi' ? 'Đã sao chép API Key' : 'API Key copied')}
-                              className="p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-700 rounded transition-colors cursor-pointer"
+                              className="p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-700 rounded-md transition-colors cursor-pointer"
                               title="Sao chép"
                             >
                               <Copy className="w-3.5 h-3.5" />
@@ -586,52 +582,79 @@ export const PanelsPage: React.FC = () => {
 
                       <td className="py-3 px-4">
                         {panel.cookie ? (
-                          <button onClick={() => handleCopyText(panel.cookie || '', 'Cookie copied')} className="font-mono text-[11px] text-slate-600 bg-slate-50 px-2 py-1 rounded-md border border-slate-200 max-w-[150px] truncate block cursor-pointer" title="Copy cookie">
-                            {panel.cookie.slice(0, 18)}••••
+                          <button onClick={() => handleCopyText(panel.cookie || '', 'Cookie copied')} className="font-mono tabular-nums text-[11px] text-slate-600 bg-slate-50 px-2 py-1 rounded-md border border-slate-200 max-w-[140px] truncate block cursor-pointer hover:bg-slate-100 transition-colors" title="Copy cookie">
+                            {panel.cookie.slice(0, 16)}••••
                           </button>
-                        ) : <button onClick={async () => { setLoadingCookiePanelId(panel.id); try { const r = await fetch(`/api/panels/${panel.id}/load-cookie`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-App-Language': language }, credentials: 'include' }); const raw = await r.text(); const d = raw ? JSON.parse(raw) : {}; if (r.ok && d.success) { addToast('success', language === 'vi' ? 'Đã đăng nhập và tải cookie thành công' : 'Logged in and loaded cookie'); window.location.reload(); } else addToast('error', d.message || `Cookie load failed (${r.status})`); } catch (e) { addToast('error', language === 'vi' ? 'Không thể kết nối máy chủ.' : 'Unable to connect to server.'); } finally { setLoadingCookiePanelId(null); } }} disabled={loadingCookiePanelId === panel.id} className="inline-flex items-center justify-center w-7 h-7 rounded-lg text-blue-600 hover:bg-blue-50 disabled:opacity-50 cursor-pointer" title={language === 'vi' ? 'Đăng nhập và tải cookie' : 'Login and load cookie'} aria-label="Load cookie">{loadingCookiePanelId === panel.id ? <LoaderCircle className="w-3.5 h-3.5 animate-spin" /> : <LogIn className="w-3.5 h-3.5" />}</button>}
+                        ) : (
+                          <button
+                            onClick={async () => {
+                              setLoadingCookiePanelId(panel.id);
+                              try {
+                                const r = await fetch(`/api/panels/${panel.id}/load-cookie`, {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json', 'X-App-Language': language },
+                                  credentials: 'include'
+                                });
+                                const raw = await r.text();
+                                const d = raw ? JSON.parse(raw) : {};
+                                if (r.ok && d.success) {
+                                  addToast('success', language === 'vi' ? 'Đã đăng nhập và tải cookie thành công' : 'Logged in and loaded cookie');
+                                  window.location.reload();
+                                } else addToast('error', d.message || `Cookie load failed (${r.status})`);
+                              } catch (e) {
+                                addToast('error', language === 'vi' ? 'Không thể kết nối máy chủ.' : 'Unable to connect to server.');
+                              } finally {
+                                setLoadingCookiePanelId(null);
+                              }
+                            }}
+                            disabled={loadingCookiePanelId === panel.id}
+                            className="inline-flex items-center justify-center w-7 h-7 rounded-full text-blue-600 hover:bg-blue-50 disabled:opacity-50 cursor-pointer transition-colors"
+                            title={language === 'vi' ? 'Đăng nhập và tải cookie' : 'Login and load cookie'}
+                          >
+                            {loadingCookiePanelId === panel.id ? <LoaderCircle className="w-3.5 h-3.5 animate-spin" /> : <LogIn className="w-3.5 h-3.5" />}
+                          </button>
+                        )}
                       </td>
 
                       {/* Gói dịch vụ */}
                       <td className="py-3 px-4">
-                        <span className="font-semibold text-slate-800 text-xs px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+                        <Badge variant="info" size="sm">
                           {panel.planName || 'Standard'}
-                        </span>
+                        </Badge>
                       </td>
 
                       {/* Trạng thái */}
                       <td className="py-3 px-4 text-center">
-                        <span
-                          className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border inline-flex items-center gap-1.5 ${
-                            panel.status === 'active'
-                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                              : 'bg-rose-50 text-rose-700 border-rose-200'
-                          }`}
+                        <Badge
+                          variant={panel.status === 'active' ? 'success' : 'danger'}
+                          pulse={panel.status === 'active'}
+                          size="sm"
                         >
-                          <span className={`w-1.5 h-1.5 rounded-full ${panel.status === 'active' ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
-                          <span>{panel.status === 'active' ? (language === 'vi' ? 'Hoạt động' : 'Active') : (language === 'vi' ? 'Tạm ngưng' : 'Suspended')}</span>
-                        </span>
+                          {panel.status === 'active' ? (language === 'vi' ? 'Hoạt động' : 'Active') : (language === 'vi' ? 'Tạm ngưng' : 'Suspended')}
+                        </Badge>
                       </td>
 
                       {/* Thao tác */}
                       <td className="py-3 px-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
-                          <button
+                          <Button
+                            variant="secondary"
+                            size="sm"
                             onClick={() => setEditingPanel(panel)}
-                            className="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/80 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
-                            title={language === 'vi' ? 'Chỉnh sửa cấu hình' : 'Edit'}
+                            icon={<Edit3 className="w-3.5 h-3.5" />}
                           >
-                            <Edit3 className="w-3.5 h-3.5" />
-                            <span>{language === 'vi' ? 'Sửa' : 'Edit'}</span>
-                          </button>
+                            {language === 'vi' ? 'Sửa' : 'Edit'}
+                          </Button>
 
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => setDeletingPanel(panel)}
-                            className="p-1 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors cursor-pointer"
+                            className="text-slate-400 hover:text-rose-600"
                             title={language === 'vi' ? 'Xóa panel' : 'Delete'}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -642,22 +665,22 @@ export const PanelsPage: React.FC = () => {
           </div>
 
           {/* Table Bottom Counter Toolbar */}
-          <div className="p-3 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+          <div className="p-3.5 bg-slate-50/80 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
             <div className="flex items-center gap-2">
               <span>
                 {language === 'vi'
                   ? `Hiển thị ${filteredPanels.length} trên tổng số ${panels.length} panel`
                   : `Showing ${filteredPanels.length} of ${panels.length} panels`}
               </span>
-              <span className="sm:hidden text-[10px] text-blue-600 bg-blue-50 border border-blue-200 px-1.5 py-0.5 rounded-md font-medium">
+              <span className="sm:hidden text-[10px] text-blue-600 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full font-medium">
                 {language === 'vi' ? '← Kéo ngang để xem tiếp →' : '← Swipe to see more →'}
               </span>
             </div>
-            <span className="font-mono text-[11px] font-bold text-slate-700">
+            <span className="font-mono tabular-nums text-[11px] font-bold text-slate-700">
               {language === 'vi' ? 'Tổng số dư: ' : 'Total: '}{formatMoney(totalPanelBalances)}
             </span>
           </div>
-        </div>
+        </Card>
       ) : (
         /* GRID CARDS VIEW */
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -672,32 +695,29 @@ export const PanelsPage: React.FC = () => {
             const isTrial = panel.planId === 'free-trial' || panel.planName?.includes('0 VNĐ') || panel.planName?.toLowerCase().includes('trial');
 
             return (
-              <div
+              <Card
                 key={panel.id}
-                className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-300 hover:shadow-md transition-all space-y-3.5 relative group"
+                className="p-5 space-y-4 relative group hover:border-blue-300 transition-all"
               >
                 {/* Header: Avatar, Name, Plan, Status */}
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-xs shrink-0">
+                    <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-xs shrink-0">
                       <Server className="w-5 h-5" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
-                          {panel.name}
-                        </h3>
-                        <span
-                          className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${
-                            isTrial
-                              ? 'bg-purple-50 text-purple-700 border-purple-200'
-                              : 'bg-blue-50 text-blue-700 border-blue-200'
-                          }`}
+                        <button
+                          onClick={() => setCurrentRoute(`/panels/${panel.id}`)}
+                          className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors text-left cursor-pointer"
                         >
+                          {panel.name}
+                        </button>
+                        <Badge variant={isTrial ? 'purple' : 'info'} size="sm">
                           {panel.planName}
-                        </span>
+                        </Badge>
                       </div>
-                      <div className="flex items-center gap-2 text-[11px] text-slate-500 font-mono mt-0.5">
+                      <div className="flex items-center gap-2 text-[11px] text-slate-500 font-mono tabular-nums mt-0.5">
                         <span className="font-semibold text-blue-600">#{panel.id}</span>
                         <span>•</span>
                         <span className="font-sans text-slate-500">{panel.domain}</span>
@@ -705,39 +725,36 @@ export const PanelsPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <span
-                    className={`px-2.5 py-1 rounded-full text-[10px] font-bold border shrink-0 flex items-center gap-1.5 ${
-                      panel.status === 'active'
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                        : 'bg-rose-50 text-rose-700 border-rose-200'
-                    }`}
+                  <Badge
+                    variant={panel.status === 'active' ? 'success' : 'danger'}
+                    pulse={panel.status === 'active'}
+                    size="sm"
                   >
-                    <span className={`w-1.5 h-1.5 rounded-full ${panel.status === 'active' ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
-                    <span>{panel.status === 'active' ? (language === 'vi' ? 'Hoạt động' : 'Active') : (language === 'vi' ? 'Tạm ngưng' : 'Suspended')}</span>
-                  </span>
+                    {panel.status === 'active' ? (language === 'vi' ? 'Hoạt động' : 'Active') : (language === 'vi' ? 'Tạm ngưng' : 'Suspended')}
+                  </Badge>
                 </div>
 
                 {/* Domain Container */}
-                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+                <div className="p-3 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-semibold text-slate-700 flex items-center gap-1 text-[11px]">
+                    <span className="font-semibold text-slate-700 flex items-center gap-1.5 text-[11px]">
                       <Globe className="w-3.5 h-3.5 text-blue-600" />
                       <span>{language === 'vi' ? 'Tên miền:' : 'Domain:'}</span>
                     </span>
-                    <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded-md flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3 text-emerald-600" /> SSL TLS 1.3
-                    </span>
+                    <Badge variant="success" size="sm">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-600 mr-1" /> SSL TLS 1.3
+                    </Badge>
                   </div>
 
-                  <div className="flex items-center justify-between bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs">
-                    <code className="font-mono text-blue-600 font-bold truncate text-[11px]">
+                  <div className="flex items-center justify-between bg-white px-3 py-2 rounded-xl border border-slate-200/80 text-xs">
+                    <code className="font-mono tabular-nums text-blue-600 font-bold truncate text-[11px]">
                       {panel.domain}
                     </code>
 
                     <div className="flex items-center gap-1 shrink-0 ml-2">
                       <button
                         onClick={() => handleCopyText(`https://${panel.domain}`, language === 'vi' ? 'Đã sao chép link tên miền' : 'Domain URL copied')}
-                        className="p-1 hover:bg-slate-100 rounded text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
+                        className="p-1 hover:bg-slate-100 rounded-md text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
                         title={language === 'vi' ? 'Sao chép link' : 'Copy URL'}
                       >
                         <Copy className="w-3.5 h-3.5" />
@@ -746,7 +763,7 @@ export const PanelsPage: React.FC = () => {
                         href={`https://${panel.domain}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="p-1 hover:bg-blue-50 rounded text-blue-600 hover:text-blue-700 transition-colors"
+                        className="p-1 hover:bg-blue-50 rounded-md text-blue-600 hover:text-blue-700 transition-colors"
                         title={language === 'vi' ? 'Mở trang web' : 'Open domain'}
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
@@ -756,9 +773,9 @@ export const PanelsPage: React.FC = () => {
                 </div>
 
                 {/* API Key Container */}
-                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+                <div className="p-3 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-semibold text-slate-700 flex items-center gap-1 text-[11px]">
+                    <span className="font-semibold text-slate-700 flex items-center gap-1.5 text-[11px]">
                       <Key className="w-3.5 h-3.5 text-amber-600" />
                       <span>API Key:</span>
                     </span>
@@ -770,22 +787,22 @@ export const PanelsPage: React.FC = () => {
                     </button>
                   </div>
 
-                  <div className="flex items-center justify-between bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs">
-                    <code className="font-mono text-[11px] text-slate-800 truncate select-all font-medium">
+                  <div className="flex items-center justify-between bg-white px-3 py-2 rounded-xl border border-slate-200/80 text-xs">
+                    <code className="font-mono tabular-nums text-[11px] text-slate-800 truncate select-all font-medium">
                       {maskedKey}
                     </code>
 
                     <div className="flex items-center gap-1 shrink-0 ml-2">
                       <button
                         onClick={() => setVisibleKeyPanelId(isKeyVisible ? null : panel.id)}
-                        className="p-1 hover:bg-slate-100 rounded text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
+                        className="p-1 hover:bg-slate-100 rounded-md text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
                         title={isKeyVisible ? 'Ẩn khóa' : 'Hiện khóa'}
                       >
                         {isKeyVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                       </button>
                       <button
                         onClick={() => handleCopyText(displayKey, language === 'vi' ? 'Đã sao chép API Key' : 'API Key copied')}
-                        className="p-1 hover:bg-slate-100 rounded text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
+                        className="p-1 hover:bg-slate-100 rounded-md text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
                         title="Sao chép"
                       >
                         <Copy className="w-3.5 h-3.5" />
@@ -795,25 +812,21 @@ export const PanelsPage: React.FC = () => {
                 </div>
 
                 {/* Expiry & Remaining Progress Bar */}
-                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+                <div className="p-3 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-1 text-[11px] text-slate-600">
+                    <div className="flex items-center gap-1.5 text-[11px] text-slate-600">
                       <Clock className="w-3.5 h-3.5 text-slate-500" />
                       <span className="font-semibold">{language === 'vi' ? 'Thời hạn:' : 'Expiry:'}</span>
-                      <span className="font-mono font-bold text-slate-900">{new Date(panel.expiresAt).toLocaleDateString()}</span>
+                      <span className="font-mono tabular-nums font-bold text-slate-900">{new Date(panel.expiresAt).toLocaleDateString()}</span>
                     </div>
 
-                    <span
-                      className={`font-bold px-2 py-0.5 rounded-md text-[10px] ${
-                        remaining.isExpired
-                          ? 'bg-rose-100 text-rose-700'
-                          : remaining.isUrgent
-                          ? 'bg-amber-100 text-amber-800 animate-pulse'
-                          : 'bg-emerald-100 text-emerald-800'
-                      }`}
+                    <Badge
+                      variant={remaining.isExpired ? 'danger' : remaining.isUrgent ? 'warning' : 'success'}
+                      pulse={remaining.isUrgent}
+                      size="sm"
                     >
                       {remaining.text}
-                    </span>
+                    </Badge>
                   </div>
 
                   <div className="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
@@ -828,33 +841,37 @@ export const PanelsPage: React.FC = () => {
 
                 {/* Action Buttons Toolbar */}
                 <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-1.5 flex-1">
-                    <button
+                  <div className="flex items-center gap-2 flex-1">
+                    <Button
+                      variant="secondary"
+                      size="sm"
                       onClick={() => setEditingPanel(panel)}
-                      className="py-1.5 px-3 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/80 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer"
+                      icon={<Edit3 className="w-3.5 h-3.5" />}
                     >
-                      <Edit3 className="w-3.5 h-3.5" />
-                      <span>{language === 'vi' ? 'Chỉnh sửa' : 'Edit'}</span>
-                    </button>
+                      {language === 'vi' ? 'Chỉnh sửa' : 'Edit'}
+                    </Button>
 
-                    <button
+                    <Button
+                      variant="secondary"
+                      size="sm"
                       onClick={() => setExtendingPanel(panel)}
-                      className="py-1.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200/80 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer"
+                      icon={<Clock className="w-3.5 h-3.5" />}
                     >
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>{language === 'vi' ? 'Gia hạn' : 'Extend'}</span>
-                    </button>
+                      {language === 'vi' ? 'Gia hạn' : 'Extend'}
+                    </Button>
                   </div>
 
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => setDeletingPanel(panel)}
-                    className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200/80 rounded-xl transition-all cursor-pointer"
+                    className="text-slate-400 hover:text-rose-600"
                     title={language === 'vi' ? 'Xóa panel' : 'Delete'}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  </Button>
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>
@@ -954,50 +971,52 @@ export const PanelsPage: React.FC = () => {
                       ? `Gói cước liên kết (${extendingPanel.planName || extendingPanel.packageId || 'N/A'}) của panel này không còn tồn tại trong hệ thống hoặc đã bị ngừng cung cấp. Bạn không thể gia hạn trực tiếp.`
                       : 'The subscription package linked to this panel no longer exists in the system. You cannot extend this package directly.'}
                   </p>
-                  <div className="pt-1 flex items-center gap-2">
-                    <button
+                  <div className="pt-1 flex items-center gap-2.5">
+                    <Button
                       type="button"
+                      variant="primary"
+                      size="sm"
                       onClick={() => {
                         const targetPanel = extendingPanel;
                         setExtendingPanel(null);
                         setEditingPanel(targetPanel);
                       }}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1.5"
+                      icon={<Edit3 className="w-3.5 h-3.5" />}
                     >
-                      <Edit3 className="w-3.5 h-3.5" />
-                      <span>{language === 'vi' ? 'Chuyển sang Chỉnh sửa để đổi gói' : 'Edit panel to change package'}</span>
-                    </button>
-                    <button
+                      {language === 'vi' ? 'Chuyển sang Chỉnh sửa để đổi gói' : 'Edit panel to change package'}
+                    </Button>
+                    <Button
                       type="button"
+                      variant="secondary"
+                      size="sm"
                       onClick={() => setExtendingPanel(null)}
-                      className="px-4 py-2 bg-white border border-rose-200 hover:bg-rose-100 text-rose-700 rounded-xl text-xs font-semibold cursor-pointer"
                     >
                       {language === 'vi' ? 'Đóng' : 'Close'}
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ) : (
                 <>
                   {/* Info summary */}
-                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200/80 grid grid-cols-2 sm:grid-cols-3 gap-3">
                     <div>
-                      <span className="text-[11px] text-slate-500 font-semibold block">{language === 'vi' ? 'Gói dịch vụ:' : 'Package:'}</span>
-                      <span className="font-bold text-blue-600 text-xs truncate block">{matchingPkg.name}</span>
+                      <span className="text-[11px] text-slate-500 font-medium block">{language === 'vi' ? 'Gói dịch vụ:' : 'Package:'}</span>
+                      <span className="font-bold text-blue-600 text-xs truncate block mt-0.5">{matchingPkg.name}</span>
                     </div>
                     <div>
-                      <span className="text-[11px] text-slate-500 font-semibold block">{language === 'vi' ? 'Hạn hiện tại:' : 'Current expiry:'}</span>
-                      <span className="font-bold text-slate-900 font-mono text-xs">{new Date(extendingPanel.expiresAt).toLocaleDateString()}</span>
+                      <span className="text-[11px] text-slate-500 font-medium block">{language === 'vi' ? 'Hạn hiện tại:' : 'Current expiry:'}</span>
+                      <span className="font-bold text-slate-900 font-mono tabular-nums text-xs mt-0.5">{new Date(extendingPanel.expiresAt).toLocaleDateString()}</span>
                     </div>
                     <div className="col-span-2 sm:col-span-1">
-                      <span className="text-[11px] text-slate-500 font-semibold block">{language === 'vi' ? 'Số dư ví của bạn:' : 'Your balance:'}</span>
-                      <span className="font-extrabold text-emerald-600 font-mono text-xs">{formatMoney(userBalance)}</span>
+                      <span className="text-[11px] text-slate-500 font-medium block">{language === 'vi' ? 'Số dư ví của bạn:' : 'Your balance:'}</span>
+                      <span className="font-extrabold text-emerald-600 font-mono tabular-nums text-xs mt-0.5">{formatMoney(userBalance)}</span>
                     </div>
                   </div>
 
                   {/* Cycle selection */}
                   <div className="space-y-2">
-                    <label className="block text-xs font-bold text-slate-700">
-                      {language === 'vi' ? 'Chọn gói thời gian gia hạn tương thích (Tuần / Tháng / Năm):' : 'Select extension cycle (Weekly / Monthly / Yearly):'}
+                    <label className="block text-xs font-semibold text-slate-700">
+                      {language === 'vi' ? 'Chọn chu kỳ gia hạn (Tuần / Tháng / Năm):' : 'Select extension cycle (Weekly / Monthly / Yearly):'}
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                       {extendCycleOptions.map((opt) => (
@@ -1005,19 +1024,19 @@ export const PanelsPage: React.FC = () => {
                           key={opt.days}
                           type="button"
                           onClick={() => setSelectedExtendOption(opt.days)}
-                          className={`p-3 rounded-2xl border text-left transition-all cursor-pointer relative flex flex-col justify-between ${
+                          className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer relative flex flex-col justify-between ${
                             selectedExtendOption === opt.days
-                              ? 'border-blue-600 bg-blue-50/70 ring-2 ring-blue-500/20 shadow-xs'
-                              : 'border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50/50'
+                              ? 'border-blue-600 bg-blue-50/60 ring-2 ring-blue-500/20 shadow-2xs'
+                              : 'border-slate-200/90 hover:border-slate-300 bg-white'
                           }`}
                         >
                           {opt.popular && (
-                            <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-[8px] font-bold bg-blue-600 text-white">
+                            <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold bg-blue-600 text-white">
                               PHỔ BIẾN
                             </span>
                           )}
                           {opt.badge && (
-                            <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-[8px] font-bold bg-emerald-600 text-white">
+                            <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-600 text-white">
                               {opt.badge}
                             </span>
                           )}
@@ -1025,8 +1044,8 @@ export const PanelsPage: React.FC = () => {
                             <span className="block font-bold text-slate-900 text-xs">{opt.title}</span>
                             <span className="block text-[11px] text-slate-500 font-medium mt-0.5">{opt.durationText}</span>
                           </div>
-                          <div className="mt-2.5 pt-2 border-t border-slate-100">
-                            <span className="text-xs font-extrabold text-blue-600 font-mono">${opt.cost.toFixed(2)} USD</span>
+                          <div className="mt-3 pt-2 border-t border-slate-100">
+                            <span className="text-xs font-extrabold text-blue-600 font-mono tabular-nums">${opt.cost.toFixed(2)} USD</span>
                           </div>
                         </button>
                       ))}
@@ -1034,57 +1053,60 @@ export const PanelsPage: React.FC = () => {
                   </div>
 
                   {/* Expiry preview & Balance check */}
-                  <div className="p-3 rounded-xl bg-blue-50/60 border border-blue-100 flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-1.5">
+                  <div className="p-3.5 rounded-2xl bg-blue-50/50 border border-blue-100/80 flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
                       <Clock className="w-4 h-4 text-blue-600 shrink-0" />
                       <div>
-                        <span className="text-slate-600 text-[11px] block">{language === 'vi' ? 'Thời hạn sau khi gia hạn:' : 'New expiry date:'}</span>
-                        <span className="font-bold text-slate-900 font-mono text-xs">{newExpiryDate.toLocaleDateString()}</span>
+                        <span className="text-slate-500 text-[11px] block">{language === 'vi' ? 'Thời hạn sau khi gia hạn:' : 'New expiry date:'}</span>
+                        <span className="font-bold text-slate-900 font-mono tabular-nums text-xs">{newExpiryDate.toLocaleDateString()}</span>
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="text-slate-600 text-[11px] block">{language === 'vi' ? 'Tổng thanh toán:' : 'Total due:'}</span>
-                      <span className="font-extrabold text-blue-700 font-mono text-xs">${activeCost.toFixed(2)} USD</span>
+                      <span className="text-slate-500 text-[11px] block">{language === 'vi' ? 'Tổng thanh toán:' : 'Total due:'}</span>
+                      <span className="font-extrabold text-blue-700 font-mono tabular-nums text-xs">${activeCost.toFixed(2)} USD</span>
                     </div>
                   </div>
 
                   {!hasEnoughBalance && (
-                    <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center justify-between">
+                    <div className="p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center justify-between">
                       <span>
                         {language === 'vi'
                           ? `Số dư không đủ (Thiếu $${(activeCost - userBalance).toFixed(2)})`
                           : `Insufficient balance (Need +$${(activeCost - userBalance).toFixed(2)})`}
                       </span>
-                      <button
+                      <Button
                         type="button"
+                        variant="danger"
+                        size="sm"
                         onClick={() => {
                           setExtendingPanel(null);
                           setCurrentRoute('/wallet');
                         }}
-                        className="px-2.5 py-1 bg-rose-600 text-white rounded-lg text-[10px] font-bold hover:bg-rose-700 cursor-pointer"
                       >
                         {language === 'vi' ? 'Nạp tiền ngay' : 'Deposit'}
-                      </button>
+                      </Button>
                     </div>
                   )}
 
-                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                    <button
+                  <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                    <Button
                       type="button"
+                      variant="secondary"
+                      size="sm"
                       onClick={() => setExtendingPanel(null)}
-                      className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors"
                     >
                       {language === 'vi' ? 'Hủy' : 'Cancel'}
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
+                      variant="success"
+                      size="sm"
                       onClick={handleConfirmExtend}
-                      disabled={extendingLoading || !hasEnoughBalance}
-                      className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                      disabled={!hasEnoughBalance}
+                      loading={extendingLoading}
                     >
-                      {extendingLoading && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
-                      <span>{language === 'vi' ? 'Xác nhận & Thanh toán' : 'Confirm & Pay'}</span>
-                    </button>
+                      {language === 'vi' ? 'Xác nhận & Thanh toán' : 'Confirm & Pay'}
+                    </Button>
                   </div>
                 </>
               )}
@@ -1102,33 +1124,34 @@ export const PanelsPage: React.FC = () => {
           size="sm"
         >
           <div className="space-y-4 text-xs">
-            <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 space-y-1">
-              <div className="flex items-center gap-1.5 font-bold">
-                <AlertTriangle className="w-4 h-4 text-amber-600" />
+            <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200/80 text-amber-900 space-y-1.5">
+              <div className="flex items-center gap-1.5 font-bold text-amber-800">
+                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
                 <span>{language === 'vi' ? 'Cảnh báo bảo mật' : 'Security Warning'}</span>
               </div>
-              <p className="leading-relaxed">
+              <p className="leading-relaxed text-amber-800">
                 {language === 'vi'
                   ? 'Khi tạo khóa mới, API Key cũ sẽ lập tức bị vô hiệu hóa. Các kết nối API bên thứ ba sử dụng khóa cũ sẽ ngừng hoạt động.'
                   : 'Rotating this key will immediately invalidate the old API Key. All third-party integrations using the old key will stop working.'}
               </p>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-              <button
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => setRotatingPanel(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer"
               >
                 {language === 'vi' ? 'Hủy' : 'Cancel'}
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
                 onClick={handleConfirmRotateKey}
-                disabled={rotatingLoading}
-                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                loading={rotatingLoading}
               >
-                {rotatingLoading && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
-                <span>{language === 'vi' ? 'Tạo khóa mới' : 'Rotate key'}</span>
-              </button>
+                {language === 'vi' ? 'Tạo khóa mới' : 'Rotate key'}
+              </Button>
             </div>
           </div>
         </Modal>
@@ -1142,10 +1165,10 @@ export const PanelsPage: React.FC = () => {
           title={language === 'vi' ? 'Thêm panel mới' : 'Add new SMM panel'}
           size="md"
         >
-          <form onSubmit={handleCreatePanelSubmit} className="space-y-3.5 text-xs">
-            {/* 1. Chọn gói dịch vụ của bạn * */}
+          <form onSubmit={handleCreatePanelSubmit} className="space-y-4 text-xs">
+            {/* 1. Chọn gói dịch vụ của bạn */}
             <div>
-              <label className="block font-bold text-slate-700 mb-1 flex items-center justify-between">
+              <label className="block font-semibold text-slate-700 mb-1.5 flex items-center justify-between">
                 <span>{language === 'vi' ? 'Chọn gói dịch vụ của bạn *' : 'Select your active package *'}</span>
                 <span className="text-[10px] text-blue-600 font-semibold">
                   {language === 'vi' ? `${activeRentedOrders.length} gói khả dụng` : `${activeRentedOrders.length} active packages`}
@@ -1175,7 +1198,7 @@ export const PanelsPage: React.FC = () => {
 
             {/* 2. Tên hiển thị panel */}
             <div>
-              <label className="block font-bold text-slate-700 mb-1">
+              <label className="block font-semibold text-slate-700 mb-1.5">
                 {language === 'vi' ? 'Tên hiển thị panel' : 'Panel name'}
               </label>
               <input
@@ -1183,13 +1206,13 @@ export const PanelsPage: React.FC = () => {
                 placeholder={language === 'vi' ? 'Nhập tên hiển thị panel (Ví dụ: ApexSMM Pro Hub)' : 'e.g. ApexSMM Pro Hub'}
                 value={createForm.name}
                 onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 bg-white"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 bg-white font-medium"
               />
             </div>
 
             {/* 3. Tên miền (domain) */}
             <div>
-              <label className="block font-bold text-slate-700 mb-1">
+              <label className="block font-semibold text-slate-700 mb-1.5">
                 {language === 'vi' ? 'Tên miền (domain)' : 'Domain'}
               </label>
               <input
@@ -1198,13 +1221,13 @@ export const PanelsPage: React.FC = () => {
                 placeholder={language === 'vi' ? 'Nhập tên miền (Ví dụ: mysmmpanel.com)' : 'e.g. mysmmpanel.com'}
                 value={createForm.domain}
                 onChange={(e) => setCreateForm({ ...createForm, domain: e.target.value })}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 font-mono text-xs bg-white"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 font-mono tabular-nums text-xs bg-white font-medium"
               />
             </div>
 
             {/* 4. API Key */}
             <div>
-              <label className="block font-bold text-slate-700 mb-1">
+              <label className="block font-semibold text-slate-700 mb-1.5">
                 {language === 'vi' ? 'API Key (Key kết nối của panel)' : 'API Key'}
               </label>
               <input
@@ -1212,7 +1235,7 @@ export const PanelsPage: React.FC = () => {
                 placeholder={language === 'vi' ? 'Nhập mã API Key của SMM Panel...' : 'Enter your SMM Panel API Key...'}
                 value={createForm.apiKey}
                 onChange={(e) => setCreateForm({ ...createForm, apiKey: e.target.value })}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-mono text-xs text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 bg-white font-mono tabular-nums text-xs text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
               />
               <p className="text-[10px] text-slate-400 mt-1">
                 {language === 'vi'
@@ -1221,18 +1244,18 @@ export const PanelsPage: React.FC = () => {
               </p>
             </div>
 
-            {/* 5. Ghi Chú */}
-            <div className="p-3 rounded-xl border border-amber-200 bg-amber-50/60 space-y-3">
-              <p className="font-bold text-amber-800">{language === 'vi' ? 'Thông tin tài khoản Admin của Panel' : 'Panel Admin account credentials'}</p>
-              <input type="text" placeholder={language === 'vi' ? 'Tài khoản Admin' : 'Admin username'} value={createForm.adminUsername} onChange={(e) => setCreateForm({ ...createForm, adminUsername: e.target.value })} className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white" />
-              <input type="password" placeholder={language === 'vi' ? 'Mật khẩu Admin' : 'Admin password'} value={createForm.adminPassword} onChange={(e) => setCreateForm({ ...createForm, adminPassword: e.target.value })} className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white" />
-              <input type="text" placeholder={language === 'vi' ? 'Secret 2FA (TOTP)' : '2FA secret (TOTP)'} value={createForm.adminTwoFactorSecret} onChange={(e) => setCreateForm({ ...createForm, adminTwoFactorSecret: e.target.value })} className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-mono" />
+            {/* 5. Ghi Chú / Admin credentials */}
+            <div className="p-4 rounded-2xl border border-amber-200/80 bg-amber-50/50 space-y-2.5">
+              <p className="font-bold text-amber-900">{language === 'vi' ? 'Thông tin tài khoản Admin của Panel' : 'Panel Admin account credentials'}</p>
+              <input type="text" placeholder={language === 'vi' ? 'Tài khoản Admin' : 'Admin username'} value={createForm.adminUsername} onChange={(e) => setCreateForm({ ...createForm, adminUsername: e.target.value })} className="w-full px-3.5 py-2 rounded-xl border border-slate-200/90 bg-white font-medium text-xs" />
+              <input type="password" placeholder={language === 'vi' ? 'Mật khẩu Admin' : 'Admin password'} value={createForm.adminPassword} onChange={(e) => setCreateForm({ ...createForm, adminPassword: e.target.value })} className="w-full px-3.5 py-2 rounded-xl border border-slate-200/90 bg-white font-medium text-xs" />
+              <input type="text" placeholder={language === 'vi' ? 'Secret 2FA (TOTP)' : '2FA secret (TOTP)'} value={createForm.adminTwoFactorSecret} onChange={(e) => setCreateForm({ ...createForm, adminTwoFactorSecret: e.target.value })} className="w-full px-3.5 py-2 rounded-xl border border-slate-200/90 bg-white font-mono tabular-nums text-xs" />
               <p className="text-[10px] text-amber-700">{language === 'vi' ? 'Thông tin nhạy cảm, chỉ dùng cho quản trị viên.' : 'Sensitive information for administrators only.'}</p>
             </div>
 
             {/* 6. Ghi Chú */}
             <div>
-              <label className="block font-bold text-slate-700 mb-1">
+              <label className="block font-semibold text-slate-700 mb-1.5">
                 {language === 'vi' ? 'Ghi chú' : 'Notes'}
               </label>
               <textarea
@@ -1240,26 +1263,27 @@ export const PanelsPage: React.FC = () => {
                 placeholder={language === 'vi' ? 'Ghi chú phục vụ quản lý...' : 'Optional notes...'}
                 value={createForm.notes}
                 onChange={(e) => setCreateForm({ ...createForm, notes: e.target.value })}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 bg-white"
+                className="w-full p-2.5 rounded-xl border border-slate-200/90 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 bg-white text-xs"
               />
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200">
-              <button
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200/90">
+              <Button
                 type="button"
+                variant="secondary"
+                size="sm"
                 onClick={() => setIsCreateModalOpen(false)}
-                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 font-semibold cursor-pointer"
               >
                 {language === 'vi' ? 'Hủy' : 'Cancel'}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
-                disabled={creatingLoading}
-                className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold cursor-pointer shadow-xs flex items-center gap-1.5"
+                variant="primary"
+                size="sm"
+                loading={creatingLoading}
               >
-                {creatingLoading && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
-                <span>{language === 'vi' ? 'Khởi tạo panel' : 'Create panel'}</span>
-              </button>
+                {language === 'vi' ? 'Khởi tạo panel' : 'Create panel'}
+              </Button>
             </div>
           </form>
         </Modal>
