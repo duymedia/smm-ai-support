@@ -37,6 +37,7 @@ interface DashboardLayoutProps {
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, activeTab }) => {
   const {
     user,
+    panels,
     language,
     setLanguage,
     currency,
@@ -71,7 +72,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
       if (!target.closest('#currency-select-container')) {
         setCurrencyDropdownOpen(false);
       }
-      if (!target.closest('#notif-container')) {
+      if (!target.closest('#notif-dropdown-container')) {
         setNotifDropdownOpen(false);
       }
       if (!target.closest('#user-menu-container')) {
@@ -85,9 +86,15 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
   const navItems = [
     { id: 'dashboard', label: t('nav.dashboard'), icon: LayoutDashboard, path: '/dashboard' },
     { id: 'packages', label: t('nav.packages'), icon: Package, path: '/packages', highlight: true },
-    { id: 'subscriptions', label: language === 'vi' ? 'Gói đang thuê' : 'Subscriptions', icon: Repeat, path: '/subscriptions', badge: 'Active' },
-    { id: 'panels', label: t('nav.myPanels'), icon: Server, path: '/panels', badge: '2' },
-    { id: 'dispatch', label: t('nav.dispatch'), icon: Send, path: '/dispatch', badge: 'NCC' },
+    { id: 'subscriptions', label: language === 'vi' ? 'Gói đang thuê' : 'Subscriptions', icon: Repeat, path: '/subscriptions' },
+    { 
+      id: 'panels', 
+      label: t('nav.myPanels'), 
+      icon: Server, 
+      path: '/panels', 
+      badge: panels && panels.length > 0 ? String(panels.length) : undefined 
+    },
+    { id: 'dispatch', label: t('nav.dispatch'), icon: Send, path: '/dispatch' },
     { id: 'add-funds', label: t('nav.addFunds'), icon: CreditCard, path: '/add-funds' },
     { id: 'transactions', label: t('nav.transactions'), icon: History, path: '/transactions' },
     { id: 'support', label: t('nav.support'), icon: LifeBuoy, path: '/support' },
