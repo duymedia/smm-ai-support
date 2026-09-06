@@ -573,8 +573,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeSectio
         </aside>
 
         {/* Content Body */}
-        <main className="flex-1 overflow-y-auto bg-slate-50 min-w-0 bg-dot-matrix">
-          <div className="p-4 sm:p-5 lg:p-6">
+        <main className="flex-1 overflow-y-auto bg-slate-50 min-w-0 bg-dot-matrix relative">
+          <AnimatedBackground variant="admin" intensity="subtle" />
+          <div className="p-4 sm:p-5 lg:p-6 relative z-10">
             {children}
           </div>
         </main>
