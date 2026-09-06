@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { PanelPackage } from '../../types';
 import { AnnouncementMarquee } from '../layout/AnnouncementMarquee';
+import { AnimatedBackground } from '../ui/AnimatedBackground';
 
 export const LandingPage: React.FC = () => {
   const { setCurrentRoute, packages, formatMoney, siteConfig, language, t } = useApp();
@@ -159,10 +160,13 @@ export const LandingPage: React.FC = () => {
 
       {/* HERO SECTION */}
       <section id="hero" className="relative pt-12 pb-20 lg:pt-20 lg:pb-28 overflow-hidden bg-gradient-to-b from-white via-slate-50 to-slate-100/60 border-b border-slate-200/80 scroll-mt-16">
-        {/* Subtle background grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-40 pointer-events-none" />
+        {/* Dynamic Vector SVG Background with cursor parallax */}
+        <AnimatedBackground variant="landing" intensity="normal" position="absolute" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        {/* Subtle background grid pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           {/* Eyebrow badge */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200/80 text-blue-700 text-xs font-semibold mb-6 shadow-2xs">
             <Sparkles className="w-3.5 h-3.5 text-blue-600" />

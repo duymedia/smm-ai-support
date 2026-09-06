@@ -4,12 +4,14 @@ export interface AnimatedBackgroundProps {
   variant?: 'dashboard' | 'admin' | 'landing' | 'auth';
   className?: string;
   intensity?: 'subtle' | 'normal' | 'vibrant';
+  position?: 'fixed' | 'absolute';
 }
 
 export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({
   variant = 'dashboard',
   className = '',
   intensity = 'subtle',
+  position = 'fixed',
 }) => {
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
@@ -88,7 +90,7 @@ export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({
   return (
     <div
       aria-hidden="true"
-      className={`fixed inset-0 pointer-events-none overflow-hidden select-none z-0 ${opacityMap[intensity]} ${className}`}
+      className={`${position} inset-0 pointer-events-none overflow-hidden select-none z-0 ${opacityMap[intensity]} ${className}`}
     >
       <svg
         className="w-full h-full object-cover transition-transform duration-300 ease-out"

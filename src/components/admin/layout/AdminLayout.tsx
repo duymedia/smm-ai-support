@@ -42,6 +42,7 @@ import {
   Check,
   User as UserIcon,
   MessageSquare,
+} from 'lucide-react';
 import { Button } from '../../ui/Button';
 import { Badge } from '../../ui/Badge';
 import { AnimatedBackground } from '../../ui/AnimatedBackground';

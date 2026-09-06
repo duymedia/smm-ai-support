@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Navbar } from '../layout/Navbar';
 import { Zap, Lock, Mail, User as UserIcon, CheckCircle2, ArrowRight, ShieldCheck, Sparkles, KeyRound } from 'lucide-react';
+import { AnimatedBackground } from '../ui/AnimatedBackground';
 
 const GoogleIcon: React.FC<{ className?: string }> = ({ className = 'h-4 w-4 shrink-0' }) => (
   <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
@@ -123,10 +124,11 @@ export const AuthPages: React.FC<AuthPageProps> = ({ mode }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 bg-dot-matrix flex flex-col justify-between">
+    <div className="min-h-screen bg-slate-50 bg-dot-matrix flex flex-col justify-between relative overflow-hidden">
+      <AnimatedBackground variant="auth" intensity="normal" position="fixed" />
       <Navbar />
 
-      <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8 relative z-10">
         <div className="w-full max-w-md glass-card-elevated border border-slate-200/90 shadow-2xl p-6 sm:p-8 relative overflow-hidden animate-in fade-in zoom-in-95 duration-200">
           {/* Mac window header chrome */}
           <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100/90">
@@ -657,7 +659,7 @@ export const AuthPages: React.FC<AuthPageProps> = ({ mode }) => {
         </div>
       </div>
 
-      <div className="text-center py-4 px-4 text-xs text-slate-400 border-t border-slate-200/80 space-y-1">
+      <div className="text-center py-4 px-4 text-xs text-slate-400 border-t border-slate-200/80 space-y-1 relative z-10">
         <div>{language === 'vi' ? 'Kết nối bảo mật • Mã hóa SSL 256-bit' : 'Secure connection • 256-bit SSL encryption'}</div>
         {siteConfig?.footerCopyright && (
           <div
