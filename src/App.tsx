@@ -6,9 +6,6 @@ import { OverviewPage } from './components/dashboard/OverviewPage';
 import { PanelsPage } from './components/panels/PanelsPage';
 import { PanelDetailPage } from './components/panels/PanelDetailPage';
 import { PackagesPage } from './components/packages/PackagesPage';
-import { ServicesPage } from './components/services/ServicesPage';
-import { NewOrderPage } from './components/orders/NewOrderPage';
-import { OrdersHistoryPage } from './components/orders/OrdersHistoryPage';
 import { AddFundsPage } from './components/billing/AddFundsPage';
 import { DispatchConfigPage } from './components/dispatch/DispatchConfigPage';
 import { SubscriptionsPage } from './components/billing/SubscriptionsPage';
@@ -201,12 +198,6 @@ const MainRouter: React.FC = () => {
         <ToastContainer />
       </>
     );
-  } else if (currentRoute === '/new-order' || currentRoute === '/order') {
-    activeTab = 'new-order';
-    content = <NewOrderPage />;
-  } else if (currentRoute === '/orders' || currentRoute === '/order-history') {
-    activeTab = 'orders';
-    content = <OrdersHistoryPage />;
   } else if (currentRoute === '/panels' || currentRoute === '/my-panels') {
     activeTab = 'panels';
     content = <PanelsPage />;
@@ -219,9 +210,6 @@ const MainRouter: React.FC = () => {
   } else if (currentRoute === '/packages' || currentRoute === '/plans') {
     activeTab = 'packages';
     content = <PackagesPage />;
-  } else if (currentRoute === '/services') {
-    activeTab = 'services';
-    content = <ServicesPage />;
   } else if (currentRoute === '/add-funds' || currentRoute === '/deposit' || currentRoute === '/wallet') {
     activeTab = 'billing';
     content = <AddFundsPage />;

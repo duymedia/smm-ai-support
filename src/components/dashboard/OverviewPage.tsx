@@ -128,31 +128,37 @@ export const OverviewPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Welcome & Quick Action Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white/90 backdrop-blur-sm p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.10)]">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-            {t('dashboard.welcomeBack')}, {user?.name || user?.username}
+          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 mb-2">
+            <span className="inline-flex size-4 items-center justify-center rounded-full bg-blue-500/10">
+              <span className="size-2 rounded-full bg-blue-600 animate-pulse" />
+            </span>
+            <span className="tracking-wider uppercase font-mono text-[11px]">NexusSMM Fleet Core</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900">
+            {t('dashboard.welcomeBack')}, <span className="text-blue-600">{user?.name || user?.username}</span>
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-500 mt-1 max-w-xl leading-relaxed">
             {language === 'vi'
-              ? 'Hệ thống vận hành ổn định. Giám sát tự động đơn hàng và kết nối API 24/7 đang hoạt động.'
+              ? 'Hệ thống vận hành mạng lưới storefront ổn định. Giám sát tự động đơn hàng và kết nối API 24/7 đang hoạt động.'
               : 'Fleet operations are running normally. Autonomous monitoring is actively managing your API providers.'}
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 shrink-0">
           <button
             onClick={handleRunGlobalScan}
             disabled={scanningHealth}
-            className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+            className="h-10 px-4 bg-slate-100/80 hover:bg-slate-200/80 text-slate-700 rounded-full text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50 border border-slate-200/60"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${scanningHealth ? 'animate-spin text-blue-600' : 'text-slate-500'}`} />
-            <span>{scanningHealth ? (language === 'vi' ? 'Đang kiểm tra...' : 'Diagnosing...') : (language === 'vi' ? 'Quét sức khỏe hệ thống' : 'System Health Scan')}</span>
+            <span>{scanningHealth ? (language === 'vi' ? 'Đang kiểm tra...' : 'Diagnosing...') : (language === 'vi' ? 'Quét sức khỏe hệ thống' : 'Health Scan')}</span>
           </button>
 
           <button
             onClick={() => setCurrentRoute('/packages')}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs hover:shadow-md shadow-blue-500/20 flex items-center gap-1.5 transition-all cursor-pointer"
+            className="h-10 px-5 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-xs font-bold shadow-xs hover:shadow-md shadow-blue-500/20 flex items-center gap-2 transition-all cursor-pointer"
           >
             <PlusCircle className="w-4 h-4" />
             <span>{t('dashboard.rentNewPanel')}</span>
@@ -619,50 +625,59 @@ export const OverviewPage: React.FC = () => {
         </div>
 
         {/* Right Col: Fleet Operations & Telemetry */}
-        <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-indigo-950 text-white border border-slate-800 shadow-md flex flex-col justify-between space-y-4">
+        <div className="rounded-2xl border border-slate-800 bg-slate-950 text-white shadow-xl overflow-hidden flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between">
-              <span className="flex items-center gap-1.5 text-xs font-bold text-indigo-300">
-                <Zap className="w-4 h-4 text-indigo-400" />
-                Fleet Operations Engine
-              </span>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[10px] font-bold">
-                Online
+            {/* Mac-style traffic lights header */}
+            <div className="flex items-center justify-between border-b border-slate-800 bg-slate-900/80 px-4 py-2.5 backdrop-blur-sm">
+              <div className="flex items-center gap-2">
+                <span className="size-2.5 rounded-full bg-rose-500/80" />
+                <span className="size-2.5 rounded-full bg-yellow-500/80" />
+                <span className="size-2.5 rounded-full bg-emerald-500/80" />
+                <span className="text-[11px] font-mono text-slate-400 ml-2">fleet-engine-core</span>
+              </div>
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" /> Live 24/7
               </span>
             </div>
 
-            <h3 className="text-base font-bold text-white mt-2">
-              {language === 'vi' ? 'Tự Động Hóa Vận Hành 24/7' : 'Autonomous Operations Active'}
-            </h3>
-            <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-              {language === 'vi'
-                ? 'Hệ thống tự động phát hiện lỗi nhà cung cấp, tự động chuyển luồng failover và chạy auto-refill.'
-                : 'System continuously inspects error rates and prevents failed deliveries before customers notice.'}
-            </p>
+            <div className="p-5 space-y-4">
+              <div>
+                <h3 className="text-base font-semibold text-white tracking-tight">
+                  {language === 'vi' ? 'Tự Động Hóa Vận Hành 24/7' : 'Autonomous Operations Active'}
+                </h3>
+                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                  {language === 'vi'
+                    ? 'Hệ thống tự động phát hiện lỗi nhà cung cấp, tự động chuyển luồng failover và chạy auto-refill.'
+                    : 'System continuously inspects error rates and prevents failed deliveries before customers notice.'}
+                </p>
+              </div>
 
-            <div className="mt-4 space-y-2.5 text-xs">
-              <div className="p-2.5 rounded-xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-between">
-                <span className="text-slate-300">FastSMMApi #14 Bridge</span>
-                <span className="text-emerald-400 font-bold">142ms • OK</span>
-              </div>
-              <div className="p-2.5 rounded-xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-between">
-                <span className="text-slate-300">GlobalStream API #08</span>
-                <span className="text-emerald-400 font-bold">198ms • OK</span>
-              </div>
-              <div className="p-2.5 rounded-xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-between">
-                <span className="text-slate-300">Auto-Refill Worker</span>
-                <span className="text-indigo-300 font-semibold">Running (Every 10m)</span>
+              <div className="space-y-2 text-xs font-mono">
+                <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                  <span className="text-slate-300">FastSMMApi #14 Bridge</span>
+                  <span className="text-emerald-400 font-bold">142ms • OK</span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                  <span className="text-slate-300">GlobalStream API #08</span>
+                  <span className="text-emerald-400 font-bold">198ms • OK</span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                  <span className="text-slate-300">Auto-Refill Worker</span>
+                  <span className="text-blue-400 font-semibold">Running (Every 10m)</span>
+                </div>
               </div>
             </div>
           </div>
 
-          <button
-            onClick={() => setCurrentRoute('/support')}
-            className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
-          >
-            <LifeBuoy className="w-4 h-4" />
-            <span>{language === 'vi' ? 'Mở Trung Tâm Hỗ Trợ AI' : 'Open Support Center'}</span>
-          </button>
+          <div className="p-5 pt-0">
+            <button
+              onClick={() => setCurrentRoute('/support')}
+              className="w-full h-10 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <LifeBuoy className="w-4 h-4" />
+              <span>{language === 'vi' ? 'Mở Trung Tâm Hỗ Trợ AI' : 'Open Support Center'}</span>
+            </button>
+          </div>
         </div>
       </div>
 

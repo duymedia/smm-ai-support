@@ -84,13 +84,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
   }, []);
 
   const navItems = [
-    { id: 'new-order', label: language === 'vi' ? 'Tạo đơn hàng' : 'New Order', icon: Zap, path: '/new-order', highlight: true },
-    { id: 'orders', label: language === 'vi' ? 'Quản lý đơn' : 'Orders', icon: History, path: '/orders' },
-    { id: 'services', label: language === 'vi' ? 'Bảng giá dịch vụ' : 'Services', icon: Layers, path: '/services' },
-    { id: 'add-funds', label: language === 'vi' ? 'Nạp tiền ví' : 'Wallet / Deposit', icon: CreditCard, path: '/add-funds' },
     { id: 'dashboard', label: t('nav.dashboard'), icon: LayoutDashboard, path: '/dashboard' },
-    { id: 'packages', label: t('nav.packages'), icon: Package, path: '/packages' },
-    { id: 'subscriptions', label: language === 'vi' ? 'Gói đang thuê' : 'Subscriptions', icon: Repeat, path: '/subscriptions' },
     { 
       id: 'panels', 
       label: t('nav.myPanels'), 
@@ -98,7 +92,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
       path: '/panels', 
       badge: panels && panels.length > 0 ? String(panels.length) : undefined 
     },
+    { id: 'packages', label: t('nav.packages'), icon: Package, path: '/packages', highlight: true },
+    { id: 'subscriptions', label: language === 'vi' ? 'Gói đang thuê' : 'Subscriptions', icon: Repeat, path: '/subscriptions' },
     { id: 'dispatch', label: t('nav.dispatch'), icon: Send, path: '/dispatch' },
+    { id: 'add-funds', label: language === 'vi' ? 'Nạp tiền ví' : 'Wallet / Deposit', icon: CreditCard, path: '/add-funds' },
     { id: 'transactions', label: t('nav.transactions'), icon: History, path: '/transactions' },
     { id: 'support', label: t('nav.support'), icon: LifeBuoy, path: '/support' },
     { id: 'profile', label: t('nav.profile'), icon: UserIcon, path: '/profile' },
