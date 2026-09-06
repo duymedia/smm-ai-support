@@ -235,33 +235,39 @@ export const PanelsPage: React.FC = () => {
       )}
 
       {/* 2. Top Header & Primary Action Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white/90 backdrop-blur-sm p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.10)]">
         <div>
-          <h1 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <span>{language === 'vi' ? 'Quản lý danh sách SMM panels' : 'SMM Panels Management'}</span>
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200/70">
+          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 mb-1.5">
+            <span className="inline-flex size-4 items-center justify-center rounded-full bg-blue-500/10">
+              <span className="size-2 rounded-full bg-blue-600 animate-pulse" />
+            </span>
+            <span className="tracking-wider uppercase font-mono text-[11px]">Fleet Infrastructure</span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900 flex items-center gap-2.5">
+            <span>{language === 'vi' ? 'Quản Lý Danh Sách SMM Panels' : 'SMM Panels Management'}</span>
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200/70 font-mono">
               {panels.length} {language === 'vi' ? 'panel' : 'panels'}
             </span>
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-500 mt-1 max-w-xl leading-relaxed">
             {language === 'vi'
-              ? 'Theo dõi trạng thái, cấu hình tên miền, API key và điều phối đơn hàng của các panel.'
-              : 'Monitor live status, custom domains, API keys, and order dispatch workflows.'}
+              ? 'Theo dõi trạng thái, cấu hình tên miền riêng, xoay API key và điều phối luồng đơn hàng tự động.'
+              : 'Monitor live status, custom domains, API keys, and automated order dispatch workflows.'}
           </p>
         </div>
 
-        <div className="flex items-center flex-wrap gap-2">
+        <div className="flex items-center flex-wrap gap-2.5 shrink-0">
           <button
             onClick={() => setShowDnsModal(true)}
-            className="px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="h-10 px-4 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80 rounded-full text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer"
           >
             <Globe className="w-3.5 h-3.5 text-slate-500" />
-            <span>{language === 'vi' ? 'Cấu hình DNS' : 'DNS Config'}</span>
+            <span>{language === 'vi' ? 'Cấu hình DNS' : 'DNS Guide'}</span>
           </button>
 
           <button
             onClick={handleRentOrAddPanel}
-            className={`px-4 py-2 rounded-xl text-xs font-bold shadow-xs flex items-center gap-1.5 transition-all cursor-pointer ${
+            className={`h-10 px-5 rounded-full text-xs font-bold shadow-xs flex items-center gap-2 transition-all cursor-pointer ${
               hasActivePackage
                 ? 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-md shadow-blue-500/20'
                 : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
@@ -269,7 +275,7 @@ export const PanelsPage: React.FC = () => {
             title={!hasActivePackage ? (language === 'vi' ? 'Cần thuê gói dịch vụ trước' : 'Package required') : undefined}
           >
             {hasActivePackage ? <PlusCircle className="w-4 h-4" /> : <Lock className="w-3.5 h-3.5 text-amber-600" />}
-            <span>{language === 'vi' ? 'Thêm panel mới' : 'Add new panel'}</span>
+            <span>{language === 'vi' ? 'Thêm Panel Mới' : 'Add New Panel'}</span>
           </button>
         </div>
       </div>

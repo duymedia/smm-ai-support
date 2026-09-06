@@ -138,29 +138,30 @@ export const PackagesPage: React.FC = () => {
   return (
     <div className="w-full space-y-6">
       {/* Header Banner */}
-      <div className="w-full py-4 text-center">
-        <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold border border-blue-200">
-          {language === 'vi' ? 'Gói Cơ Sở Hạ Tầng Máy Chủ SMM' : 'Cloud Infrastructure Plans'}
-        </span>
-        <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-2">
+      <div className="w-full py-6 text-center max-w-3xl mx-auto space-y-3">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50/80 text-blue-700 text-xs font-semibold border border-blue-200/80">
+          <span className="size-2 rounded-full bg-blue-600 animate-pulse" />
+          <span>{language === 'vi' ? 'Gói Cơ Sở Hạ Tầng Máy Chủ SMM' : 'Cloud Infrastructure Plans'}</span>
+        </div>
+        <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900">
           {t('packages.title')}
         </h1>
-        <p className="text-xs sm:text-sm text-slate-500 mt-2 max-w-2xl mx-auto">
+        <p className="text-xs sm:text-sm text-slate-500 leading-relaxed max-w-xl mx-auto">
           {t('packages.subtitle')}
         </p>
 
         {/* 7-DAY FREE TRIAL HERO BANNER (KHI BẬT) */}
         {isFreeTrialEnabled && (
-          <div className="mt-6 max-w-4xl mx-auto p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4 text-left">
-            <div className="space-y-1">
-              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[11px] font-bold">
+          <div className="mt-6 max-w-4xl mx-auto p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-blue-900 via-indigo-950 to-slate-950 text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-5 text-left border border-slate-800">
+            <div className="space-y-1.5">
+              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-[11px] font-bold">
                 <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
                 <span>{language === 'vi' ? 'Ưu Đãi Đặc Biệt: Dùng Thử Miễn Phí 7 Ngày' : 'Special Offer: 7-Day Free Trial'}</span>
               </div>
-              <h2 className="text-base sm:text-lg font-black tracking-tight">
+              <h2 className="text-base sm:text-lg font-semibold tracking-tight text-white">
                 {language === 'vi' ? 'Trải Nghiệm Hệ Thống SMM Panel Riêng Biệt 0 VNĐ' : 'Experience Full SMM Panel Infrastructure for $0.00'}
               </h2>
-              <p className="text-xs text-blue-100 leading-relaxed max-w-xl">
+              <p className="text-xs text-slate-300 leading-relaxed max-w-xl">
                 {language === 'vi'
                   ? 'Kích hoạt ngay Panel với đầy đủ tính năng, kết nối 50+ API nhà cung cấp, AI Auto-refill và chẩn đoán SSL trong 7 ngày hoàn toàn miễn phí.'
                   : 'Start your 7-day trial with full feature access, 50+ provider API bridges, AI auto-refills, and SSL diagnostics.'}
@@ -169,7 +170,7 @@ export const PackagesPage: React.FC = () => {
 
             <button
               onClick={() => setTrialModalOpen(true)}
-              className="px-5 py-2.5 rounded-xl bg-white text-blue-700 hover:bg-blue-50 font-extrabold text-xs shadow-md transition-all shrink-0 cursor-pointer"
+              className="h-10 px-5 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md transition-all shrink-0 cursor-pointer"
             >
               {language === 'vi' ? 'Dùng Thử 7 Ngày (0đ)' : 'Start 7-Day Free Trial'}
             </button>
@@ -177,34 +178,36 @@ export const PackagesPage: React.FC = () => {
         )}
 
         {/* Billing Cycle Switcher */}
-        <div className="mt-6 inline-flex items-center rounded-xl bg-white p-1 border border-slate-200 shadow-xs text-xs font-semibold">
-          <button
-            onClick={() => setBillingPeriod('weekly')}
-            className={`px-4 py-2 rounded-lg transition-all cursor-pointer ${
-              billingPeriod === 'weekly' ? 'bg-slate-900 text-white font-bold' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            {t('packages.billingWeekly')}
-          </button>
-          <button
-            onClick={() => setBillingPeriod('monthly')}
-            className={`px-4 py-2 rounded-lg transition-all cursor-pointer ${
-              billingPeriod === 'monthly' ? 'bg-slate-900 text-white font-bold' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            {t('packages.billingMonthly')}
-          </button>
-          <button
-            onClick={() => setBillingPeriod('yearly')}
-            className={`px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-              billingPeriod === 'yearly' ? 'bg-blue-600 text-white font-bold' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <span>{t('packages.billingYearly')}</span>
-            <span className="px-1.5 py-0.5 bg-emerald-500 text-white text-[10px] rounded-full font-bold">
-              {language === 'vi' ? 'Tiết kiệm 20%' : t('common.savePercent')}
-            </span>
-          </button>
+        <div className="pt-2">
+          <div className="inline-flex items-center rounded-full bg-slate-100 p-1 border border-slate-200/80 shadow-2xs text-xs font-semibold">
+            <button
+              onClick={() => setBillingPeriod('weekly')}
+              className={`px-4 py-1.5 rounded-full transition-all cursor-pointer ${
+                billingPeriod === 'weekly' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              {t('packages.billingWeekly')}
+            </button>
+            <button
+              onClick={() => setBillingPeriod('monthly')}
+              className={`px-4 py-1.5 rounded-full transition-all cursor-pointer ${
+                billingPeriod === 'monthly' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              {t('packages.billingMonthly')}
+            </button>
+            <button
+              onClick={() => setBillingPeriod('yearly')}
+              className={`px-4 py-1.5 rounded-full transition-all cursor-pointer flex items-center gap-1.5 ${
+                billingPeriod === 'yearly' ? 'bg-blue-600 text-white font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <span>{t('packages.billingYearly')}</span>
+              <span className="px-1.5 py-0.5 bg-emerald-500 text-white text-[10px] rounded-full font-bold">
+                {language === 'vi' ? 'Tiết kiệm 20%' : t('common.savePercent')}
+              </span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -287,13 +290,14 @@ export const PackagesPage: React.FC = () => {
 
               <button
                 onClick={() => handleOpenRental(pkg)}
-                className={`mt-6 w-full py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+                className={`mt-6 w-full h-11 rounded-full font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-2 ${
                   pkg.isPopular
-                    ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-md'
+                    ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-500/25'
                     : 'bg-slate-900 hover:bg-slate-800 text-white'
                 }`}
               >
-                {t('packages.rentNow')}
+                <span>{t('packages.rentNow')}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
           );
