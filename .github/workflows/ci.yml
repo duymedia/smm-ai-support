@@ -38,9 +38,9 @@ jobs:
         run: npm run build
 
   deploy:
-    name: Deploy to VPS
+    name: Deploy to VPS with Docker
     needs: validate
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
     runs-on: ubuntu-latest
 
     steps:
@@ -54,9 +54,15 @@ jobs:
           script_stop: true
           script: |
             set -e
-            APP_DIR=/var/www/smm-ai-support
 
-            # 1. Tạo thư mục và clone mã nguồn nếu chưa có
+            # 1. Xác định thư mục dự án trên VPS
+            if [ -d "$HOME/smm-ai-support/.git" ] && [ ! -d "/var/www/smm-ai-support/.git" ]; then
+              APP_DIR="$HOME/smm-ai-support"
+            else
+              APP_DIR="/var/www/smm-ai-support"
+            fi
+
+            # 2. Tạo thư mục và clone nếu chưa có
             if [ ! -d "$APP_DIR/.git" ]; then
               echo "[CI/CD] Thư mục dự án chưa tồn tại, đang clone repository..."
               mkdir -p /var/www
@@ -65,30 +71,29 @@ jobs:
 
             cd "$APP_DIR"
 
-            # 2. Cập nhật mã nguồn mới nhất từ branch main
-            echo "[CI/CD] Cập nhật mã nguồn mới nhất..."
-            git fetch origin main
-            git reset --hard origin/main
+            # 3. Cập nhật mã nguồn mới nhất
+            echo "[CI/CD] Pull code mới nhất từ git..."
+            git fetch origin main || git fetch origin master
+            git reset --hard origin/main 2>/dev/null || git reset --hard origin/master
 
-            # 3. Tạo file .env nếu chưa có
+            # 4. Tạo file .env nếu chưa có
             if [ ! -f "$APP_DIR/.env" ]; then
               echo "[CI/CD] Tạo file .env từ .env.example..."
               cp "$APP_DIR/.env.example" "$APP_DIR/.env"
             fi
 
-            # 4. Cài đặt dependencies và build
-            echo "[CI/CD] Cài đặt dependencies và build..."
-            npm install --no-audit --no-fund
-            npx prisma generate
-            npx prisma db push --skip-generate --accept-data-loss
-            npm run build
-
-            # 5. Khởi chạy / Reload bằng PM2
-            if command -v pm2 >/dev/null 2>&1; then
-              echo "[CI/CD] Khởi động ứng dụng qua PM2..."
-              pm2 restart smm-ai-support --update-env || pm2 start dist/server.cjs --name smm-ai-support
-              pm2 save
-            else
-              echo "[CI/CD ERROR] PM2 chưa được cài đặt trên VPS. Chạy: npm install -g pm2"
-              exit 1
+            # 5. Kiểm tra Docker & Docker Compose
+            if ! command -v docker >/dev/null 2>&1; then
+              echo "[CI/CD] Đang cài đặt Docker trên VPS..."
+              curl -fsSL https://get.docker.com | sh
             fi
+
+            # 6. Rebuild và Restart toàn bộ hệ thống bằng Docker Compose
+            echo "[CI/CD] Đang build và khởi chạy containers..."
+            docker compose up -d --build --remove-orphans
+
+            # 7. Dọn dẹp images cũ thừa
+            docker image prune -f
+
+            echo "[CI/CD] ✅ Triển khai Docker thành công! Web đang chạy tại http://$(curl -s ifconfig.me):3000 hoặc http://$(curl -s ifconfig.me)"
+
