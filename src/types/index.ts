@@ -30,26 +30,28 @@ export type PanelStatus = 'active' | 'pending' | 'suspended' | 'maintenance' | '
 export type DispatchMethod = 'ticket' | 'telegram' | 'whatsapp' | 'api';
 
 export interface ProviderTicketItem {
-  id: string;
+  id?: string;
   domain: string; // Domain nhà cung cấp (Perfect Panel)
   username: string; // Tài khoản đăng nhập NCC
   password: string; // Mật khẩu đăng nhập NCC
   category?: string; // Category ID (VD: 18, 1, 10...)
   subcategory?: string; // Subcategory ID (VD: 19, 21, 23...)
   enabled?: boolean;
+  categories?: any[];
+  categoriesTree?: any[];
 }
 
 export interface ProviderTelegramItem {
-  id: string;
+  id?: string;
   domain: string; // Domain nhà cung cấp (VD: smmflare.com, fastsmm.vip...)
   target: string; // @username hoặc SĐT người nhận (VD: @smmflare_support)
   enabled?: boolean;
 }
 
 export interface ProviderWhatsAppItem {
-  id: string;
+  id?: string;
   domain: string; // Domain nhà cung cấp (VD: smmflare.com, fastsmm.vip...)
-  targetType: 'user' | 'group';
+  targetType: 'user' | 'group' | 'invite';
   userPhone?: string; // SĐT người nhận (+84...)
   groupLink?: string; // Link nhóm WhatsApp
   groupId?: string; // Group ID / JID
@@ -93,10 +95,11 @@ export interface ProviderDispatchConfig {
   };
   // 3. WhatsApp (Hỗ trợ cấu hình nhiều Domain NCC khác nhau)
   whatsapp?: {
-    targetType?: 'user' | 'group';
+    targetType?: 'user' | 'group' | 'invite';
     gatewayUrl?: string;
     apiKey?: string;
     instanceId?: string;
+    defaultMessage?: string;
     userPhone?: string;
     recipientPhone?: string;
     groupLink?: string;
@@ -235,7 +238,9 @@ export interface Transaction {
   id: string | number;
   code?: string;
   userId: string;
-  date: string;
+  date?: string;
+  createdAt?: string;
+  updatedAt?: string;
   description: string;
   type: TransactionType;
   amount: number; // positive for deposit, negative for purchase/sub/renewal
@@ -244,6 +249,8 @@ export interface Transaction {
   status: TransactionStatus;
   paymentMethod?: string;
   referenceCode?: string;
+  fee?: number;
+  currency?: string;
 }
 
 export type TicketPriority = 'low' | 'normal' | 'high' | 'urgent';

@@ -1801,7 +1801,7 @@ export const DispatchConfigPage: React.FC = () => {
                       )}
                       <button
                         type="button"
-                        onClick={handleCheckTelegramAuth}
+                        onClick={() => handleCheckTelegramAuth()}
                         title="Kiểm tra lại trạng thái phiên"
                         className="p-1 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
                       >

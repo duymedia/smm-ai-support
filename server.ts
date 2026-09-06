@@ -1105,8 +1105,11 @@ async function startServer() {
           currentUser = {
             ...currentUser,
             ...safeUser,
+            id: String(safeUser.id),
+            createdAt: safeUser.createdAt.toISOString(),
+            lastLoginAt: safeUser.lastLoginAt?.toISOString() || new Date().toISOString(),
             balance: Number(safeUser.balance),
-          };
+          } as any;
           return res.json({
             success: true,
             data: {
@@ -1806,7 +1809,7 @@ async function startServer() {
           id: r.id,
           panelId: r.panelId,
           panelName: r.panel?.name || `Panel #${r.panelId}`,
-          panelDomain: r.panel?.customDomain || r.panel?.domain || "",
+          panelDomain: (r.panel as any)?.customDomain || r.panel?.domain || "",
           panelStatus: r.panel?.status || "active",
           user: r.panel?.user || null,
           enabled: r.enabled,
@@ -2417,19 +2420,20 @@ async function startServer() {
       });
       if (!row) return res.status(404).json({ success: false, message: "Panel not found" });
 
-      const newAutoRenew = !row.autoRenew;
+      const currentStatus = row.status === "active";
+      const newStatus = currentStatus ? "paused" : "active";
       await prisma.panel.update({
         where: { id: row.id },
-        data: { autoRenew: newAutoRenew },
+        data: { status: newStatus },
       });
 
       res.json({
         success: true,
-        data: { ...formatDbPanel(row), autoRenew: newAutoRenew },
+        data: { ...formatDbPanel(row), status: newStatus, autoRenew: newStatus === "active" },
         message: locMsg(
           req,
-          `Đã ${newAutoRenew ? 'BẬT' : 'TẮT'} tự động gia hạn cho ${row.name}.`,
-          `Auto-renewal is now ${newAutoRenew ? 'ENABLED' : 'DISABLED'} for ${row.name}.`
+          `Đã cập nhật trạng thái cho ${row.name}.`,
+          `Updated status for ${row.name}.`
         ),
       });
     } catch (e: any) {

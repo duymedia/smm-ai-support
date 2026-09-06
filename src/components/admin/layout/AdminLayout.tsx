@@ -88,20 +88,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeSectio
 
   // Close dropdowns on click outside
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (!target.closest('#admin-currency-select-container')) {
-        setCurrencyDropdownOpen(false);
-      }
-      if (!target.closest('#admin-lang-select-container')) {
-        setLangDropdownOpen(false);
-      }
-      if (!target.closest('#admin-user-menu-container')) {
-        setUserDropdownOpen(false);
-      }
-    };
-    const target = (e: MouseEvent) => e.target as HTMLElement;
     const clickHandler = (e: MouseEvent) => {
       const el = e.target as HTMLElement;
+      if (!el || !el.closest) return;
       if (!el.closest('#admin-currency-select-container')) setCurrencyDropdownOpen(false);
       if (!el.closest('#admin-lang-select-container')) setLangDropdownOpen(false);
       if (!el.closest('#admin-user-menu-container')) setUserDropdownOpen(false);
