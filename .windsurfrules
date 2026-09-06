@@ -1,38 +1,23 @@
-# Frontend Design Skills — Windsurf Rules
-# This file makes skills discoverable in Windsurf.
-# For detailed skill usage, see individual SKILL.md files.
+# Open-Design Mandatory Frontend Standards (nexu-io/open-design)
 
-## Available Skills
+All frontend design and implementation in this project MUST strictly follow the Open-Design system:
 
-### Core Design
-- Use `skills-src/ui-design/SKILL.md` for layout, grids, visual hierarchy, components, whitespace
-- Use `skills-src/ux-design/SKILL.md` for user research, information architecture, interaction patterns
+1. **Design System & Aesthetics**:
+   - Reference archetypes: Linear App, Cloudflare Console, Stripe, Trading Terminal.
+   - Dot-matrix subtle canvas texture: `bg-[radial-gradient(circle,rgba(15,23,42,0.06)_1px,transparent_1px)] [background-size:28px_28px]`.
+   - Glassmorphic card surfaces: `rounded-2xl border border-slate-200/80 bg-white/90 backdrop-blur-sm shadow-[0_18px_40px_-28px_rgba(15,23,42,0.10)]`.
+   - Mac window header chrome for telemetry/fleet engine modules.
 
-### Typography, Color & Accessibility
-- Use `skills-src/web-typography/SKILL.md` for font selection, pairing, fluid typography, scales
-- Use `skills-src/color-theory/SKILL.md` for color schemes, 60-30-10, contrast, dark mode
-- Use `skills-src/accessibility/SKILL.md` for WCAG, BFSG, semantic HTML, ARIA, keyboard nav
+2. **Typography & Numbers**:
+   - UI typography: Clean sentence-case Sans (`Inter` / system-ui).
+   - Financial & Telemetry: Monospace tabular numbers (`font-mono tabular-nums`) for currency, rates, IDs, and latency.
 
-### Implementation
-- Use `skills-src/usability/SKILL.md` for heuristic evaluation, form design, conversion
-- Use `skills-src/responsive-design/SKILL.md` for mobile-first, breakpoints, fluid grids
-- Use `skills-src/navigation-design/SKILL.md` for menu patterns, breadcrumbs, IA
-- Use `skills-src/images-media/SKILL.md` for image optimization, WebP/AVIF, SVG, lazy loading
-- Use `skills-src/branding-identity/SKILL.md` for brand strategy, corporate design, tone of voice
+3. **Buttons & Controls**:
+   - Primary and secondary buttons MUST use `rounded-full` (Pill buttons) with minimum height >= 40px.
+   - Status indicators MUST use pill badges (`rounded-full`) with live pulsing LED dots.
 
-### Strategy & Process
-- Use `skills-src/customer-journey/SKILL.md` for personas, touchpoints, onboarding
-- Use `skills-src/design-process/SKILL.md` for briefing, wireframing, prototyping, handoff
-- Use `skills-src/ai-design-workflow/SKILL.md` for AI integration in design workflow
-- Use `skills-src/landing-pages/SKILL.md` for conversion structure, CTAs, A/B testing
-- Use `skills-src/website-audit/SKILL.md` for site analysis, relaunch planning, SEO migration
-
-### Trends & Modern Patterns
-- Use `skills-src/design-trends/SKILL.md` for current award-winning patterns, motion, trends
-- Use `skills-src/ui-patterns/SKILL.md` for hero, cards, navigation, pricing, testimonials
-- Use `skills-src/visual-direction/SKILL.md` for color/typography/layout trend intelligence
-- Use `skills-src/component-patterns/SKILL.md` for compound components, design tokens, theming
-- Use `skills-src/agent-ui-design/SKILL.md` for chat interfaces, streaming UI, agent UX
-
-### Design Review
-- Use `skills-src/webdesign-review/SKILL.md` for comprehensive design review (orchestrates all skills)
+4. **Strict Anti-Cliché Rules**:
+   - NO generic SaaS AI template cards with 32px borders.
+   - NO decorative purple gradients or blurry blobs.
+   - NO div soup; use semantic HTML elements.
+   - All interactive elements MUST have visible keyboard focus (`focus-visible:ring-2`).
