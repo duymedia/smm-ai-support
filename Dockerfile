@@ -1,46 +1,25 @@
-# syntax=docker/dockerfile:1
-FROM node:20-slim AS builder
-
-WORKDIR /app
-
-# Cài đặt OpenSSL cần thiết cho Prisma Client
-RUN apt-get update -y && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
-
-# Copy package files
-COPY package*.json ./
-COPY prisma ./prisma/
-
-# Cài đặt toàn bộ dependencies và generate prisma client
-RUN npm install --no-audit --no-fund
-RUN npx prisma generate
-
-# Copy toàn bộ source code
-COPY . .
-
-# Build Vite frontend & Node backend bundle vào dist/
-RUN npm run build
-
-# ==================== RUNTIME STAGE ====================
-FROM node:20-slim AS runner
+FROM node:20-slim
 
 WORKDIR /app
 
 ENV NODE_ENV=production
 ENV PORT=3000
 
+# Cài đặt OpenSSL cho Prisma
 RUN apt-get update -y && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 
+# Copy package và schema prisma
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Cài đặt production dependencies & prisma client
-RUN npm install --omit=dev --no-audit --no-fund
+# Cài dependencies và tạo Prisma Client
+RUN npm install --no-audit --no-fund
 RUN npx prisma generate
 
-# Copy artifact build từ builder stage
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/database.sql ./database.sql
+# Copy mã nguồn và build
+COPY . .
+RUN npm run build
 
 EXPOSE 3000
 
-CMD ["node", "dist/server.cjs"]
+CMD ["sh", "-c", "npx prisma db push --skip-generate --accept-data-loss && node dist/server.cjs"]

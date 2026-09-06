@@ -95,5 +95,5 @@ jobs:
             # 7. Dọn dẹp images cũ thừa
             docker image prune -f
 
-            echo "[CI/CD] ✅ Triển khai Docker thành công! Web đang chạy tại http://$(curl -s ifconfig.me):3000 hoặc http://$(curl -s ifconfig.me)"
+            echo "[CI/CD] ✅ Triển khai Docker thành công!"
 
